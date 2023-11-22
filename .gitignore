@@ -1,0 +1,6 @@
+*.zip
+old*
+bin/
+*.class
+.idea/
+qodana.yml
