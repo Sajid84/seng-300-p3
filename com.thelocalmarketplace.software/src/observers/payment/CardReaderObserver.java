@@ -34,4 +34,22 @@ public class CardReaderObserver extends AbstractDeviceObserver implements CardRe
 		this.ref.notifyCardSwipe(data);
 	}
 
+	@Override
+	public void aCardHasBeenInserted() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void theCardHasBeenRemoved() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void aCardHasBeenTapped() {
+		// TODO Auto-generated method stub
+
+	}
+
 }
