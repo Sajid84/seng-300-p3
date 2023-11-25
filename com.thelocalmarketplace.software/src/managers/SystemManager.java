@@ -52,11 +52,13 @@ public class SystemManager implements ISystemManager, IPaymentManager, IOrderMan
 	// object ownership
 	protected PaymentManager pm;
 	protected OrderManager om;
+	protected AttendantManager am;
 
 	// vars
 	protected SessionStatus state;
 	protected CardIssuer issuer;
 	protected Map<String, List<Pair<Long, Double>>> records;
+	protected boolean disabledRequest = false;
 
 	/**
 	 * This object is responsible for the needs of the customer. This is how the
@@ -84,6 +86,7 @@ public class SystemManager implements ISystemManager, IPaymentManager, IOrderMan
 		// creating the managers
 		this.pm = new PaymentManager(this, issuer);
 		this.om = new OrderManager(this, leniency);
+		this.am = new AttendantManager(this);
 	}
 
 	@Override
@@ -300,7 +303,7 @@ public class SystemManager implements ISystemManager, IPaymentManager, IOrderMan
 
 	@Override
 	public void notifyAttendant(String reason) {
-		System.out.printf("[ATTENDANT NOTIFY]: %s\n", reason);
+		am.notifyAttendant(reason);
 	}
 
 	@Override
@@ -327,31 +330,73 @@ public class SystemManager implements ISystemManager, IPaymentManager, IOrderMan
 
 	@Override
 	public void signalForAttendant() {
-		// TODO Auto-generated method stub
-		
+		am.signalForAttendant();
 	}
 
 	@Override
 	public void maintainBanknotes() {
-		// TODO Auto-generated method stub
-		
+		am.maintainBanknotes();
 	}
 
 	@Override
 	public void maintainPaper() {
-		// TODO Auto-generated method stub
-		
+		am.maintainPaper();
 	}
 
 	@Override
 	public void maintainCoins() {
-		// TODO Auto-generated method stub
-		
+		am.maintainCoins();
 	}
 
 	@Override
 	public void maintainInk() {
-		// TODO Auto-generated method stub
-		
+		am.maintainInk();
+	}
+
+	@Override
+	public boolean isBlocked() {
+		return getState() == SessionStatus.BLOCKED;
+	}
+
+	@Override
+	public boolean isUnblocked() {
+		return getState() != SessionStatus.BLOCKED;
+	}
+
+	@Override
+	public boolean isPaid() {
+		return getState() == SessionStatus.PAID;
+	}
+
+	@Override
+	public void disableMachine() {
+		// TODO make this method actually do something
+		if (disabledRequest) {
+			setState(SessionStatus.DISABLED);
+		}
+
+		notifyAttendant("Machine was disabled");
+	}
+
+	@Override
+	public void enableMachine() {
+		// TODO make this method actually do something
+		notifyAttendant("Machine was enabled");
+	}
+
+	@Override
+	public void requestDisableMachine() {
+		disabledRequest = false;
+	}
+
+	@Override
+	public void requestEnableMachine() {
+		if (isDisabled())
+			disabledRequest = true;
+	}
+
+	@Override
+	public boolean isDisabled() {
+		return getState() == SessionStatus.DISABLED;
 	}
 }

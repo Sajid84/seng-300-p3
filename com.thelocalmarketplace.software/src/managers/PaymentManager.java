@@ -488,4 +488,24 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 		return hasInk && hasPaper;
 	}
 
+	@Override
+	public boolean isBlocked() {
+		return sm.isBlocked();
+	}
+
+	@Override
+	public boolean isUnblocked() {
+		return sm.isUnblocked();
+	}
+
+	@Override
+	public boolean isPaid() {
+		return sm.isPaid();
+	}
+
+	@Override
+	public boolean isDisabled() {
+		return sm.isDisabled();
+	}
+
 }

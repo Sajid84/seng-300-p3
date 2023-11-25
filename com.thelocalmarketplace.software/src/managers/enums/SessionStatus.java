@@ -6,5 +6,6 @@ package managers.enums;
 public enum SessionStatus {
 	NORMAL,
 	BLOCKED,
-	PAID
+	PAID,
+	DISABLED
 }

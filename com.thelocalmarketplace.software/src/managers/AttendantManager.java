@@ -20,8 +20,8 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 			throw new IllegalArgumentException("the system manager cannot be null");
 		}
 
+		// copying the system manager
 		this.sm = sm;
-
 	}
 
 	@Override
@@ -34,20 +34,17 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 	@Override
 	public SessionStatus getState() {
-		// TODO Auto-generated method stub
-		return null;
+		return sm.getState();
 	}
 
 	@Override
 	public void blockSession() {
-		// TODO Auto-generated method stub
-
+		sm.blockSession();
 	}
 
 	@Override
 	public void unblockSession() {
-		// TODO Auto-generated method stub
-
+		sm.unblockSession();
 	}
 
 	@Override
@@ -64,8 +61,8 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 	@Override
 	public void notifyAttendant(String reason) {
-		// TODO Auto-generated method stub
-
+		// TODO replace this with a GUI
+		System.out.printf("[ATTENDANT NOTIFY]: %s\n", reason);
 	}
 
 	@Override
@@ -130,20 +127,32 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 	@Override
 	public boolean isBlocked() {
-		// TODO Auto-generated method stub
-		return false;
+		return sm.isBlocked();
 	}
 
 	@Override
 	public boolean isUnblocked() {
-		// TODO Auto-generated method stub
-		return false;
+		return sm.isUnblocked();
 	}
 
 	@Override
 	public boolean isPaid() {
-		// TODO Auto-generated method stub
-		return false;
+		return sm.isPaid();
+	}
+
+	@Override
+	public void requestDisableMachine() {
+		sm.requestDisableMachine();
+	}
+
+	@Override
+	public void requestEnableMachine() {
+		sm.requestEnableMachine();
+	}
+
+	@Override
+	public boolean isDisabled() {
+		return sm.isDisabled();
 	}
 
 }

@@ -457,8 +457,8 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 				unblockSession();
 			}
 			break;
-		case PAID:
-			throw new IllegalStateException("cannot check weight difference when in state PAID");
+		default:
+			throw new IllegalStateException("cannot check weight difference not blocked nor normal");
 		}
 	}
 
@@ -479,6 +479,26 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 	@Override
 	public boolean isScaleOverloaded() {
 		return overloadedScales.size() > 0;
+	}
+
+	@Override
+	public boolean isBlocked() {
+		return sm.isBlocked();
+	}
+
+	@Override
+	public boolean isUnblocked() {
+		return sm.isUnblocked();
+	}
+
+	@Override
+	public boolean isPaid() {
+		return sm.isPaid();
+	}
+
+	@Override
+	public boolean isDisabled() {
+		return sm.isDisabled();
 	}
 
 }
