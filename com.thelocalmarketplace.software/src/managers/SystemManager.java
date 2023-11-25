@@ -28,6 +28,7 @@ import ca.ucalgary.seng300.simulation.NullPointerSimulationException;
 import managers.enums.PaymentType;
 import managers.enums.ScanType;
 import managers.enums.SessionStatus;
+import managers.interfaces.IAttendantManager;
 import managers.interfaces.IOrderManager;
 import managers.interfaces.IPaymentManager;
 import managers.interfaces.ISystemManager;
@@ -41,7 +42,7 @@ import utils.Pair;
  * This delegates all functionality (with some exceptions) to the other manager
  * classes.
  */
-public class SystemManager implements ISystemManager, IPaymentManager, IOrderManager {
+public class SystemManager implements ISystemManager, IPaymentManager, IOrderManager, IAttendantManager {
 
 	// hardware references
 	protected AbstractSelfCheckoutStation machine;
@@ -322,5 +323,35 @@ public class SystemManager implements ISystemManager, IPaymentManager, IOrderMan
 	@Override
 	public boolean isScaleOverloaded() {
 		return om.isScaleOverloaded();
+	}
+
+	@Override
+	public void signalForAttendant() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void maintainBanknotes() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void maintainPaper() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void maintainCoins() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void maintainInk() {
+		// TODO Auto-generated method stub
+		
 	}
 }

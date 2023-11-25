@@ -35,6 +35,27 @@ public interface IManager extends IManagerNotify {
 	void unblockSession();
 
 	/**
+	 * This method returns true if the session is blocked, false otherwise.
+	 * 
+	 * @return
+	 */
+	boolean isBlocked();
+
+	/**
+	 * This method returns true if the session is not blocked, false otherwise.
+	 * 
+	 * @return
+	 */
+	boolean isUnblocked();
+
+	/**
+	 * This method returns true if the session is paid, false otherwise.
+	 * 
+	 * @return
+	 */
+	boolean isPaid();
+
+	/**
 	 * This function tests whether or not the system can be used based on the states
 	 * of the components of the machine.
 	 * 
