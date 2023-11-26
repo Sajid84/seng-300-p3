@@ -87,7 +87,7 @@ public class CardHelper {
 				String number = String.valueOf(r.nextLong(1, 1_000_000_000));
 
 				// creating the card object
-				Card card = new Card("debit", number, holder, ccv);
+				Card card = new Card("debit", number, holder, ccv, "111", true, true);
 
 				// adding the card to the issuer
 				issuer.addCardData(number, holder, expiry, ccv, limit);
@@ -127,7 +127,7 @@ public class CardHelper {
 		String number = String.valueOf(r.nextLong(1, 1_000_000_000));
 
 		// creating the card object
-		Card card = new Card("debit", number, holder, ccv);
+		Card card = new Card("debit", number, holder, ccv, "111", true, true);
 
 		// returning the card to the caller
 		return card;
