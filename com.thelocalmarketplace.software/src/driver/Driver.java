@@ -8,13 +8,13 @@
 package driver;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
 
 import javax.naming.OperationNotSupportedException;
+import javax.swing.*;
 
 import com.jjjwelectronics.Item;
 import com.jjjwelectronics.OverloadedDevice;
@@ -38,111 +38,106 @@ import utils.DriverHelper;
 
 public class Driver {
 
-	// hardware references
-	protected AbstractSelfCheckoutStation machine;
+    // hardware references
+    protected AbstractSelfCheckoutStation machine;
 
-	// object references
-	protected static Scanner scanner = new Scanner(System.in);
+    // object references
+    protected static Scanner scanner = new Scanner(System.in);
 
-	// object ownership
-	protected SystemManager system;
-	protected CardIssuer cardIssuer;
+    // object ownership
+    protected SystemManager system;
+    protected CardIssuer cardIssuer;
 
-	// vars
-	protected List<Item> items;
-	protected BigDecimal leniency = BigDecimal.ONE;
-	protected Card card;
+    // vars
+    protected List<Item> items;
+    protected BigDecimal leniency = BigDecimal.ONE;
+    protected Card card;
 
-	// denominations
-	protected final BigDecimal[] coinDenominations = new BigDecimal[] { new BigDecimal(0.01), new BigDecimal(0.05),
-			new BigDecimal(0.10), new BigDecimal(0.25), new BigDecimal(1), new BigDecimal(2) };
-	protected final BigDecimal[] banknoteDenominations = new BigDecimal[] { new BigDecimal(5), new BigDecimal(10),
-			new BigDecimal(20), new BigDecimal(50) };
+    // denominations
+    protected final BigDecimal[] coinDenominations = new BigDecimal[]{new BigDecimal(0.01), new BigDecimal(0.05),
+            new BigDecimal(0.10), new BigDecimal(0.25), new BigDecimal(1), new BigDecimal(2)};
+    protected final BigDecimal[] banknoteDenominations = new BigDecimal[]{new BigDecimal(5), new BigDecimal(10),
+            new BigDecimal(20), new BigDecimal(50)};
 
-	public Driver(SelfCheckoutTypes type) {
-		// configuring the machine (need to do this before we initialize it)
-		DriverHelper.configureMachine(coinDenominations, banknoteDenominations, 100, 1000);
+    public Driver(SelfCheckoutTypes type) {
+        // configuring the machine (need to do this before we initialize it)
+        DriverHelper.configureMachine(coinDenominations, banknoteDenominations, 100, 1000);
 
-		// create the machine itself
-		this.machine = DriverHelper.createMachine(type);
+        // create the machine itself
+        this.machine = DriverHelper.createMachine(type);
 
-		// creating the vars for the system manager
-		cardIssuer = CardHelper.createCardIssuer();
-		card = CardHelper.createCard(cardIssuer);
+        // creating the vars for the system manager
+        cardIssuer = CardHelper.createCardIssuer();
+        card = CardHelper.createCard(cardIssuer);
 
-		// creating the system manager
-		this.system = new SystemManager(cardIssuer, leniency);
-	}
+        // creating the system manager
+        this.system = new SystemManager(cardIssuer, leniency);
+    }
 
-	protected void setup() {
-		// configuring the system
-		this.system.configure(this.machine);
+    protected void setup() {
+        // configuring the system
+        this.system.configure(this.machine);
 
-		// so that no power surges happen
-		PowerGrid.engageUninterruptiblePowerSource();
+        // so that no power surges happen
+        PowerGrid.engageUninterruptiblePowerSource();
 
-		// plug in and turn on the machine
-		this.machine.plugIn(PowerGrid.instance());
-		this.machine.turnOn();
+        // TODO replace with java swing implementation
+        JFrame main = machine.screen.getFrame();
 
-		// creating list of items
-		this.items = new ArrayList<Item>();
+        main.setSize(600, 400);
+        main.setContentPane(new SystemManagerForm().root);
+        main.pack();
 
-		// loading the coin dispensers
-		for (int i = 0; i < coinDenominations.length; ++i) {
-			ICoinDispenser cd = machine.coinDispensers.get(coinDenominations[i]);
-			for (int j = 0; j < cd.getCapacity(); ++j) {
-				try {
-					cd.load(new Coin(coinDenominations[i]));
-				} catch (SimulationException | CashOverloadException e) {
-					// shouldn't happen
-				}
-			}
-		}
+        // plug in and turn on the machine
+        this.machine.plugIn(PowerGrid.instance());
+        this.machine.turnOn();
 
-		// loading the banknote dispensers
-		for (int i = 0; i < banknoteDenominations.length; ++i) {
-			IBanknoteDispenser abd = machine.banknoteDispensers.get(banknoteDenominations[i]);
-			for (int j = 0; j < abd.getCapacity(); ++j) {
-				try {
-					abd.load(new Banknote(Currency.getInstance(Locale.CANADA), banknoteDenominations[i]));
-				} catch (SimulationException | CashOverloadException e) {
-					// shouldn't happen
-				}
-			}
-		}
+        main.setVisible(true);
 
-		// adding paper and ink to the printer
-		try {
-			machine.printer.addInk(1 << 20);
-			machine.printer.addPaper(1 << 10);
-		} catch (OverloadedDevice e) {
-			// shouldn't happen
-		}
-	}
+        // loading the coin dispensers
+        for (BigDecimal coinDenomination : coinDenominations) {
+            ICoinDispenser cd = machine.coinDispensers.get(coinDenomination);
+            for (int j = 0; j < cd.getCapacity(); ++j) {
+                try {
+                    cd.load(new Coin(coinDenomination));
+                } catch (SimulationException | CashOverloadException e) {
+                    // shouldn't happen
+                }
+            }
+        }
 
-	/*
-	 * Main method of program
-	 */
-	public static void main(String[] args) throws OperationNotSupportedException {
-		// create driver class
-		Driver d = new Driver(DriverHelper.chooseMachineType());
+        // loading the banknote dispensers
+        for (BigDecimal banknoteDenomination : banknoteDenominations) {
+            IBanknoteDispenser abd = machine.banknoteDispensers.get(banknoteDenomination);
+            for (int j = 0; j < abd.getCapacity(); ++j) {
+                try {
+                    abd.load(new Banknote(Currency.getInstance(Locale.CANADA), banknoteDenomination));
+                } catch (SimulationException | CashOverloadException e) {
+                    // shouldn't happen
+                }
+            }
+        }
 
-		// setup driver class
-		d.setup();
+        // adding paper and ink to the printer
+        try {
+            machine.printer.addInk(1 << 20);
+            machine.printer.addPaper(1 << 10);
+        } catch (OverloadedDevice e) {
+            // shouldn't happen
+        }
+    }
 
-		// logging the state of the system
-		if (!d.system.ready()) {
-			d.system.notifyAttendant(
-					"not all of the device components are setup correctly,\n\tthis might cause issues during the use of this system");
-		}
+    /*
+     * Main method of program
+     */
+    public static void main(String[] args) {
+        // create driver class
+        Driver d = new Driver(DriverHelper.chooseMachineType());
 
-		// TODO replace with java swing implementation
+        // setup driver class
+        d.setup();
 
-		// posting the credit card transactions
-		d.system.postTransactions();
-
-		// exiting
-		System.exit(0);
-	}
+        // posting the credit card transactions
+        d.system.postTransactions();
+    }
 }
