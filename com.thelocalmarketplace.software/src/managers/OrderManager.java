@@ -183,20 +183,7 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 
             // calculating the price for a plu coded item
             if (i instanceof PLUCodedItem) {
-                // getting the corresponding product
-                PLUCodedProduct prod = DatabaseHelper.get((PLUCodedItem) i);
-
-                // getting the price
-                BigDecimal price = new BigDecimal(prod.getPrice());
-
-                // scaling mass up to kilograms
-                BigDecimal scale = i.getMass().inGrams().divide(BigDecimal.valueOf(1_000), RoundingMode.DOWN);
-
-                // multiplying mass by kilograms
-                price = price.multiply(scale);
-
-                // adding the price
-                total = total.add(price);
+				total = total.add(priceOf((PLUCodedItem) i));
                 continue;
             }
 
@@ -273,49 +260,29 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 	 * Removes the specified item from the order, purging it from the list. Informs
 	 * all listeners of this event. If the item cannot be found, or is null, then
 	 * customer is displayed an error message.
-	 *
-	 * @throws OperationNotSupportedException
 	 */
 	@Override
-	public void removeItemFromOrder(Item item) throws OperationNotSupportedException {
+	public void removeItemFromOrder(Item item) {
 		if (item == null) {
 			throw new IllegalArgumentException("tried to remove a null item from the bagging area");
 		}
 
-		if (item instanceof BarcodedItem) {
-			this.removeItemFromOrder((BarcodedItem) item);
-		}
+		/**
+		 * functionally, there is no difference between removing a barcoded item
+		 * and a PLU coded item. nor would I suspect a difference from removing
+		 * any other kind of item
+		 */
 
-		else if (item instanceof PLUCodedItem) {
-			this.removeItemFromOrder((PLUCodedItem) item);
+		// removing the item from the map
+		if (this.items.remove(item)) {
+			for (IOrderManagerNotify listener : listeners) {
+				listener.onItemRemovedFromOrder(item);
+			}
 		}
 
 		// removing the item from the bagging area
 		// this function needs to be here to work with the bags too heavy use case
 		this.machine.baggingArea.removeAnItem(item);
-	}
-
-	/**
-	 * This removes a {@link BarcodedItem} from the order and the bagging area.
-	 *
-	 * @param item the {@link BarcodedItem} to remove
-	 */
-	protected void removeItemFromOrder(BarcodedItem item) {
-		// removing
-        if (this.items.remove(item)) {
-            for (IOrderManagerNotify listener : listeners) {
-                listener.onItemRemovedFromOrder(item);
-            }
-        }
-	}
-
-	/**
-	 * This removes a {@link PLUCodedItem} from the order and the bagging area.
-	 *
-	 * @param item the {@link PLUCodedItem} to remove
-	 */
-	protected void removeItemFromOrder(PLUCodedItem item) throws OperationNotSupportedException {
-		throw new OperationNotSupportedException("removing PLU coded items is not supported yet");
 	}
 
 	/**
@@ -452,6 +419,21 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 	@Override
 	public boolean wasBarcodeScanned() {
 		return barcodeScanned;
+	}
+
+	@Override
+	public BigDecimal priceOf(PLUCodedItem item) {
+		// getting the corresponding product
+		PLUCodedProduct prod = DatabaseHelper.get(item);
+
+		// getting the price
+		BigDecimal price = new BigDecimal(prod.getPrice());
+
+		// scaling mass up to kilograms
+		BigDecimal scale = item.getMass().inGrams().divide(BigDecimal.valueOf(1_000), RoundingMode.DOWN);
+
+		// multiplying mass by kilograms
+		return price.multiply(scale);
 	}
 
 	@Override

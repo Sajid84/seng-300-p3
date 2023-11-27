@@ -10,6 +10,7 @@ import com.jjjwelectronics.scale.IElectronicScale;
 import com.jjjwelectronics.scanner.Barcode;
 import com.jjjwelectronics.scanner.BarcodedItem;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
+import com.thelocalmarketplace.hardware.PLUCodedItem;
 import managers.enums.ScanType;
 
 import javax.naming.OperationNotSupportedException;
@@ -96,4 +97,12 @@ public interface IOrderManager extends IManager {
      * @return true if a barcode was scanned, false if not
      */
     boolean wasBarcodeScanned();
+
+    /**
+     * This calculates the price of a PLU coded item.
+     *
+     * @param item the PLU coded item
+     * @return the price by kilogram
+     */
+    BigDecimal priceOf(PLUCodedItem item);
 }

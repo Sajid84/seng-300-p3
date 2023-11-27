@@ -14,9 +14,11 @@ import java.util.Collections;
 import java.util.List;
 
 import com.jjjwelectronics.EmptyDevice;
+import com.jjjwelectronics.Item;
 import com.jjjwelectronics.OverloadedDevice;
 import com.jjjwelectronics.card.Card;
 import com.jjjwelectronics.card.Card.CardData;
+import com.jjjwelectronics.scanner.BarcodedItem;
 import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
 import com.tdc.NoCashAvailableException;
@@ -24,9 +26,7 @@ import com.tdc.banknote.Banknote;
 import com.tdc.banknote.IBanknoteDispenser;
 import com.tdc.coin.Coin;
 import com.tdc.coin.ICoinDispenser;
-import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
-import com.thelocalmarketplace.hardware.BarcodedProduct;
-import com.thelocalmarketplace.hardware.Product;
+import com.thelocalmarketplace.hardware.*;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
 
 import managers.enums.PaymentType;
@@ -37,6 +37,7 @@ import observers.payment.BanknoteCollector;
 import observers.payment.CardReaderObserver;
 import observers.payment.CoinCollector;
 import observers.payment.ReceiptPrinterObserver;
+import utils.DatabaseHelper;
 
 public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 
@@ -402,18 +403,25 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 		// printing the receipt
 		try {
 			printLine("----- Receipt -----\n");
-			for (Product product : sm.getItems()) {
+			for (Item item : sm.getItems().keySet()) {
 				// printing the item
-				if (product instanceof BarcodedProduct) {
-					BarcodedProduct p = (BarcodedProduct) product;
-					printLine("$" + String.valueOf(p.getPrice()) + "   " + p.getDescription() + "\n");
+				if (item instanceof BarcodedItem) {
+					BarcodedProduct p = DatabaseHelper.get((BarcodedItem) item);
+					printLine("$" + p.getPrice() + "   " + p.getDescription() + "\n");
+					continue;
+				}
+
+				// printing the item
+				if (item instanceof PLUCodedItem) {
+					PLUCodedProduct p = DatabaseHelper.get((PLUCodedItem) item);
+					printLine("$" + sm.priceOf((PLUCodedItem) item) + "   " + p.getDescription() + "\n");
 					continue;
 				}
 
 				// this should never happen because other functions would catch an illegal
 				// product
 				throw new IllegalArgumentException(
-						"cannot print information of product of type " + product.getClass().toString());
+						"cannot print information of product of type " + item.getClass().toString());
 			}
 			printLine("Payment Type: " + type.toString() + "\n");
 			printLine("Price: $" + sm.getTotalPrice() + "\n");

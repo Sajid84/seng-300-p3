@@ -159,10 +159,6 @@ public class StubbedOrderManager extends OrderManager {
 		return super.getItems();
 	}
 
-	public Map<Product, Boolean> getProductsVar() {
-		return super.items;
-	}
-
 	@Override
 	public void onAttendantOverride() {
 		onAttendantOverrideCalled = true;
@@ -176,7 +172,7 @@ public class StubbedOrderManager extends OrderManager {
 	}
 
 	@Override
-	public void removeItemFromOrder(Item item) throws OperationNotSupportedException {
+	public void removeItemFromOrder(Item item) {
 		removeItemFromOrderCalled = true;
 		super.removeItemFromOrder(item);
 	}

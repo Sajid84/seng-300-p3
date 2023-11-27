@@ -21,6 +21,8 @@ import com.tdc.NoCashAvailableException;
 import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
 import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
+import com.thelocalmarketplace.hardware.PLUCodedItem;
+import com.thelocalmarketplace.hardware.PLUCodedProduct;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
 
 import ca.ucalgary.seng300.simulation.NullPointerSimulationException;
@@ -317,6 +319,11 @@ public class SystemManager implements ISystemManager, IPaymentManager, IOrderMan
 	@Override
 	public boolean wasBarcodeScanned() {
 		return om.wasBarcodeScanned();
+	}
+
+	@Override
+	public BigDecimal priceOf(PLUCodedItem item) {
+		return om.priceOf(item);
 	}
 
 	@Override
