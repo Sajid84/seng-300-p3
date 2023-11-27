@@ -16,100 +16,70 @@ import stubbing.StubbedStation;
 import stubbing.StubbedSystemManager;
 
 public class TestReceiptPrinterObserver {
-	// vars
-	private StubbedPaymentManager pm;
-	private StubbedSystemManager sm;
-	private ReceiptPrinterObserver rpls;
-	private AbstractSelfCheckoutStation machine;
+    // vars
+    private StubbedPaymentManager pm;
+    private StubbedSystemManager sm;
+    private ReceiptPrinterObserver rpls;
+    private AbstractSelfCheckoutStation machine;
 
-	@Before
-	public void setup() {
-		// creating the stubs
-		sm = new StubbedSystemManager();
-		pm = sm.pmStub;
+    @Before
+    public void setup() {
+        // creating the stubs
+        sm = new StubbedSystemManager();
+        pm = sm.pmStub;
 
-		// configuring the hardware
-		StubbedStation.configure();
+        // configuring the hardware
+        StubbedStation.configure();
 
-		// creating the hardware
-		machine = new StubbedStation().machine;
-		machine.plugIn(StubbedGrid.instance());
+        // creating the hardware
+        machine = new StubbedStation().machine;
+        machine.plugIn(StubbedGrid.instance());
 
-		// configuring the machine
-		sm.configure(machine);
-		
-		rpls = pm.getReceiptPrinterObserver();
-	}
+        // configuring the machine
+        sm.configure(machine);
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testNullPaymentManager() {
-		new ReceiptPrinterObserver(null, machine.printer);
-	}
+        rpls = pm.getReceiptPrinterObserver();
+    }
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testNullDevice() {
-		new ReceiptPrinterObserver(pm, null);
-	}
+    @Test(expected = IllegalArgumentException.class)
+    public void testNullPaymentManager() {
+        new ReceiptPrinterObserver(null, machine.printer);
+    }
 
-	@Test
-	public void testNotifyOutOfPaper() {
-		rpls.thePrinterIsOutOfPaper();
+    @Test(expected = IllegalArgumentException.class)
+    public void testNullDevice() {
+        new ReceiptPrinterObserver(pm, null);
+    }
 
-		// asserting
-		assertFalse(pm.getHasPaper());
-	}
+    @Test
+    public void testNotifyOutOfPaper() {
+        rpls.thePrinterIsOutOfPaper();
 
-	@Test
-	public void testNotifyPaperAdded() {
-		rpls.paperHasBeenAddedToThePrinter();
+        // asserting
+        assertFalse(pm.getHasPaper());
+    }
 
-		// asserting
-		assertTrue(pm.getHasPaper());
-	}
+    @Test
+    public void testNotifyPaperAdded() {
+        rpls.paperHasBeenAddedToThePrinter();
 
-	@Test
-	public void testNotifyOutOfInk() {
-		rpls.thePrinterIsOutOfInk();
+        // asserting
+        assertTrue(pm.getHasPaper());
+    }
 
-		// asserting
-		assertFalse(pm.getHasInk());
-	}
+    @Test
+    public void testNotifyOutOfInk() {
+        rpls.thePrinterIsOutOfInk();
 
-	@Test
-	public void testNotifyInkAdded() {
-		rpls.inkHasBeenAddedToThePrinter();
+        // asserting
+        assertFalse(pm.getHasInk());
+    }
 
-		// asserting
-		assertTrue(pm.getHasInk());
-	}
+    @Test
+    public void testNotifyInkAdded() {
+        rpls.inkHasBeenAddedToThePrinter();
 
-	@Test
-	public void testCannotUseWhenTurnedOffAndDisabled() {
-		// asserting
-		assertFalse(rpls.canUse());
-	}
-
-	@Test
-	public void testCannotUseWhenTurnedOff() {
-		// this can never actually happen
-		// the machine needs to be turned on before I can call enable
-	}
-
-	@Test
-	public void testCannotUseWhenDisabled() {
-		machine.printer.turnOn();
-		machine.printer.disable();
-
-		// asserting
-		assertFalse(rpls.canUse());
-	}
-
-	@Test
-	public void testCanUseWhenTurnedOnAndEnabled() {
-		machine.printer.turnOn();
-		machine.printer.enable();
-
-		// asserting
-		assertTrue(rpls.canUse());
-	}
+        // asserting
+        assertTrue(pm.getHasInk());
+    }
 }

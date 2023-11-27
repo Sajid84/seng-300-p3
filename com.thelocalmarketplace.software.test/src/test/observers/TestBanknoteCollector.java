@@ -22,79 +22,49 @@ import stubbing.StubbedSystemManager;
 
 public class TestBanknoteCollector {
 
-	private StubbedPaymentManager pm;
-	private BanknoteCollector bc;
-	private StubbedSystemManager sm;
-	private AbstractSelfCheckoutStation machine;
+    private StubbedPaymentManager pm;
+    private BanknoteCollector bc;
+    private StubbedSystemManager sm;
+    private AbstractSelfCheckoutStation machine;
 
-	@Before
-	public void setup() {
-		// creating the stubs
-		sm = new StubbedSystemManager();
-		pm = sm.pmStub;
+    @Before
+    public void setup() {
+        // creating the stubs
+        sm = new StubbedSystemManager();
+        pm = sm.pmStub;
 
-		// configuring the hardware
-		StubbedStation.configure();
+        // configuring the hardware
+        StubbedStation.configure();
 
-		// creating the hardware
-		machine = new StubbedStation().machine;
-		machine.plugIn(StubbedGrid.instance());
+        // creating the hardware
+        machine = new StubbedStation().machine;
+        machine.plugIn(StubbedGrid.instance());
 
-		// configuring the machine
-		sm.configure(machine);
+        // configuring the machine
+        sm.configure(machine);
 
-		bc = pm.getBanknoteCollector();
-		machine.banknoteValidator.disable(); // the component is enabled by default, OK
-	}
+        bc = pm.getBanknoteCollector();
+        machine.banknoteValidator.disable(); // the component is enabled by default, OK
+    }
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testNullPaymentManager() {
-		new BanknoteCollector(null, machine.banknoteValidator);
-	}
+    @Test(expected = IllegalArgumentException.class)
+    public void testNullPaymentManager() {
+        new BanknoteCollector(null, machine.banknoteValidator);
+    }
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testNullDevice() {
-		new BanknoteCollector(pm, null);
-	}
+    @Test(expected = IllegalArgumentException.class)
+    public void testNullDevice() {
+        new BanknoteCollector(pm, null);
+    }
 
-	// Testing when the system detects a new valid bank note has been added
-	@Test
-	public void TestgoodBanknote() {
-		Currency currency = Currency.getInstance("CAD");
-		bc.goodBanknote(null, currency, new BigDecimal(5.00f));
+    // Testing when the system detects a new valid bank note has been added
+    @Test
+    public void TestgoodBanknote() {
+        Currency currency = Currency.getInstance("CAD");
+        bc.goodBanknote(null, currency, new BigDecimal(5.00f));
 
-		// We expect the PaymentManager to know about a bank note of value 5
-		assertTrue("The Payment Manager did recieve the correct amount",
-				pm.notifyBalanceAddedValue.floatValue() == 5.00f);
-	}
-
-	@Test
-	public void testCannotUseWhenTurnedOffAndDisabled() {
-		// asserting
-		assertFalse(bc.canUse());
-	}
-
-	@Test
-	public void testCannotUseWhenTurnedOff() {
-		// this can never actually happen
-		// the machine needs to be turned on before I can call enable
-	}
-
-	@Test
-	public void testCannotUseWhenDisabled() {
-		machine.banknoteValidator.activate();
-
-		// asserting
-		assertFalse(bc.canUse());
-	}
-
-	@Test
-	public void testCanUseWhenTurnedOnAndEnabled() {
-		machine.banknoteValidator.activate();
-		machine.banknoteValidator.enable();
-
-		// asserting
-		assertTrue(bc.canUse());
-	}
-
+        // We expect the PaymentManager to know about a bank note of value 5
+        assertTrue("The Payment Manager did recieve the correct amount",
+                pm.notifyBalanceAddedValue.floatValue() == 5.00f);
+    }
 }

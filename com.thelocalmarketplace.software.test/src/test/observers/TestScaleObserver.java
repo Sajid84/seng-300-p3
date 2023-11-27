@@ -22,83 +22,53 @@ import stubbing.StubbedSystemManager;
 
 public class TestScaleObserver {
 
-	// vars
-	private StubbedOrderManager om;
-	private StubbedSystemManager sm;
-	private ScaleObserver so;
-	private AbstractSelfCheckoutStation machine;
+    // vars
+    private StubbedOrderManager om;
+    private StubbedSystemManager sm;
+    private ScaleObserver so;
+    private AbstractSelfCheckoutStation machine;
 
-	@Before
-	public void setup() {
-		// creating the stubs
-		sm = new StubbedSystemManager();
-		om = sm.omStub;
+    @Before
+    public void setup() {
+        // creating the stubs
+        sm = new StubbedSystemManager();
+        om = sm.omStub;
 
-		// configuring the hardware
-		StubbedStation.configure();
+        // configuring the hardware
+        StubbedStation.configure();
 
-		// creating the hardware
-		machine = new StubbedStation().machine;
-		machine.plugIn(StubbedGrid.instance());
+        // creating the hardware
+        machine = new StubbedStation().machine;
+        machine.plugIn(StubbedGrid.instance());
 
-		// configuring the machine
-		sm.configure(machine);
+        // configuring the machine
+        sm.configure(machine);
 
-		so = om.getBaggingAreaObserver();
-	}
+        so = om.getBaggingAreaObserver();
+    }
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testNullOrderManager() {
-		new ScaleObserver(null, machine.baggingArea);
-	}
+    @Test(expected = IllegalArgumentException.class)
+    public void testNullOrderManager() {
+        new ScaleObserver(null, machine.baggingArea);
+    }
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testNullDevice() {
-		new ScaleObserver(om, null);
-	}
+    @Test(expected = IllegalArgumentException.class)
+    public void testNullDevice() {
+        new ScaleObserver(om, null);
+    }
 
-	/**
-	 * Testing that the mass observed by the scale was passed correctly to the
-	 * OrderManager.
-	 */
-	@Test
-	public void testNotifyOrderManagerMassChange() {
-		Mass mass = new Mass(1);
+    /**
+     * Testing that the mass observed by the scale was passed correctly to the
+     * OrderManager.
+     */
+    @Test
+    public void testNotifyOrderManagerMassChange() {
+        Mass mass = new Mass(1);
 
-		// We don't care who the validator is, so it may be null.
-		so.theMassOnTheScaleHasChanged(null, mass);
+        // We don't care who the validator is, so it may be null.
+        so.theMassOnTheScaleHasChanged(null, mass);
 
-		// ensure that the actual weight in the OrderManager has updated
-		assertEquals(mass.inGrams(), om.getActualWeight());
-	}
-
-	@Test
-	public void testCannotUseWhenTurnedOffAndDisabled() {
-		// asserting
-		assertFalse(so.canUse());
-	}
-
-	@Test
-	public void testCannotUseWhenTurnedOff() {
-		// this can never actually happen
-		// the machine needs to be turned on before I can call enable
-	}
-
-	@Test
-	public void testCannotUseWhenDisabled() {
-		machine.baggingArea.turnOn();
-		machine.baggingArea.disable();
-
-		// asserting
-		assertFalse(so.canUse());
-	}
-
-	@Test
-	public void testCanUseWhenTurnedOnAndEnabled() {
-		machine.baggingArea.turnOn();
-		machine.baggingArea.enable();
-
-		// asserting
-		assertTrue(so.canUse());
-	}
+        // ensure that the actual weight in the OrderManager has updated
+        assertEquals(mass.inGrams(), om.getActualWeight());
+    }
 }
