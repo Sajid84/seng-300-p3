@@ -99,19 +99,6 @@ public class SystemManager implements ISystemManager, IPaymentManager, IOrderMan
 		this.om.configure(this.machine);
 	}
 
-	@Override
-	public boolean ready() {
-		if (!om.ready()) {
-			return false;
-		}
-		if (!pm.ready()) {
-			return false;
-		}
-
-		// all the managers are ready, returning true
-		return true;
-	}
-
 	/**
 	 * This calculates the outstanding balance the customer must pay for their
 	 * order.

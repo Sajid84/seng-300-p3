@@ -48,12 +48,6 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	}
 
 	@Override
-	public boolean ready() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
 	public void signalForAttendant() {
 		// TODO Auto-generated method stub
 

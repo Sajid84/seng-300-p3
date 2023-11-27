@@ -61,13 +61,4 @@ public interface IManager extends IManagerNotify {
 	 * @return true if the machine is disabled, false otherwise.
 	 */
 	boolean isDisabled();
-
-	/**
-	 * This function tests whether or not the system can be used based on the states
-	 * of the components of the machine.
-	 * 
-	 * @see IObserverUseable#canUse()
-	 * @return returns true if all the observers can be used, false otherwise
-	 */
-	boolean ready();
 }

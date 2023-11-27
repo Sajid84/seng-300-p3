@@ -22,11 +22,6 @@ public class AbstractComponentObserver implements IComponentObserver, IObserverU
 	}
 
 	@Override
-	public boolean canUse() {
-		return (!device.isDisabled()) && device.isActivated();
-	}
-
-	@Override
 	public void enabled(IComponent<? extends IComponentObserver> component) {
 		// these functions never actually get called anywhere in
 		// AbstractSelfCheckoutStation

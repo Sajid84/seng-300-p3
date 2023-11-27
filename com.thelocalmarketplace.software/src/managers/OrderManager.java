@@ -92,22 +92,6 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 	}
 
 	@Override
-	public boolean ready() {
-		if (!baggingarea_so.canUse()) {
-			return false;
-		}
-		if (!main_bso.canUse()) {
-			return false;
-		}
-		if (!handheld_bso.canUse()) {
-			return false;
-		}
-
-		// all the observers are ready, return true
-		return true;
-	}
-
-	@Override
 	public void notifyScaleOverload(IElectronicScale scale, boolean state) {
 		if (state) {
 			// the scale was overloaded
@@ -154,7 +138,7 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 			}
 
 			// no bagging request for this item, don't add this to the expected weight
-			if (products.get(i) == false) {
+			if (!products.get(i)) {
 				continue;
 			}
 

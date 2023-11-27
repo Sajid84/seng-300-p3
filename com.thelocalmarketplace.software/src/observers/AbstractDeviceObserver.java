@@ -22,14 +22,6 @@ public abstract class AbstractDeviceObserver implements IDeviceListener, IObserv
 	}
 
 	@Override
-	public boolean canUse() {
-		if (!device.isPoweredUp()) {
-			return false;
-		}
-		return !device.isDisabled();
-	}
-
-	@Override
 	public void aDeviceHasBeenEnabled(IDevice<? extends IDeviceListener> device) {
 		// this method is never actually called
 	}

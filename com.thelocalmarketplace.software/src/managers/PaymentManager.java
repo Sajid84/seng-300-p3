@@ -94,25 +94,6 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 		rpls = new ReceiptPrinterObserver(this, machine.printer);
 	}
 
-	@Override
-	public boolean ready() {
-		if (!cc.canUse()) {
-			return false;
-		}
-		if (!bc.canUse()) {
-			return false;
-		}
-		if (!cro.canUse()) {
-			return false;
-		}
-		if (!rpls.canUse()) {
-			return false;
-		}
-
-		// all the observers are ready, return true
-		return true;
-	}
-
 	/**
 	 * This is how you should tell the payment manager that there was payment added
 	 * to the system.
