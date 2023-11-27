@@ -78,7 +78,7 @@ public class TestBarcodeScannerObserver {
 		BarcodedProduct prod = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(item.getBarcode());
 
 		// ensuring that the item is present in the OrderManager
-		assertTrue(om.getProducts().contains(prod));
+		assertTrue(om.getItems().contains(prod));
 	}
 
 	@Test

@@ -46,6 +46,6 @@ public class TestNotifyBarcodeScanned {
 
 		om.notifyBarcodeScanned(null, stub.getBarcode());
 
-		assertEquals(1, om.getProducts().size());
+		assertEquals(1, om.getItems().size());
 	}
 }

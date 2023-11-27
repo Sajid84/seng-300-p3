@@ -81,7 +81,7 @@ public class TestTenderChange {
 		// Add item to order to get total price
 		// Price of item is $10
 		prod = new StubbedBarcodedProduct();
-		om.addProduct(prod);
+		om.addItem(prod);
 
 	}
 

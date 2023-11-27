@@ -8,6 +8,7 @@
 package managers;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,11 +22,7 @@ import com.jjjwelectronics.scale.IElectronicScale;
 import com.jjjwelectronics.scanner.Barcode;
 import com.jjjwelectronics.scanner.BarcodedItem;
 import com.jjjwelectronics.scanner.IBarcodeScanner;
-import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
-import com.thelocalmarketplace.hardware.BarcodedProduct;
-import com.thelocalmarketplace.hardware.PLUCodedItem;
-import com.thelocalmarketplace.hardware.Product;
-import com.thelocalmarketplace.hardware.external.ProductDatabases;
+import com.thelocalmarketplace.hardware.*;
 
 import managers.enums.ScanType;
 import managers.enums.SessionStatus;
@@ -33,6 +30,7 @@ import managers.interfaces.IOrderManager;
 import managers.interfaces.IOrderManagerNotify;
 import observers.order.BarcodeScannerObserver;
 import observers.order.ScaleObserver;
+import utils.DatabaseHelper;
 
 public class OrderManager implements IOrderManager, IOrderManagerNotify {
 
@@ -52,11 +50,12 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 	protected BigDecimal adjustment = BigDecimal.ZERO;
 	protected BigDecimal actualWeight = BigDecimal.ZERO;
 	protected boolean bagItem = true;
-	protected Map<Product, Boolean> products = new HashMap<Product, Boolean>();
+	protected Map<Item, Boolean> items = new HashMap<>();
 	protected List<IOrderManagerNotify> listeners = new ArrayList<IOrderManagerNotify>();
 	protected List<IElectronicScale> overloadedScales = new ArrayList<IElectronicScale>();
+    protected boolean barcodeScanned = false;
 
-	/**
+    /**
 	 * This controls everything relating to adding and removing items from a
 	 * customer's order.
 	 *
@@ -112,15 +111,9 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 		if (barcode == null)
 			throw new IllegalArgumentException("invalid barcode was scanned");
 
-		// getting the item
-		BarcodedProduct prod = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode);
-
-		// checking for null
-		if (prod == null)
-			throw new IllegalArgumentException("barcode doesn't match any known item");
-
-		// adding the item to the order
-		products.put(prod, bagItem);
+		// notifying that the item was actually scanned and there was nothing wrong
+        // happened
+        barcodeScanned = true;
 	}
 
 	/**
@@ -131,25 +124,19 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 	public BigDecimal getExpectedMass() {
 		BigDecimal total = BigDecimal.ZERO;
 
-		for (Product i : this.products.keySet()) {
+		for (Item i : this.items.keySet()) {
 			// checking for null
 			if (i == null) {
 				throw new IllegalArgumentException("tried to calculate mass of a null Product");
 			}
 
 			// no bagging request for this item, don't add this to the expected weight
-			if (!products.get(i)) {
+			if (!items.get(i)) {
 				continue;
 			}
 
-			// if its a barcodedproduct, we can calculate mass directly
-			if (i instanceof BarcodedProduct) {
-				BarcodedProduct temp = (BarcodedProduct) i;
-				total = total.add(new BigDecimal(temp.getExpectedWeight()));
-				continue;
-			}
-
-			throw new UnsupportedOperationException("cannot calculate mass of a non-barcoded product");
+			// the item class guarantees a non-null positive mass
+			total = total.add(i.getMass().inGrams());
 		}
 
 		return total;
@@ -177,19 +164,41 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 	public BigDecimal getTotalPrice() throws IllegalArgumentException {
 		BigDecimal total = BigDecimal.ZERO;
 
-		for (Product i : this.products.keySet()) {
+		for (Item i : this.items.keySet()) {
 			// checking for null
 			if (i == null) {
 				throw new IllegalArgumentException("tried to calculate mass of a null Product");
 			}
 
 			// calculating the price for a barcodeditem
-			if (i instanceof BarcodedProduct) {
-				// barcodeditems are always sold per unit, therefore we can just add the price
-				// directly
-				total = total.add(new BigDecimal(i.getPrice()));
+			if (i instanceof BarcodedItem) {
+                // getting the corresponding product
+                BarcodedProduct prod = DatabaseHelper.get((BarcodedItem) i);
+
+                // barcodeditems are always sold per unit, therefore we can just add the price
+                // directly
+				total = total.add(new BigDecimal(prod.getPrice()));
 				continue;
 			}
+
+            // calculating the price for a plu coded item
+            if (i instanceof PLUCodedItem) {
+                // getting the corresponding product
+                PLUCodedProduct prod = DatabaseHelper.get((PLUCodedItem) i);
+
+                // getting the price
+                BigDecimal price = new BigDecimal(prod.getPrice());
+
+                // scaling mass up to kilograms
+                BigDecimal scale = i.getMass().inGrams().divide(BigDecimal.valueOf(1_000), RoundingMode.DOWN);
+
+                // multiplying mass by kilograms
+                price = price.multiply(scale);
+
+                // adding the price
+                total = total.add(price);
+                continue;
+            }
 
 			// Temporary exception, while item types other than Barcode are unsupported.
 			throw new UnsupportedOperationException();
@@ -219,9 +228,12 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 		}
 
 		// check if customer wants to bag item (bulky item handler extension)
-		if (bagItem == true) {
+		if (bagItem) {
 			this.machine.baggingArea.addAnItem(item);
 		}
+
+        // adding the item to the order
+        items.put(item, bagItem);
 
 		// reset bagging request tracker for the next item
 		bagItem = true;
@@ -252,6 +264,8 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 	 * @param method the method of scanning
 	 */
 	protected void addItemToOrder(PLUCodedItem item, ScanType method) throws OperationNotSupportedException {
+        // TODO implement java swing stuff here
+
 		throw new OperationNotSupportedException("adding items by PLU code is not supported yet");
 	}
 
@@ -287,28 +301,12 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 	 * @param item the {@link BarcodedItem} to remove
 	 */
 	protected void removeItemFromOrder(BarcodedItem item) {
-		// getting the product
-		BarcodedProduct prod = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(item.getBarcode());
-
-		// checking for null
-		if (prod == null) {
-			throw new IllegalArgumentException("cannot find the product that item maps to");
-		}
-
-		// not going to check if the map contains the item because it is likely that if
-		// the scanner failed to scan the barcode, the item would not have been added to
-		// the order, causing a crash in the main loop
-
 		// removing
-		try {
-			if (this.products.remove(prod)) {
-				for (IOrderManagerNotify listener : listeners) {
-					listener.onItemRemovedFromOrder(item);
-				}
-			}
-		} catch (Exception e) {
-			// do nothing because the item wasn't actually added to the map of products
-		}
+        if (this.items.remove(item)) {
+            for (IOrderManagerNotify listener : listeners) {
+                listener.onItemRemovedFromOrder(item);
+            }
+        }
 	}
 
 	/**
@@ -326,17 +324,11 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 	 * accordingly.
 	 *
 	 * @param bags the bag that is going to be added
-	 * @throws IllegalArgumentException
 	 */
 	@Override
-	public void addCustomerBags(Item bags) throws IllegalArgumentException {
+	public void addCustomerBags(Item bags) {
 		// Get the weight of just the bags
 		BigDecimal bagWeight = bags.getMass().inGrams();
-
-		// Check if the weight of the bags are valid (greater than 0)
-		if (bagWeight.compareTo(BigDecimal.ZERO) <= 0) {
-			throw new IllegalArgumentException("No valid weight is detected for bags.");
-		}
 
 		// Update adjustment for weight of bag
 		this.adjustment = this.adjustment.add(bagWeight);
@@ -346,16 +338,8 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 	}
 
 	@Override
-	public List<Product> getProducts() {
-		List<Product> prods = new ArrayList<Product>();
-
-		// appending from the key set
-		for (Product p : products.keySet()) {
-			prods.add(p);
-		}
-
-		// returning the products
-		return prods;
+	public Map<Item, Boolean> getItems() {
+		return items;
 	}
 
 	@Override
@@ -413,7 +397,7 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 
 		/**
 		 * calculating the magnitude of the difference, the expected weight should be
-		 * greater than the expected weight.
+		 * greater than the actual weight.
 		 */
 		BigDecimal expected = getExpectedMass().subtract(getWeightAdjustment());
 		BigDecimal actual = actualWeight;
@@ -427,7 +411,7 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 	 * This separation is just to test resolving weight discrepancies.
 	 */
 	protected void checkWeightDifference(BigDecimal difference) {
-		// testing whether or not to block or unblock the session
+		// testing whether to block or unblock the session
 		switch (getState()) {
 		case NORMAL:
 			// blocking the session due to a discrepancy
@@ -462,7 +446,12 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 
 	@Override
 	public boolean isScaleOverloaded() {
-		return overloadedScales.size() > 0;
+		return !overloadedScales.isEmpty();
+	}
+
+	@Override
+	public boolean wasBarcodeScanned() {
+		return barcodeScanned;
 	}
 
 	@Override

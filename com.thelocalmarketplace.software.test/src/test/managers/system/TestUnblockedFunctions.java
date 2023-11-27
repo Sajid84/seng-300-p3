@@ -63,7 +63,7 @@ public class TestUnblockedFunctions {
 	public void testGetProductsFunctionsWithoutState() {
 		for (SessionStatus status : SessionStatus.values()) {
 			sm.setState(status);
-			assertNotNull(sm.getProducts());
+			assertNotNull(sm.getItems());
 		}
 	}
 	

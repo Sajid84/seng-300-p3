@@ -21,7 +21,6 @@ import com.tdc.NoCashAvailableException;
 import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
 import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
-import com.thelocalmarketplace.hardware.Product;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
 
 import ca.ucalgary.seng300.simulation.NullPointerSimulationException;
@@ -169,8 +168,8 @@ public class SystemManager implements ISystemManager, IPaymentManager, IOrderMan
 	}
 
 	@Override
-	public List<Product> getProducts() throws NullPointerSimulationException {
-		return this.om.getProducts();
+	public Map<Item, Boolean> getItems() throws NullPointerSimulationException {
+		return this.om.getItems();
 	}
 
 	@Override
@@ -316,6 +315,11 @@ public class SystemManager implements ISystemManager, IPaymentManager, IOrderMan
 	}
 
 	@Override
+	public boolean wasBarcodeScanned() {
+		return om.wasBarcodeScanned();
+	}
+
+	@Override
 	public void signalForAttendant() {
 		am.signalForAttendant();
 	}
@@ -368,18 +372,24 @@ public class SystemManager implements ISystemManager, IPaymentManager, IOrderMan
 	@Override
 	public void enableMachine() {
 		// TODO make this method actually do something
-		notifyAttendant("Machine was enabled");
+		if (isDisabled()) {
+			setState(SessionStatus.NORMAL);
+			notifyAttendant("Machine was enabled");
+		}
+
+		// throwing when not in the expected state
+		throw new IllegalStateException("cannot enable a non-disabled machine");
 	}
 
 	@Override
 	public void requestDisableMachine() {
-		disabledRequest = false;
+		disabledRequest = true;
 	}
 
 	@Override
 	public void requestEnableMachine() {
 		if (isDisabled())
-			disabledRequest = true;
+			disabledRequest = false;
 	}
 
 	@Override

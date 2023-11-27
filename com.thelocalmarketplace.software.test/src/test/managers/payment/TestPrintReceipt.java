@@ -99,7 +99,7 @@ public class TestPrintReceipt {
 
 		// adding a product to the order
 		BarcodedProduct prod = new StubbedBarcodedProduct();
-		om.addProduct(prod);
+		om.addItem(prod);
 		pm.setPayment(prod.getPrice());
 
 		// this should pass
@@ -119,7 +119,7 @@ public class TestPrintReceipt {
 
 		// adding a product to the order
 		BarcodedProduct prod = new StubbedBarcodedProduct();
-		om.addProduct(prod);
+		om.addItem(prod);
 		pm.setPayment(prod.getPrice());
 
 		// this should pass
@@ -139,7 +139,7 @@ public class TestPrintReceipt {
 
 		// adding a product to the order
 		BarcodedProduct prod = new StubbedBarcodedProduct();
-		om.addProduct(prod);
+		om.addItem(prod);
 		pm.setPayment(prod.getPrice());
 
 		// this should pass
@@ -159,7 +159,7 @@ public class TestPrintReceipt {
 
 		// adding a product to the order
 		BarcodedProduct prod = new StubbedBarcodedProduct();
-		om.addProduct(prod);
+		om.addItem(prod);
 		pm.setPayment(prod.getPrice());
 
 		// this should pass
@@ -178,7 +178,7 @@ public class TestPrintReceipt {
 
 		// adding a product to the order
 		BarcodedProduct prod = new StubbedBarcodedProduct();
-		om.addProduct(prod);
+		om.addItem(prod);
 		pm.setPayment(prod.getPrice());
 
 		// this should fail
@@ -197,7 +197,7 @@ public class TestPrintReceipt {
 
 		// adding a product to the order
 		BarcodedProduct prod = new StubbedBarcodedProduct();
-		om.addProduct(prod);
+		om.addItem(prod);
 		pm.setPayment(prod.getPrice());
 
 		// this should fail
@@ -216,7 +216,7 @@ public class TestPrintReceipt {
 
 		// adding a product to the order
 		BarcodedProduct prod = new StubbedBarcodedProduct();
-		om.addProduct(prod);
+		om.addItem(prod);
 		pm.setPayment(prod.getPrice());
 
 		// this should fail
@@ -231,7 +231,7 @@ public class TestPrintReceipt {
 	public void testPaymentLessThanPrice() {
 		// adding a product to the order
 		BarcodedProduct prod = new StubbedBarcodedProduct();
-		om.addProduct(prod);
+		om.addItem(prod);
 
 		pm.printReceipt(PaymentType.CASH, null);
 	}

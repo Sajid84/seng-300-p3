@@ -34,9 +34,9 @@ public class TestGetters {
 
 	@Test
 	public void testGetProductsContainsAllAdded() {
-		om.addProduct(new StubbedBarcodedProduct());
+		om.addItem(new StubbedBarcodedProduct());
 
-		List<Product> prods = om.getProducts();
+		List<Product> prods = om.getItems();
 
 		assertEquals(prods.size(), 1);
 
@@ -53,7 +53,7 @@ public class TestGetters {
 	
 	@Test
 	public void testGetTotalOfBarcodedItems() {
-		om.addProduct(StubbedBarcodedProduct.getActual());
+		om.addItem(StubbedBarcodedProduct.getActual());
 
 		// asserting
 		assertNotNull(om.getTotalPrice());
@@ -62,42 +62,42 @@ public class TestGetters {
 
 	@Test
 	public void testGetProductsHasNonOnCreation() {
-		List<Product> prods = om.getProducts();
+		List<Product> prods = om.getItems();
 
 		assertEquals(prods.size(), 0);
 	}
 
 	@Test(expected = UnsupportedOperationException.class)
 	public void testTotalPriceThrowsOnPLU() {
-		om.addProduct(new StubbedPLUProduct());
+		om.addItem(new StubbedPLUProduct());
 
 		om.getTotalPrice();
 	}
 
 	@Test(expected = UnsupportedOperationException.class)
 	public void testExpectedMassThrowsOnPLU() {
-		om.addProduct(new StubbedPLUProduct());
+		om.addItem(new StubbedPLUProduct());
 
 		om.getExpectedMass();
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testTotalPriceThrowsOnNull() {
-		om.addProduct(null);
+		om.addItem(null);
 
 		om.getTotalPrice();
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testExpectedMassThrowsOnNull() {
-		om.addProduct(null);
+		om.addItem(null);
 
 		om.getExpectedMass();
 	}
 
 	@Test
 	public void testExpectedMassEqualsProductMasses() {
-		om.addProduct(new StubbedBarcodedProduct());
+		om.addItem(new StubbedBarcodedProduct());
 
 		BigDecimal mass = om.getExpectedMass();
 
@@ -111,7 +111,7 @@ public class TestGetters {
 
 	@Test
 	public void testExpectedMassZeroWithNoItems() {
-		assertEquals(om.getProducts().size(), 0);
+		assertEquals(om.getItems().size(), 0);
 		assertEquals(om.getExpectedMass(), BigDecimal.ZERO);
 	}
 

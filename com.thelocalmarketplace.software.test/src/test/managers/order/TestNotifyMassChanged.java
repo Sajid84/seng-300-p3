@@ -41,7 +41,7 @@ public class TestNotifyMassChanged {
 
 	@Test
 	public void testNotifyMassChangeThrowsWithAdjustmentDoesntBlock() {
-		om.addProduct(new StubbedBarcodedProduct());
+		om.addItem(new StubbedBarcodedProduct());
 		om.setWeightAdjustment(new BigDecimal(StubbedBarcodedProduct.WEIGHT));
 
 		om.notifyMassChanged(null, BigDecimal.ZERO);

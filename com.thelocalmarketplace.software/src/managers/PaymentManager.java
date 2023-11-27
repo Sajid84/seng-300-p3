@@ -387,7 +387,7 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 		if (sm.getCustomerPayment().compareTo(sm.getTotalPrice()) < 0) {
 			throw new RuntimeException("Payment is less than total price.");
 		}
-		if (sm.getProducts().isEmpty()) {
+		if (sm.getItems().isEmpty()) {
 			throw new RuntimeException("Product list cannot be empty.");
 		}
 
@@ -402,7 +402,7 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 		// printing the receipt
 		try {
 			printLine("----- Receipt -----\n");
-			for (Product product : sm.getProducts()) {
+			for (Product product : sm.getItems()) {
 				// printing the item
 				if (product instanceof BarcodedProduct) {
 					BarcodedProduct p = (BarcodedProduct) product;

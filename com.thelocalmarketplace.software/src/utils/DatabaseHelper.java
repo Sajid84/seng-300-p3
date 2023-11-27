@@ -187,6 +187,16 @@ public class DatabaseHelper {
     }
 
     /**
+     * This is just a shorthand to get the corresponding product from the database.
+     *
+     * @param item the product to search for
+     * @return the corresponding product, if there is one
+     */
+    public static PLUCodedProduct get(PLUCodedItem item) {
+        return ProductDatabases.PLU_PRODUCT_DATABASE.get(item.getPLUCode());
+    }
+
+    /**
      * Creates a new randomly generated {@link PLUCodedItem} with a corresponding {@link PLUCodedProduct} in the database to look for.
      *
      * @return a new {@link PLUCodedItem}

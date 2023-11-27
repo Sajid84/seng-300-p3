@@ -91,12 +91,12 @@ public class StubbedOrderManager extends OrderManager {
 		super.setWeightAdjustment(a);
 	}
 	
-	public void addProduct(Product p) {
-		addProduct(p, true);
+	public void addItem(Item i) {
+		addItem(i, true);
 	}
 
-	public void addProduct(Product p, boolean donotbag) {
-		super.products.put(p, donotbag);
+	public void addItem(Item i, boolean donotbag) {
+		super.items.put(i, donotbag);
 	}
 
 	public void setState(SessionStatus s) {
@@ -154,13 +154,13 @@ public class StubbedOrderManager extends OrderManager {
 	}
 
 	@Override
-	public List<Product> getProducts() throws NullPointerSimulationException {
+	public Map<Item, Boolean> getItems() throws NullPointerSimulationException {
 		getProductsCalled = true;
-		return super.getProducts();
+		return super.getItems();
 	}
 
 	public Map<Product, Boolean> getProductsVar() {
-		return super.products;
+		return super.items;
 	}
 
 	@Override

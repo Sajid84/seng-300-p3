@@ -71,7 +71,7 @@ public class TestAddItem {
 		BarcodedItem item = new BarcodedItem(prod.getBarcode(), new Mass(prod.getExpectedWeight()));
 		om.addItemToOrder(item, ScanType.MAIN);
 
-		assertEquals(om.getProducts().size(), 1);
+		assertEquals(om.getItems().size(), 1);
 	}
 
 	@Test
@@ -82,7 +82,7 @@ public class TestAddItem {
 		BarcodedItem item = new BarcodedItem(prod.getBarcode(), new Mass(prod.getExpectedWeight()));
 		om.addItemToOrder(item, ScanType.HANDHELD);
 
-		assertEquals(om.getProducts().size(), 1);
+		assertEquals(om.getItems().size(), 1);
 	}
 
 	@Test(expected = OperationNotSupportedException.class)

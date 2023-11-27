@@ -119,7 +119,7 @@ public class TestFunctionDelegation {
 		sm.setState(SessionStatus.NORMAL);
 
 		try {
-			sm.getProducts();
+			sm.getItems();
 		} catch (Exception e) {
 			// do nothing
 		}

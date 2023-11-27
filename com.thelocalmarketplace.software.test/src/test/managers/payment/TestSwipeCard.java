@@ -57,7 +57,7 @@ public class TestSwipeCard {
 		sm.setIssuer(issuer);
 
 		// configuring the machine
-		om.addProduct(prod);
+		om.addItem(prod);
 		sm.configure(machine);
 
 	}

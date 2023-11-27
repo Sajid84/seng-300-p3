@@ -56,7 +56,7 @@ public class TestAttendantOverride {
 	public void testAttendantOverrideSetsAdjustment() {
 		// setup
 		StubbedBarcodedProduct p = new StubbedBarcodedProduct();
-		om.addProduct(p, true);
+		om.addItem(p, true);
 		om.setActualWeight(BigDecimal.ONE);
 
 		// calling
