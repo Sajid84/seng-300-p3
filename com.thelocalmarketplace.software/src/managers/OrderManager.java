@@ -210,17 +210,13 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 			this.addItemToOrder((BarcodedItem) item, method);
 		}
 
-		if (item instanceof PLUCodedItem) {
-			this.addItemToOrder((PLUCodedItem) item, method);
-		}
+		// adding the item to the order
+		items.put(item, bagItem);
 
 		// check if customer wants to bag item (bulky item handler extension)
 		if (bagItem) {
 			this.machine.baggingArea.addAnItem(item);
 		}
-
-        // adding the item to the order
-        items.put(item, bagItem);
 
 		// reset bagging request tracker for the next item
 		bagItem = true;
@@ -242,18 +238,6 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 			break;
 		}
 
-	}
-
-	/**
-	 * Simulates adding an {@link PLUCodedItem} to the order.
-	 *
-	 * @param item   the item to add
-	 * @param method the method of scanning
-	 */
-	protected void addItemToOrder(PLUCodedItem item, ScanType method) throws OperationNotSupportedException {
-        // TODO implement java swing stuff here
-
-		throw new OperationNotSupportedException("adding items by PLU code is not supported yet");
 	}
 
 	/**
