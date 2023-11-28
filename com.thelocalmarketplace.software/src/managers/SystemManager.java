@@ -5,35 +5,32 @@
 
 package managers;
 
+import ca.ucalgary.seng300.simulation.NullPointerSimulationException;
+import com.jjjwelectronics.Item;
+import com.jjjwelectronics.card.Card;
+import com.jjjwelectronics.card.Card.CardData;
+import com.jjjwelectronics.screen.ITouchScreen;
+import com.tdc.NoCashAvailableException;
+import com.tdc.banknote.Banknote;
+import com.tdc.coin.Coin;
+import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
+import com.thelocalmarketplace.hardware.PLUCodedItem;
+import com.thelocalmarketplace.hardware.external.CardIssuer;
+import driver.SystemManagerForm;
+import managers.enums.PaymentType;
+import managers.enums.ScanType;
+import managers.enums.SessionStatus;
+import managers.interfaces.*;
+import utils.Pair;
+
+import javax.naming.OperationNotSupportedException;
+import javax.swing.*;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.naming.OperationNotSupportedException;
-
-import com.jjjwelectronics.Item;
-import com.jjjwelectronics.card.Card;
-import com.jjjwelectronics.card.Card.CardData;
-import com.tdc.NoCashAvailableException;
-import com.tdc.banknote.Banknote;
-import com.tdc.coin.Coin;
-import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
-import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
-import com.thelocalmarketplace.hardware.PLUCodedItem;
-import com.thelocalmarketplace.hardware.external.CardIssuer;
-
-import ca.ucalgary.seng300.simulation.NullPointerSimulationException;
-import managers.enums.PaymentType;
-import managers.enums.ScanType;
-import managers.enums.SessionStatus;
-import managers.interfaces.IAttendantManager;
-import managers.interfaces.IOrderManager;
-import managers.interfaces.IPaymentManager;
-import managers.interfaces.ISystemManager;
-import utils.Pair;
 
 /**
  * This class is meant to contain everything that is hardware related, this acts
@@ -43,7 +40,7 @@ import utils.Pair;
  * This delegates all functionality (with some exceptions) to the other manager
  * classes.
  */
-public class SystemManager implements ISystemManager, IPaymentManager, IOrderManager, IAttendantManager {
+public class SystemManager implements IScreen, ISystemManager, IPaymentManager, IOrderManager, IAttendantManager {
 
 	// hardware references
 	protected ISelfCheckoutStation machine;
@@ -54,6 +51,7 @@ public class SystemManager implements ISystemManager, IPaymentManager, IOrderMan
 	protected PaymentManager pm;
 	protected OrderManager om;
 	protected AttendantManager am;
+	protected SystemManagerForm smf;
 
 	// vars
 	protected SessionStatus state;
@@ -88,12 +86,28 @@ public class SystemManager implements ISystemManager, IPaymentManager, IOrderMan
 		this.pm = new PaymentManager(this, issuer);
 		this.om = new OrderManager(this, leniency);
 		this.am = new AttendantManager(this);
+
+		// creating the GUI
+		smf = new SystemManagerForm(this);
+	}
+
+	@Override
+	public JPanel getPanel() {
+		return smf.getPanel();
+	}
+
+	@Override
+	public void configure(ITouchScreen touchScreen) {
+		smf.configure(touchScreen);
 	}
 
 	@Override
 	public void configure(ISelfCheckoutStation machine) {
 		// saving a reference
 		this.machine = machine;
+
+		// configuring the jframe
+		configure(machine.getScreen());
 
 		// configuring the managers
 		this.pm.configure(this.machine);
@@ -111,7 +125,7 @@ public class SystemManager implements ISystemManager, IPaymentManager, IOrderMan
 	}
 
 	@Override
-	public void removeItemFromOrder(Item item) throws OperationNotSupportedException {
+	public void removeItemFromOrder(Item item) {
 		if (getState() == SessionStatus.PAID) {
 			throw new IllegalStateException("cannot remove item from state PAID");
 		}
