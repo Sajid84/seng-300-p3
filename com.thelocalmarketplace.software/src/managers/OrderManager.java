@@ -116,7 +116,8 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
         // adding the item to the order
         items.put(last_item, bagItem);
 
-        sm.itemWasAdded(last_item);
+        // notifying the system manager
+        sm.notifyItemAdded(last_item);
     }
 
     /**
@@ -127,10 +128,12 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
     public BigDecimal getExpectedMass() {
         BigDecimal total = BigDecimal.ZERO;
 
+        System.out.println(this.items.keySet().size());
+
         for (Item i : this.items.keySet()) {
             // checking for null
             if (i == null) {
-                throw new IllegalArgumentException("tried to calculate mass of a null Product");
+                throw new IllegalArgumentException("tried to calculate mass of a null item");
             }
 
             // no bagging request for this item, don't add this to the expected weight
@@ -208,14 +211,18 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
             throw new IllegalArgumentException("a null scanning type was passed");
         }
 
-        // figuring out how to scan the item
-        if (item instanceof BarcodedItem) {
-            this.addItemToOrder((BarcodedItem) item, method);
-        }
-
         // only adding the item to the order if we receive an event
         // from an observer
         last_item = item;
+
+        // figuring out how to scan the item
+        if (item instanceof BarcodedItem) {
+            this.addItemToOrder((BarcodedItem) item, method);
+        } else {
+            // if it's not a barcoded item, we can assume that the item is just going to be added to the
+            // bagging area
+            items.put(item, bagItem);
+        }
 
         // check if customer wants to bag item (bulky item handler extension)
         if (bagItem) {
@@ -263,7 +270,7 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
         // removing the item from the map
         if (this.items.remove(item)) {
             // publishing event
-            sm.itemWasRemoved(item);
+            sm.notifyItemRemoved(item);
 
             for (IOrderManagerNotify listener : listeners) {
                 listener.onItemRemovedFromOrder(item);

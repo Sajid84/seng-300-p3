@@ -23,7 +23,6 @@ import managers.enums.SessionStatus;
 import managers.interfaces.*;
 import utils.Pair;
 
-import javax.naming.OperationNotSupportedException;
 import javax.swing.*;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -78,7 +77,6 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 		}
 
 		// init vars
-		setState(SessionStatus.NORMAL);
 		this.issuer = issuer; // a reference to the bank
 		this.records = new HashMap<>();
 
@@ -89,6 +87,9 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 
 		// creating the GUI
 		smf = new SystemManagerForm(this);
+
+		// setting the initial state
+		setState(SessionStatus.NORMAL);
 	}
 
 	@Override
@@ -234,7 +235,11 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 			throw new IllegalArgumentException("cannot set the state of the manager to null");
 		}
 
+		// setting the state
 		this.state = state;
+
+		// publishing the state
+		notifyStateChange(state);
 	}
 
 	@Override
@@ -414,14 +419,20 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	}
 
 	@Override
-	public void itemWasAdded(Item item) {
-		smf.itemWasAdded(item);
+	public void notifyItemAdded(Item item) {
+		smf.notifyItemAdded(item);
 	}
 
 	@Override
-	public void itemWasRemoved(Item item) {
+	public void notifyItemRemoved(Item item) {
 		// TODO revisit this implementation, the GUI will probably tell the order manager to remove the item
-		// not the other way around
-		smf.itemWasRemoved(item);
+		// TOOD not the other way around
+		smf.notifyItemRemoved(item);
+	}
+
+	@Override
+	public void notifyStateChange(SessionStatus state) {
+		// ТОDO revisit this method as it probably isn't the best way to do things
+		smf.notifyStateChange(state);
 	}
 }

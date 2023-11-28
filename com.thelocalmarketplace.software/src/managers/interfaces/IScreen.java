@@ -4,7 +4,7 @@ import com.jjjwelectronics.screen.ITouchScreen;
 
 import javax.swing.*;
 
-public interface IScreen extends IScreenUpdate {
+public interface IScreen extends ISystemManagerNotify {
 
     /**
      * This simply returns the root panel of the form.

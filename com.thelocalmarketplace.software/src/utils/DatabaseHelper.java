@@ -104,7 +104,7 @@ public class DatabaseHelper {
      * </p>
      * <p>
      * This method guarantees that the {@link Barcode}s of both item and product are
-     * the same and that they are put into respective databases in {@link Database}.
+     * the same and that they are put into respective databases in {@link ProductDatabases}.
      * </p>
      *
      * @return the {@link BarcodedItem}
@@ -121,7 +121,7 @@ public class DatabaseHelper {
      * </p>
      * <p>
      * This method guarantees that the {@link Barcode}s of both item and product are
-     * the same and that they are put into respective databases in {@link Database}.
+     * the same and that they are put into respective databases in {@link ProductDatabases}.
      * </p>
      *
      * @param length how many digits to generate for the {@link Barcode}
@@ -144,6 +144,18 @@ public class DatabaseHelper {
 
         // return item to caller
         return item;
+    }
+
+    /**
+     * Since {@link Item} is abstract, the only real way to arbitrarily add mass to the
+     * scale is by generating some dummy item.
+     *
+     * @return a {@link BarcodedItem} with a mass of 200 and a randomly generated barcode.
+     */
+    public static BarcodedItem createCustomerBags() {
+        Barcode barcode = DatabaseHelper.createRandomBarcode(10);
+
+        return new BarcodedItem(barcode, new Mass(200));
     }
 
     /**
