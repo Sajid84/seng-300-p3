@@ -144,11 +144,11 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 		}
 	}
 	@Override
-	public void insertCard(Card card) throws IOException {
+	public void insertCard(Card card, String pin) throws IOException {
 		if (card == null ) {
 			throw new IllegalArgumentException("Cannot insert a null card");
 		}
-		this.machine.getCardReader().insert(card);
+		this.machine.getCardReader().insert(card, pin);
 	}
 
 	@Override
