@@ -26,10 +26,8 @@ public interface IOrderManager extends IManager {
      * This returns the total price of the items in the customer's order.
      *
      * @return the total price
-     * @throws NullPointerSimulationException if the {@link BarcodedItem} could not
-     *                                        be found in the product database
      */
-    BigDecimal getTotalPrice() throws NullPointerSimulationException;
+    BigDecimal getTotalPrice();
 
     /**
      * Allows the attendant to override the session and unblock it. This also
@@ -57,14 +55,14 @@ public interface IOrderManager extends IManager {
      * @param item   the item to add
      * @param method the method of scanning
      */
-    void addItemToOrder(Item item, ScanType method) throws OperationNotSupportedException;
+    void addItemToOrder(Item item, ScanType method);
 
     /**
      * This removes an {@link Item} from the order and the bagging area.
      *
      * @param item the {@link Item} to remove
      */
-    void removeItemFromOrder(Item item) throws OperationNotSupportedException;
+    void removeItemFromOrder(Item item);
 
     /**
      * Returns the expected mass of the items the customer has scanned.
@@ -76,11 +74,9 @@ public interface IOrderManager extends IManager {
     /**
      * This returns the list of items added to the cart.
      *
-     * @return a list of {@link BarcodedProduct}
-     * @throws NullPointerSimulationException if the {@link Barcode} could not be
-     *                                        found in the product database
+     * @return a map of {@link Item} and whether they are to be bagged or not
      */
-    Map<Item, Boolean> getItems() throws NullPointerSimulationException;
+    Map<Item, Boolean> getItems();
 
     /**
      * This function returns an {@link IElectronicScale} object if any of the scales
@@ -90,13 +86,6 @@ public interface IOrderManager extends IManager {
      * otherwise
      */
     boolean isScaleOverloaded();
-
-    /**
-     * This allows the system to check if a barcode was scanned and if the software received the message from the observer.
-     *
-     * @return true if a barcode was scanned, false if not
-     */
-    boolean wasBarcodeScanned();
 
     /**
      * This calculates the price of a PLU coded item.

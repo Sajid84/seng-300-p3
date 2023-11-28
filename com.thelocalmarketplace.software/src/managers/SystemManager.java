@@ -203,7 +203,7 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	}
 
 	@Override
-	public void addItemToOrder(Item item, ScanType method) throws OperationNotSupportedException {
+	public void addItemToOrder(Item item, ScanType method) {
 		// not performing action if session is blocked
 		if (getState() != SessionStatus.NORMAL)
 			throw new IllegalStateException("cannot add item when in a non-normal state");
@@ -331,11 +331,6 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	}
 
 	@Override
-	public boolean wasBarcodeScanned() {
-		return om.wasBarcodeScanned();
-	}
-
-	@Override
 	public BigDecimal priceOf(PLUCodedItem item) {
 		return om.priceOf(item);
 	}
@@ -416,5 +411,17 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	@Override
 	public boolean isDisabled() {
 		return getState() == SessionStatus.DISABLED;
+	}
+
+	@Override
+	public void itemWasAdded(Item item) {
+		smf.itemWasAdded(item);
+	}
+
+	@Override
+	public void itemWasRemoved(Item item) {
+		// TODO revisit this implementation, the GUI will probably tell the order manager to remove the item
+		// not the other way around
+		smf.itemWasRemoved(item);
 	}
 }

@@ -104,6 +104,7 @@ public class Driver {
         // configuring the main screen
         gui.setUndecorated(false);
         gui.setSize(600, 400);
+        gui.setResizable(false);
 
         // getting the touch screen
         JFrame screen = machine.getScreen().getFrame();
