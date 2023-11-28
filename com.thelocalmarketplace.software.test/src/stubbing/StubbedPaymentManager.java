@@ -10,6 +10,7 @@ import com.tdc.NoCashAvailableException;
 import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
 import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
+import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
 
 import managers.PaymentManager;
@@ -103,7 +104,7 @@ public class StubbedPaymentManager extends PaymentManager {
 	private boolean configured;
 
 	@Override
-	public void configure(AbstractSelfCheckoutStation machine) {
+	public void configure(ISelfCheckoutStation machine) {
 		super.configure(machine);
 
 		configured = true;

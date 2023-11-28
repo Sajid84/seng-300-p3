@@ -21,8 +21,8 @@ import com.tdc.NoCashAvailableException;
 import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
 import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
+import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import com.thelocalmarketplace.hardware.PLUCodedItem;
-import com.thelocalmarketplace.hardware.PLUCodedProduct;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
 
 import ca.ucalgary.seng300.simulation.NullPointerSimulationException;
@@ -46,7 +46,7 @@ import utils.Pair;
 public class SystemManager implements ISystemManager, IPaymentManager, IOrderManager, IAttendantManager {
 
 	// hardware references
-	protected AbstractSelfCheckoutStation machine;
+	protected ISelfCheckoutStation machine;
 
 	// object references
 
@@ -91,7 +91,7 @@ public class SystemManager implements ISystemManager, IPaymentManager, IOrderMan
 	}
 
 	@Override
-	public void configure(AbstractSelfCheckoutStation machine) {
+	public void configure(ISelfCheckoutStation machine) {
 		// saving a reference
 		this.machine = machine;
 

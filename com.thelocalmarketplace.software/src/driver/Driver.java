@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
 
-import javax.naming.OperationNotSupportedException;
 import javax.swing.*;
 
 import com.jjjwelectronics.Item;
@@ -25,6 +24,7 @@ import com.tdc.banknote.IBanknoteDispenser;
 import com.tdc.coin.Coin;
 import com.tdc.coin.ICoinDispenser;
 import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
+import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
 
 import ca.ucalgary.seng300.simulation.SimulationException;
@@ -39,7 +39,7 @@ import utils.DriverHelper;
 public class Driver {
 
     // hardware references
-    protected AbstractSelfCheckoutStation machine;
+    protected ISelfCheckoutStation machine;
 
     // object references
     protected static Scanner scanner = new Scanner(System.in);
@@ -82,7 +82,7 @@ public class Driver {
         PowerGrid.engageUninterruptiblePowerSource();
 
         // TODO replace with java swing implementation
-        JFrame main = machine.screen.getFrame();
+        JFrame main = machine.getScreen().getFrame();
 
         main.setSize(600, 400);
         main.setContentPane(new SystemManagerForm().root);
@@ -96,7 +96,7 @@ public class Driver {
 
         // loading the coin dispensers
         for (BigDecimal coinDenomination : coinDenominations) {
-            ICoinDispenser cd = machine.coinDispensers.get(coinDenomination);
+            ICoinDispenser cd = machine.getCoinDispensers().get(coinDenomination);
             for (int j = 0; j < cd.getCapacity(); ++j) {
                 try {
                     cd.load(new Coin(coinDenomination));
@@ -108,7 +108,7 @@ public class Driver {
 
         // loading the banknote dispensers
         for (BigDecimal banknoteDenomination : banknoteDenominations) {
-            IBanknoteDispenser abd = machine.banknoteDispensers.get(banknoteDenomination);
+            IBanknoteDispenser abd = machine.getBanknoteDispensers().get(banknoteDenomination);
             for (int j = 0; j < abd.getCapacity(); ++j) {
                 try {
                     abd.load(new Banknote(Currency.getInstance(Locale.CANADA), banknoteDenomination));
@@ -120,8 +120,8 @@ public class Driver {
 
         // adding paper and ink to the printer
         try {
-            machine.printer.addInk(1 << 20);
-            machine.printer.addPaper(1 << 10);
+            machine.getPrinter().addInk(1 << 20);
+            machine.getPrinter().addPaper(1 << 10);
         } catch (OverloadedDevice e) {
             // shouldn't happen
         }

@@ -2,6 +2,7 @@ package managers;
 
 import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 
+import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import managers.enums.SessionStatus;
 import managers.interfaces.IAttendantManager;
 import managers.interfaces.IAttendantManagerNotify;
@@ -9,7 +10,7 @@ import managers.interfaces.IAttendantManagerNotify;
 public class AttendantManager implements IAttendantManager, IAttendantManagerNotify {
 
 	// hardware references
-	protected AbstractSelfCheckoutStation machine;
+	protected ISelfCheckoutStation machine;
 
 	// object references
 	protected SystemManager sm;
@@ -25,7 +26,7 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	}
 
 	@Override
-	public void configure(AbstractSelfCheckoutStation machine) {
+	public void configure(ISelfCheckoutStation machine) {
 		// saving reference
 		this.machine = machine;
 

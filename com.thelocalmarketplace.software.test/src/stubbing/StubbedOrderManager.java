@@ -13,7 +13,7 @@ import javax.naming.OperationNotSupportedException;
 import com.jjjwelectronics.Item;
 import com.jjjwelectronics.scale.IElectronicScale;
 import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
-import com.thelocalmarketplace.hardware.Product;
+import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 
 import ca.ucalgary.seng300.simulation.NullPointerSimulationException;
 import managers.OrderManager;
@@ -119,7 +119,7 @@ public class StubbedOrderManager extends OrderManager {
 	private boolean configured;
 
 	@Override
-	public void configure(AbstractSelfCheckoutStation machine) {
+	public void configure(ISelfCheckoutStation machine) {
 		super.configure(machine);
 
 		configured = true;

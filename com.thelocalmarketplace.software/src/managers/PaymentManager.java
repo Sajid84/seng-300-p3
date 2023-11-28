@@ -10,6 +10,7 @@ package managers;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -42,7 +43,7 @@ import utils.DatabaseHelper;
 public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 
 	// hardware references
-	protected AbstractSelfCheckoutStation machine;
+	protected ISelfCheckoutStation machine;
 
 	// object references
 	protected SystemManager sm;
@@ -83,16 +84,16 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 	}
 
 	@Override
-	public void configure(AbstractSelfCheckoutStation machine) {
+	public void configure(ISelfCheckoutStation machine) {
 		// saving reference
 		this.machine = machine;
 
 		// passing references, because nothing actually notifies the observers of the
 		// machine itself EVER
-		cc = new CoinCollector(this, machine.coinValidator);
-		bc = new BanknoteCollector(this, machine.banknoteValidator);
-		cro = new CardReaderObserver(this, machine.cardReader);
-		rpls = new ReceiptPrinterObserver(this, machine.printer);
+		cc = new CoinCollector(this, machine.getCoinValidator());
+		bc = new BanknoteCollector(this, machine.getBanknoteValidator());
+		cro = new CardReaderObserver(this, machine.getCardReader());
+		rpls = new ReceiptPrinterObserver(this, machine.getPrinter());
 	}
 
 	/**
@@ -120,7 +121,7 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 			throw new IllegalArgumentException("cannot swipe a null card");
 		}
 
-		this.machine.cardReader.swipe(card);
+		this.machine.getCardReader().swipe(card);
 	}
 
 	@Override
@@ -146,7 +147,7 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 	@Override
 	public void insertCoin(Coin coin) {
 		try {
-			this.machine.coinSlot.receive(coin);
+			this.machine.getCoinSlot().receive(coin);
 		} catch (DisabledException e) {
 			this.sm.blockSession();
 			this.sm.notifyAttendant("Device Powered Off");
@@ -162,7 +163,7 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 	@Override
 	public void insertBanknote(Banknote banknote) {
 		try {
-			this.machine.banknoteInput.receive(banknote);
+			this.machine.getBanknoteInput().receive(banknote);
 		} catch (DisabledException e) {
 			this.sm.blockSession();
 			this.sm.notifyAttendant("Device Powered Off");
@@ -186,17 +187,15 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 
 		// Loop through all coin dispensers in the machine to check if empty
 		// and find total machine cash balance
-		for (int i = 0; i < this.machine.coinDenominations.size(); i++) {
-			denomination = this.machine.coinDenominations.get(i);
-			coinDispenser = this.machine.coinDispensers.get(denomination);
+		for (BigDecimal denom : this.machine.getCoinDenominations()) {
+			coinDispenser = this.machine.getCoinDispensers().get(denom);
 			cashCount = cashCount + coinDispenser.size();
 			totalMachineCash = totalMachineCash.add(denomination.multiply(BigDecimal.valueOf(coinDispenser.size())));
 		}
 
 		// Loop through all banknotes in machine to check if empty
-		for (int i = 0; i < this.machine.banknoteDenominations.length; i++) {
-			denomination = this.machine.banknoteDenominations[i];
-			banknoteDispenser = this.machine.banknoteDispensers.get(denomination);
+		for (BigDecimal denom : this.machine.getBanknoteDenominations()) {
+			banknoteDispenser = this.machine.getBanknoteDispensers().get(denom);
 			cashCount = cashCount + banknoteDispenser.size();
 			totalMachineCash = totalMachineCash
 					.add(denomination.multiply(BigDecimal.valueOf(banknoteDispenser.size())));
@@ -245,17 +244,14 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 		}
 
 		// sorting and reversing the denominations
-		List<BigDecimal> sorted_banknote_denoms = new ArrayList<BigDecimal>();
-		for (int i = 0; i < machine.banknoteDenominations.length; ++i) {
-			sorted_banknote_denoms.add(machine.banknoteDenominations[i]);
-		}
+        List<BigDecimal> sorted_banknote_denoms = new ArrayList<BigDecimal>(Arrays.asList(machine.getBanknoteDenominations()));
 		Collections.sort(sorted_banknote_denoms);
 		Collections.reverse(sorted_banknote_denoms);
 
 		// Iterate through all the banknote denominations in descending order
 		// This assumes largest denominations are last in list
 		for (BigDecimal denomination : sorted_banknote_denoms) {
-			IBanknoteDispenser banknoteDispenser = this.machine.banknoteDispensers.get(denomination);
+			IBanknoteDispenser banknoteDispenser = this.machine.getBanknoteDispensers().get(denomination);
 
 			// check if current dispensers is empty.
 			// If empty, switch to next denomination
@@ -286,7 +282,7 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 		}
 
 		// sorting and reversing the denominations
-		List<BigDecimal> sorted_coin_denoms = machine.coinDenominations;
+		List<BigDecimal> sorted_coin_denoms = machine.getCoinDenominations();
 		Collections.sort(sorted_coin_denoms);
 		Collections.reverse(sorted_coin_denoms);
 
@@ -294,7 +290,7 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 
 		// Iterate through all the cash denominations now
 		for (BigDecimal denomination : sorted_coin_denoms) {
-			ICoinDispenser coinDispenser = this.machine.coinDispensers.get(denomination);
+			ICoinDispenser coinDispenser = this.machine.getCoinDispensers().get(denomination);
 
 			// checks if current dispenser are empty
 			// If empty switch to next denomination
@@ -335,13 +331,13 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 			yield false;
 		case 0:
 			// Dispensed enough change
-			this.machine.banknoteOutput.dispense();
+			this.machine.getBanknoteOutput().dispense();
 			this.sm.notifyPaid();
 			yield true;
 		case -1:
 			// this should never actually happen
 			this.sm.notifyAttendant("To much change was dispensed");
-			this.machine.banknoteOutput.dispense();
+			this.machine.getBanknoteOutput().dispense();
 			this.sm.notifyPaid();
 			yield false;
 		default:
@@ -440,16 +436,16 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 		}
 
 		// cutting the paper
-		this.machine.printer.cutPaper();
+		this.machine.getPrinter().cutPaper();
 	}
 
 	protected void printLine(String s) throws EmptyDevice {
 		for (int i = 0; i < s.length(); i++) {
 			try {
-				this.machine.printer.print(s.charAt(i));
+				this.machine.getPrinter().print(s.charAt(i));
 			} catch (OverloadedDevice e) {
 				try {
-					this.machine.printer.print('\n');
+					this.machine.getPrinter().print('\n');
 				} catch (OverloadedDevice e_2) {
 					// this should never happen
 					throw new RuntimeException("an unexpected error occurred.");

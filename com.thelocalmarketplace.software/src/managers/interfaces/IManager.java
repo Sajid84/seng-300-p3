@@ -5,8 +5,8 @@ package managers.interfaces;
 
 import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 
+import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import managers.enums.SessionStatus;
-import observers.IObserverUseable;
 
 public interface IManager extends IManagerNotify {
 	/**
@@ -15,7 +15,7 @@ public interface IManager extends IManagerNotify {
 	 * 
 	 * @param machine the desired machine to observe
 	 */
-	void configure(AbstractSelfCheckoutStation machine);
+	void configure(ISelfCheckoutStation machine);
 
 	/**
 	 * Gets the state of the manager.

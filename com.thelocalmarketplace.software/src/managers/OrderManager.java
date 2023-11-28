@@ -35,7 +35,7 @@ import utils.DatabaseHelper;
 public class OrderManager implements IOrderManager, IOrderManagerNotify {
 
 	// hardware references
-	protected AbstractSelfCheckoutStation machine;
+	protected ISelfCheckoutStation machine;
 
 	// object references
 	protected SystemManager sm;
@@ -79,15 +79,15 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 	}
 
 	@Override
-	public void configure(AbstractSelfCheckoutStation machine) {
+	public void configure(ISelfCheckoutStation machine) {
 		// saving reference
 		this.machine = machine;
 
 		// passing references, because nothing actually notifies the observers of the
 		// machine itself EVER
-		baggingarea_so = new ScaleObserver(this, machine.baggingArea);
-		main_bso = new BarcodeScannerObserver(this, machine.mainScanner);
-		handheld_bso = new BarcodeScannerObserver(this, machine.handheldScanner);
+		baggingarea_so = new ScaleObserver(this, machine.getBaggingArea());
+		main_bso = new BarcodeScannerObserver(this, machine.getMainScanner());
+		handheld_bso = new BarcodeScannerObserver(this, machine.getHandheldScanner());
 	}
 
 	@Override
@@ -215,7 +215,7 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 
 		// check if customer wants to bag item (bulky item handler extension)
 		if (bagItem) {
-			this.machine.baggingArea.addAnItem(item);
+			this.machine.getBaggingArea().addAnItem(item);
 		}
 
 		// reset bagging request tracker for the next item
@@ -231,10 +231,10 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 	protected void addItemToOrder(BarcodedItem item, ScanType method) {
 		switch (method) {
 		case MAIN:
-			this.machine.mainScanner.scan(item);
+			this.machine.getMainScanner().scan(item);
 			break;
 		case HANDHELD:
-			this.machine.handheldScanner.scan(item);
+			this.machine.getHandheldScanner().scan(item);
 			break;
 		}
 
@@ -266,7 +266,7 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 
 		// removing the item from the bagging area
 		// this function needs to be here to work with the bags too heavy use case
-		this.machine.baggingArea.removeAnItem(item);
+		this.machine.getBaggingArea().removeAnItem(item);
 	}
 
 	/**
@@ -285,7 +285,7 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 		this.adjustment = this.adjustment.add(bagWeight);
 
 		// Placing the bags in the bagging area
-		this.machine.baggingArea.addAnItem(bags);
+		this.machine.getBaggingArea().addAnItem(bags);
 	}
 
 	@Override
