@@ -115,6 +115,40 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 	}
 
 	@Override
+	public void tapCard(Card card) throws IOException{
+		if (card == null) {
+			throw new IllegalArgumentException("cannot tap a null card");
+		}
+		try {
+			this.machine.cardReader.tap(card);
+			// Happens if there is a problem with the chip
+		} catch (ChipFailureException e){
+			this.sm.blockSession();
+			this.sm.notifyAttendant("Card tap failed");
+		}
+	}
+
+	@Override
+	public void notifyCardTap(CardData cardData) {
+		if (cardData == null) {
+			throw new IllegalArgumentException("received null card data from the observer";
+		}
+
+		//vars
+		double amountDouble = sm.getTotalPrice().doubleValue();
+		long holdNumber = issuer.authorizeHold(cardData.getNumber(), amountDouble);
+
+		// testing the hold number
+		if (holdNumber == -1) {
+			return;
+		} else {
+			payment = sm.getTotalPrice();
+			recordTransaction(cardData, holdNumber, amountDouble);
+			sm.notifyPaid();
+		}
+	}
+
+	@Override
 	public void swipeCard(Card card) throws IOException {
 		if (card == null) {
 			throw new IllegalArgumentException("cannot swipe a null card");
