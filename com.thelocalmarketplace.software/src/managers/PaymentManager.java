@@ -146,11 +146,9 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 	@Override
 	public void insertCard(Card card) throws IOException {
 		if (card == null ) {
-			throw new IllegalArgumentException("Cannot insert a null card")
+			throw new IllegalArgumentException("Cannot insert a null card");
 		}
-
 		this.machine.getCardReader().insert(card);
-
 	}
 
 	@Override
@@ -159,9 +157,9 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 			throw new IllegalArgumentException("received null card data from the observer");
 		}
 		double amountDouble = sm.getTotalPrice().doubleValue();
-		long holdNumber = issuer.authorizeHold(cardData.getNumber(), amountDue);
+		long holdNumber = issuer.authorizeHold(cardData.getNumber(), amountDouble);
 
-		if (getHoldNumber == -1){
+		if (holdNumber == -1){
 			return;
 		} else {
 			recordTransaction(cardData, holdNumber, amountDouble);
