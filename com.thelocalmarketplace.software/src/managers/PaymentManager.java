@@ -18,6 +18,7 @@ import com.jjjwelectronics.Item;
 import com.jjjwelectronics.OverloadedDevice;
 import com.jjjwelectronics.card.Card;
 import com.jjjwelectronics.card.Card.CardData;
+import com.jjjwelectronics.card.ChipFailureException;
 import com.jjjwelectronics.scanner.BarcodedItem;
 import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
