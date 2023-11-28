@@ -132,7 +132,7 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 	@Override
 	public void notifyCardTap(CardData cardData) {
 		if (cardData == null) {
-			throw new IllegalArgumentException("received null card data from the observer";
+			throw new IllegalArgumentException("received null card data from the observer");
 		}
 
 		//vars

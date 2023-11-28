@@ -23,6 +23,15 @@ public interface IPaymentManagerNotify {
 	 * @return
 	 */
 	void notifyCardSwipe(CardData cardData);
+	
+	/**
+	 * This method notifies the {@link IPaymentManager} that a child object received 
+	 * a card tap.
+	 * 
+	 * @param the tapped card data
+	 * @return
+	 */
+	void notifyCardTap(CardData cardData);
 
 	/**
 	 * This method notifies the {@link IPaymentManager} that a child object has
@@ -45,4 +54,5 @@ public interface IPaymentManagerNotify {
 	 * @param hasInk A boolean indicating whether there is ink available (true) or not (false).
 	 */
 	void notifyInk(boolean hasInk);
+
 }
