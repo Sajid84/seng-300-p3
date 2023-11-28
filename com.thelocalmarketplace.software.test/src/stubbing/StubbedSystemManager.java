@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.jjjwelectronics.card.Card.CardData;
 import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
+import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
 
 import managers.SystemManager;
@@ -70,7 +71,7 @@ public class StubbedSystemManager extends SystemManager {
 		return super.issuer;
 	}
 
-	public AbstractSelfCheckoutStation getMachine() {
+	public ISelfCheckoutStation getMachine() {
 		return machine;
 	}
 

@@ -24,11 +24,6 @@ public class StubbedStation extends SelfCheckoutStationGold {
 	public StubbedStation() {
 		machine = new SelfCheckoutStationGold();
 	}
-	
-	public ElectronicScaleGold getBaggingAreaScale() {
-		// at runtime, this is a ElectronicScaleGold object
-		return (ElectronicScaleGold) machine.baggingArea;
-	}
 
 	public static void configure() {
 		AbstractSelfCheckoutStation.resetConfigurationToDefaults();

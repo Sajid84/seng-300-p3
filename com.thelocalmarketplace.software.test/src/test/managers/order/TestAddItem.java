@@ -23,7 +23,7 @@ import stubbing.StubbedBarcodedProduct;
 import stubbing.StubbedGrid;
 import stubbing.StubbedItem;
 import stubbing.StubbedOrderManager;
-import stubbing.StubbedPLUCodedItem;
+import stubbing.StubbedPLUItem;
 import stubbing.StubbedStation;
 import stubbing.StubbedSystemManager;
 
@@ -87,13 +87,13 @@ public class TestAddItem {
 
 	@Test(expected = OperationNotSupportedException.class)
 	public void addingInstanceOfPLUViaMainScanner() throws OperationNotSupportedException {
-		PLUCodedItem pluCodedItem = new StubbedPLUCodedItem();
+		PLUCodedItem pluCodedItem = new StubbedPLUItem();
 		om.addItemToOrder(pluCodedItem, ScanType.MAIN);
 	}
 
 	@Test(expected = OperationNotSupportedException.class)
 	public void addingInstanceOfPLUViaHandheldScanner() throws OperationNotSupportedException {
-		PLUCodedItem pluCodedItem = new StubbedPLUCodedItem();
+		PLUCodedItem pluCodedItem = new StubbedPLUItem();
 		om.addItemToOrder(pluCodedItem, ScanType.HANDHELD);
 	}
 }

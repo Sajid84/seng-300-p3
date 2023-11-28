@@ -97,7 +97,7 @@ public class StubbedPaymentManager extends PaymentManager {
 		super.issuer = i;
 	}
 
-	public AbstractSelfCheckoutStation getMachine() {
+	public ISelfCheckoutStation getMachine() {
 		return machine;
 	}
 

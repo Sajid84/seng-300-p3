@@ -11,11 +11,7 @@ import org.junit.Test;
 import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 
 import managers.enums.SessionStatus;
-import stubbing.StubbedBarcodedProduct;
-import stubbing.StubbedGrid;
-import stubbing.StubbedOrderManager;
-import stubbing.StubbedStation;
-import stubbing.StubbedSystemManager;
+import stubbing.*;
 
 public class TestAttendantOverride {
 	// machine
@@ -55,7 +51,7 @@ public class TestAttendantOverride {
 	@Test
 	public void testAttendantOverrideSetsAdjustment() {
 		// setup
-		StubbedBarcodedProduct p = new StubbedBarcodedProduct();
+		StubbedBarcodedItem p = new StubbedBarcodedItem();
 		om.addItem(p, true);
 		om.setActualWeight(BigDecimal.ONE);
 
@@ -63,6 +59,6 @@ public class TestAttendantOverride {
 		om.onAttendantOverride();
 
 		// asserting
-		assertEquals(om.getWeightAdjustment(), new BigDecimal(StubbedBarcodedProduct.WEIGHT).subtract(BigDecimal.ONE));
+		assertEquals(om.getWeightAdjustment(), new BigDecimal(StubbedBarcodedItem.WEIGHT).subtract(BigDecimal.ONE));
 	}
 }

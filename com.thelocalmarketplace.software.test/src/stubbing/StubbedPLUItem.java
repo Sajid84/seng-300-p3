@@ -6,16 +6,16 @@ import com.jjjwelectronics.Mass;
 import com.thelocalmarketplace.hardware.PLUCodedItem;
 import com.thelocalmarketplace.hardware.PriceLookUpCode;
 
-public class StubbedPLUCodedItem extends PLUCodedItem {
+public class StubbedPLUItem extends PLUCodedItem {
 
 	public static final PriceLookUpCode PLUCODE = new PriceLookUpCode("12345");
 	public static final Mass mass = new Mass(10);
 
-	public StubbedPLUCodedItem() {
-		this(StubbedPLUCodedItem.PLUCODE, StubbedPLUCodedItem.mass);
+	public StubbedPLUItem() {
+		this(StubbedPLUItem.PLUCODE, StubbedPLUItem.mass);
 	}
 
-    public StubbedPLUCodedItem(PriceLookUpCode plucode2, Mass mass2) {
+    public StubbedPLUItem(PriceLookUpCode plucode2, Mass mass2) {
         super(plucode2, mass2);
 
     }

@@ -112,7 +112,7 @@ public class StubbedOrderManager extends OrderManager {
 		return super.bagItem;
 	}
 
-	public AbstractSelfCheckoutStation getMachine() {
+	public ISelfCheckoutStation getMachine() {
 		return super.machine;
 	}
 
@@ -130,7 +130,7 @@ public class StubbedOrderManager extends OrderManager {
 	}
 
 	@Override
-	public void addItemToOrder(Item item, ScanType method) throws OperationNotSupportedException {
+	public void addItemToOrder(Item item, ScanType method) {
 		addItemToOrderCalled = true;
 		super.addItemToOrder(item, method);
 	}
@@ -154,7 +154,7 @@ public class StubbedOrderManager extends OrderManager {
 	}
 
 	@Override
-	public Map<Item, Boolean> getItems() throws NullPointerSimulationException {
+	public Map<Item, Boolean> getItems() {
 		getProductsCalled = true;
 		return super.getItems();
 	}

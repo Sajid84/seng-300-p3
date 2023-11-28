@@ -145,7 +145,7 @@ public class TestRemoveItem {
 	 */
 	@Test
 	public void testSystemManagerItemInOrder() throws OperationNotSupportedException, OverloadedDevice {
-		AbstractElectronicScale scale = (AbstractElectronicScale) machine.baggingArea;
+		AbstractElectronicScale scale = (AbstractElectronicScale) machine.getBaggingArea();
 		StubbedOrderManagerNotify omnStub = new StubbedOrderManagerNotify();
 		sm.omStub.registerListener(omnStub);
 
@@ -171,13 +171,12 @@ public class TestRemoveItem {
 	 * If the item is a Barcoded type and is in the current order, we expect that it
 	 * will be removed, all OrderManager's listeners will be informed, and that the
 	 * item will be removed from the scale.
-	 * 
-	 * @throws OperationNotSupportedException
+	 *
 	 * @throws OverloadedDevice
 	 */
 	@Test
-	public void testWhenItemInOrder() throws OperationNotSupportedException, OverloadedDevice {
-		AbstractElectronicScale scale = (AbstractElectronicScale) machine.baggingArea;
+	public void testWhenItemInOrder() throws OverloadedDevice {
+		AbstractElectronicScale scale = (AbstractElectronicScale) machine.getBaggingArea();
 		StubbedOrderManagerNotify omnStub = new StubbedOrderManagerNotify();
 		om.registerListener(omnStub);
 

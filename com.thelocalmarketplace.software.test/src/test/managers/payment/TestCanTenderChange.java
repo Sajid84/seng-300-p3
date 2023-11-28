@@ -59,8 +59,8 @@ public class TestCanTenderChange {
 
 	//Loads money into machine
 	private void loadMoneyIntoTheMachine() throws SimulationException, CashOverloadException {
-		BigDecimal denomination = this.machine.coinDenominations.get(5);
-		coinDispenser = this.machine.coinDispensers.get(denomination);
+		BigDecimal denomination = this.machine.getCoinDenominations().get(5);
+		coinDispenser = this.machine.getCoinDispensers().get(denomination);
 		for (int i = 0; i < 10; i++) {
 			coinDispenser.load(coin);
 		}
