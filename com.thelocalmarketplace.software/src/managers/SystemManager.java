@@ -126,13 +126,13 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	}
 
 	@Override
-	public void removeItemFromOrder(Item item) {
+	public void removeItemFromOrder(Pair<Item, Boolean> pair) {
 		if (getState() == SessionStatus.PAID) {
 			throw new IllegalStateException("cannot remove item from state PAID");
 		}
 
 		// not restricting this function, this is used to resolve discrepancies
-		this.om.removeItemFromOrder(item);
+		this.om.removeItemFromOrder(pair);
 	}
 
 	@Override
@@ -185,7 +185,7 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	}
 
 	@Override
-	public Map<Item, Boolean> getItems() throws NullPointerSimulationException {
+	public List<Pair<Item, Boolean>> getItems() throws NullPointerSimulationException {
 		return this.om.getItems();
 	}
 
@@ -201,6 +201,11 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	@Override
 	public void doNotBagRequest(boolean bagRequest) {
 		this.om.doNotBagRequest(bagRequest);
+	}
+
+	@Override
+	public boolean getDoNotBagRequest() {
+		return om.getDoNotBagRequest();
 	}
 
 	@Override
@@ -430,8 +435,6 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 
 	@Override
 	public void notifyItemRemoved(Item item) {
-		// TODO revisit this implementation, the GUI will probably tell the order manager to remove the item
-		// TOOD not the other way around
 		smf.notifyItemRemoved(item);
 	}
 

@@ -24,13 +24,12 @@ import managers.interfaces.IOrderManagerNotify;
 import observers.order.BarcodeScannerObserver;
 import observers.order.ScaleObserver;
 import utils.DatabaseHelper;
+import utils.Pair;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class OrderManager implements IOrderManager, IOrderManagerNotify {
 
@@ -50,7 +49,7 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
     protected BigDecimal adjustment = BigDecimal.ZERO;
     protected BigDecimal actualWeight = BigDecimal.ZERO;
     protected boolean bagItem = true;
-    protected Map<Item, Boolean> items = new HashMap<>();
+    protected List<Pair<Item, Boolean>> items = new ArrayList<>();
     protected List<IOrderManagerNotify> listeners = new ArrayList<IOrderManagerNotify>();
     protected List<IElectronicScale> overloadedScales = new ArrayList<IElectronicScale>();
     protected Item last_item;
@@ -122,21 +121,22 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
     public BigDecimal getExpectedMass() {
         BigDecimal total = BigDecimal.ZERO;
 
-        System.out.println(this.items.keySet().size());
+        System.out.println(this.items.size());
 
-        for (Item i : this.items.keySet()) {
+        for (Pair<Item, Boolean> p : this.items) {
+            // destructure
+            Item i = p.getKey();
+
             // checking for null
             if (i == null) {
                 throw new IllegalArgumentException("tried to calculate mass of a null item");
             }
 
             // no bagging request for this item, don't add this to the expected weight
-            if (!items.get(i)) {
-                continue;
+            if (p.getValue()) {
+                // the item class guarantees a non-null positive mass
+                total = total.add(i.getMass().inGrams());
             }
-
-            // the item class guarantees a non-null positive mass
-            total = total.add(i.getMass().inGrams());
         }
 
         return total;
@@ -164,7 +164,10 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
     public BigDecimal getTotalPrice() throws IllegalArgumentException {
         BigDecimal total = BigDecimal.ZERO;
 
-        for (Item i : this.items.keySet()) {
+        for (Pair<Item, Boolean> p : this.items) {
+            // destructure
+            Item i = p.getKey();
+
             // checking for null
             if (i == null) {
                 throw new IllegalArgumentException("tried to calculate mass of a null item");
@@ -215,7 +218,7 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
         }
 
         // adding the item
-        items.put(item, bagItem);
+        items.add(new Pair<>(item, bagItem));
 
         // notifying the system manager
         sm.notifyItemAdded(item);
@@ -252,8 +255,8 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
      * customer is displayed an error message.
      */
     @Override
-    public void removeItemFromOrder(Item item) {
-        if (item == null) {
+    public void removeItemFromOrder(Pair<Item, Boolean> pair) {
+        if (pair == null) {
             throw new IllegalArgumentException("tried to remove a null item from the bagging area");
         }
 
@@ -264,17 +267,20 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
          */
 
         // removing the item from the map
-        if (this.items.remove(item)) {
+        if (this.items.remove(pair)) {
             // publishing event
-            sm.notifyItemRemoved(item);
+            sm.notifyItemRemoved(pair.getKey());
             for (IOrderManagerNotify listener : listeners) {
-                listener.onItemRemovedFromOrder(item);
+                listener.onItemRemovedFromOrder(pair.getKey());
             }
         }
 
-        // removing the item from the bagging area
-        // this function needs to be here to work with the bags too heavy use case
-        this.machine.getBaggingArea().removeAnItem(item);
+        // removing if the item was bagged
+        if (pair.getValue()) {
+            // removing the item from the bagging area
+            // this function needs to be here to work with the bags too heavy use case
+            this.machine.getBaggingArea().removeAnItem(pair.getKey());
+        }
     }
 
     /**
@@ -297,7 +303,7 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
     }
 
     @Override
-    public Map<Item, Boolean> getItems() {
+    public List<Pair<Item, Boolean>> getItems() {
         return items;
     }
 
@@ -339,6 +345,11 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
             notifyAttendant("Not bagging the next item");
             bagItem = false;
         }
+    }
+
+    @Override
+    public boolean getDoNotBagRequest() {
+        return bagItem;
     }
 
     @Override

@@ -39,6 +39,7 @@ import observers.payment.CardReaderObserver;
 import observers.payment.CoinCollector;
 import observers.payment.ReceiptPrinterObserver;
 import utils.DatabaseHelper;
+import utils.Pair;
 
 public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 
@@ -57,7 +58,6 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 
 	// vars
 	protected BigDecimal payment = BigDecimal.ZERO;
-	protected String signature;
 	protected boolean hasPaper = false;
 	protected boolean hasInk = false;
 
@@ -399,7 +399,10 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 		// printing the receipt
 		try {
 			printLine("----- Receipt -----\n");
-			for (Item item : sm.getItems().keySet()) {
+			for (Pair<Item, Boolean> pair : sm.getItems()) {
+				// destructuring
+				Item item = pair.getKey();
+
 				// printing the item
 				if (item instanceof BarcodedItem) {
 					BarcodedProduct p = DatabaseHelper.get((BarcodedItem) item);
