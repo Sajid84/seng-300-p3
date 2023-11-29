@@ -158,7 +158,7 @@ public class TestFunctionDelegation {
 		sm.setState(SessionStatus.NORMAL);
 
 		try {
-			sm.onDoNotBagRequest(null);
+			sm.doNotBagRequest(true);
 		} catch (Exception e) {
 			// do nothing
 		}

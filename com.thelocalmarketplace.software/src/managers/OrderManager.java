@@ -68,7 +68,6 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
         if (sm == null) {
             throw new IllegalArgumentException("the system manager cannot be null");
         }
-
         if (leniency == null) {
             throw new IllegalArgumentException("the leniency cannot be null");
         }
@@ -110,14 +109,9 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
         // checking for null
         if (barcode == null) throw new IllegalArgumentException("invalid barcode was scanned");
 
-        // notifying that the item was actually scanned and there was nothing wrong
-        // happened
-
-        // adding the item to the order
-        items.put(last_item, bagItem);
-
-        // notifying the system manager
-        sm.notifyItemAdded(last_item);
+        // setting the last item to null to essentially clear it
+        // this is useful to determine whether an item was added properly without error
+        last_item = null;
     }
 
     /**
@@ -173,7 +167,7 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
         for (Item i : this.items.keySet()) {
             // checking for null
             if (i == null) {
-                throw new IllegalArgumentException("tried to calculate mass of a null Product");
+                throw new IllegalArgumentException("tried to calculate mass of a null item");
             }
 
             // calculating the price for a barcodeditem
@@ -218,11 +212,13 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
         // figuring out how to scan the item
         if (item instanceof BarcodedItem) {
             this.addItemToOrder((BarcodedItem) item, method);
-        } else {
-            // if it's not a barcoded item, we can assume that the item is just going to be added to the
-            // bagging area
-            items.put(item, bagItem);
         }
+
+        // adding the item
+        items.put(item, bagItem);
+
+        // notifying the system manager
+        sm.notifyItemAdded(item);
 
         // check if customer wants to bag item (bulky item handler extension)
         if (bagItem) {
@@ -271,7 +267,6 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
         if (this.items.remove(item)) {
             // publishing event
             sm.notifyItemRemoved(item);
-
             for (IOrderManagerNotify listener : listeners) {
                 listener.onItemRemovedFromOrder(item);
             }
@@ -334,20 +329,16 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
      * This method handles a customer's request to skip bagging for a specific item.
      * It adjusts the expected weight and updates the weight adjustment, blocks the
      * session, and notifies the attendant.
-     *
-     * @param item the item for which bagging is skipped
      */
     @Override
-    public void onDoNotBagRequest(Item item) {
-        if (item == null) {
-            throw new IllegalArgumentException("a null item was requested not to be bagged");
+    public void doNotBagRequest(boolean bagRequest) {
+        if (bagRequest) {
+            notifyAttendant("Bagging the next item");
+            bagItem = true;
+        } else {
+            notifyAttendant("Not bagging the next item");
+            bagItem = false;
         }
-
-        // notifying the attendant
-        notifyAttendant("do not bag request was received");
-
-        // Set the flag for no bagging
-        bagItem = false;
     }
 
     @Override
@@ -425,6 +416,13 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 
         // multiplying mass by kilograms
         return price.multiply(scale);
+    }
+
+    @Override
+    public boolean errorAddingItem() {
+        // since we know that the notifyBarcodeScanned() function sets this back to null
+        // we can assume that the scanner malfunctioned if this variable is not null
+        return last_item != null;
     }
 
     @Override

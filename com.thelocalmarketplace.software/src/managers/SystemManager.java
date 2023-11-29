@@ -199,8 +199,8 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	}
 
 	@Override
-	public void onDoNotBagRequest(Item item) {
-		this.om.onDoNotBagRequest(item);
+	public void doNotBagRequest(boolean bagRequest) {
+		this.om.doNotBagRequest(bagRequest);
 	}
 
 	@Override
@@ -338,6 +338,11 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	@Override
 	public BigDecimal priceOf(PLUCodedItem item) {
 		return om.priceOf(item);
+	}
+
+	@Override
+	public boolean errorAddingItem() {
+		return om.errorAddingItem();
 	}
 
 	@Override

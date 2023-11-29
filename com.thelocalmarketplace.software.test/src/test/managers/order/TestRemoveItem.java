@@ -3,8 +3,6 @@
 
 package test.managers.order;
 
-import static org.junit.Assert.assertTrue;
-
 import java.math.BigDecimal;
 
 import javax.naming.OperationNotSupportedException;
@@ -30,6 +28,8 @@ import stubbing.StubbedOrderManagerNotify;
 import stubbing.StubbedStation;
 import stubbing.StubbedSystemManager;
 import utils.DatabaseHelper;
+
+import static org.junit.Assert.*;
 
 public class TestRemoveItem {
 	private StubbedOrderManager om;
@@ -62,20 +62,14 @@ public class TestRemoveItem {
 	/**
 	 * When an Item isn't PLU-Coded, or Barcoded, then this happens. A null item is
 	 * a good example of this type.
-	 * 
-	 * @throws OperationNotSupportedException This is expected to happen
 	 */
 	@Test(expected = IllegalArgumentException.class)
-	public void testWhenItemTypeNotRecognized() throws OperationNotSupportedException {
-		Item item = null;
-		om.removeItemFromOrder(item);
+	public void testWhenItemTypeNotRecognized() {
+		om.removeItemFromOrder(null);
 	}
 
 	/**
-	 * PLU Coded items are unimplemented, so we expect an exception for the time
-	 * being.
-	 * 
-	 * @throws OperationNotSupportedException This is expected to happen.
+	 * TODO redo this method
 	 */
 	@Test(expected = OperationNotSupportedException.class)
 	public void testWhenItemIsPLUCoded() throws OperationNotSupportedException {
@@ -91,7 +85,7 @@ public class TestRemoveItem {
 	 * @throws OperationNotSupportedException This is expected to happen.
 	 */
 	@Test(expected = IllegalArgumentException.class)
-	public void testWhenItemNotInOrder() throws OperationNotSupportedException {
+	public void testWhenItemNotInOrder() {
 		Barcode otherBarcode = new Barcode(new Numeral[] { Numeral.nine, Numeral.nine, Numeral.nine, });
 		BarcodedItem item = new BarcodedItem(otherBarcode, new Mass(2));
 		om.removeItemFromOrder((Item) item);
@@ -100,13 +94,10 @@ public class TestRemoveItem {
 	/**
 	 * When an Item isn't PLU-Coded, or Barcoded, then this happens. A null item is
 	 * a good example of this type.
-	 * 
-	 * @throws OperationNotSupportedException This is expected to happen
 	 */
 	@Test(expected = IllegalArgumentException.class)
-	public void testSystemManagerItemTypeNotRecognized() throws OperationNotSupportedException {
-		Item item = null;
-		sm.removeItemFromOrder(item);
+	public void testSystemManagerItemTypeNotRecognized() {
+		sm.removeItemFromOrder(null);
 	}
 
 	/**
@@ -159,20 +150,18 @@ public class TestRemoveItem {
 		sm.removeItemFromOrder((Item) item);
 
 		// We expect our listeners to hear about this.
-		assertTrue(omnStub.gotOnItemRemovedFromOrderMessage == true);
-		assertTrue(omnStub.itemRemovedFromOrder == item);
+		assertTrue(omnStub.gotOnItemRemovedFromOrderMessage);
+        assertSame(omnStub.itemRemovedFromOrder, item);
 
 		// We expect the item to be removed from the bagging area.
 		// Because this is the only item, removing it will make the current mass == 0
-		assertTrue(scale.getCurrentMassOnTheScale().inGrams().floatValue() == 0);
+        assertEquals(0, scale.getCurrentMassOnTheScale().inGrams().floatValue(), 0.0);
 	}
 
 	/**
 	 * If the item is a Barcoded type and is in the current order, we expect that it
 	 * will be removed, all OrderManager's listeners will be informed, and that the
 	 * item will be removed from the scale.
-	 *
-	 * @throws OverloadedDevice
 	 */
 	@Test
 	public void testWhenItemInOrder() throws OverloadedDevice {
@@ -190,11 +179,11 @@ public class TestRemoveItem {
 		om.removeItemFromOrder((Item) item);
 
 		// We expect our listeners to hear about this.
-		assertTrue(omnStub.gotOnItemRemovedFromOrderMessage == true);
-		assertTrue(omnStub.itemRemovedFromOrder == item);
+		assertTrue(omnStub.gotOnItemRemovedFromOrderMessage);
+        assertSame(omnStub.itemRemovedFromOrder, item);
 
 		// We expect the item to be removed from the bagging area.
 		// Because this is the only item, removing it will make the current mass == 0
-		assertTrue(scale.getCurrentMassOnTheScale().inGrams().floatValue() == 0);
+        assertEquals(0, scale.getCurrentMassOnTheScale().inGrams().floatValue(), 0.0);
 	}
 }

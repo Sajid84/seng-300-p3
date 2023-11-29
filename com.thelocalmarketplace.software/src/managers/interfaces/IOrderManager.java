@@ -4,16 +4,12 @@
 
 package managers.interfaces;
 
-import ca.ucalgary.seng300.simulation.NullPointerSimulationException;
 import com.jjjwelectronics.Item;
 import com.jjjwelectronics.scale.IElectronicScale;
-import com.jjjwelectronics.scanner.Barcode;
 import com.jjjwelectronics.scanner.BarcodedItem;
-import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.PLUCodedItem;
 import managers.enums.ScanType;
 
-import javax.naming.OperationNotSupportedException;
 import java.math.BigDecimal;
 import java.util.Map;
 
@@ -39,7 +35,7 @@ public interface IOrderManager extends IManager {
      * Allows the customer to request the item not be bagged, unblocking the
      * session. This also updates the weight adjustment.
      */
-    void onDoNotBagRequest(Item item);
+    void doNotBagRequest(boolean bagRequest);
 
     /**
      * Allows customer to add their own bags. The scale and weight is updated
@@ -94,4 +90,11 @@ public interface IOrderManager extends IManager {
      * @return the price by kilogram
      */
     BigDecimal priceOf(PLUCodedItem item);
+
+    /**
+     * This method returns true if there was no issue adding an item to the internal list of items.
+     *
+     * @return true if the item wasn't added properly, false otherwise
+     */
+    boolean errorAddingItem();
 }
