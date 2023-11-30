@@ -22,12 +22,17 @@
 
 package managers;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.math.BigDecimal;
+
 import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import managers.enums.SessionStatus;
 import managers.interfaces.IAttendantManager;
 import managers.interfaces.IAttendantManagerNotify;
+import observers.CoinMonitor;
 
 public class AttendantManager implements IAttendantManager, IAttendantManagerNotify {
 
@@ -42,6 +47,22 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 		if (sm == null) {
 			throw new IllegalArgumentException("the system manager cannot be null");
 		}
+
+		// create observers to for each demonination
+		Map<BigDecimal, CoinMonitor> coinMonitorMap = new HashMap<BigDecimal, CoinMonitor>();
+		coinMonitorMap.put(new BigDecimal(0.01), new CoinMonitor());
+		coinMonitorMap.put(new BigDecimal(0.05), new CoinMonitor());
+		coinMonitorMap.put(new BigDecimal(0.10), new CoinMonitor());
+		coinMonitorMap.put(new BigDecimal(0.25), new CoinMonitor());
+		coinMonitorMap.put(new BigDecimal(1.00), new CoinMonitor());
+		coinMonitorMap.put(new BigDecimal(2.00), new CoinMonitor());
+
+		Map<BigDecimal, CoinMonitor> bankNoteMonitorMap = new HashMap<BigDecimal, CoinMonitor>();
+		coinMonitorMap.put(new BigDecimal(5.00), new CoinMonitor());
+		coinMonitorMap.put(new BigDecimal(10.00), new CoinMonitor());
+		coinMonitorMap.put(new BigDecimal(20.00), new CoinMonitor());
+		coinMonitorMap.put(new BigDecimal(50.00), new CoinMonitor());
+		coinMonitorMap.put(new BigDecimal(100.00), new CoinMonitor());
 
 		// copying the system manager
 		this.sm = sm;
@@ -98,7 +119,6 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	@Override
 	public void notifyCoinsFull() {
 		this.notifyAttendant("COINS FULL!");
-
 		this.blockSession();
 	}
 
