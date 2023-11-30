@@ -160,6 +160,8 @@ public class PaymentSimualtorGui extends JFrame {
 				}
 			}});
 		CashPanel.add(InsertBanknoteButton);
+		
+		this.setVisible(true);
 	}
 
 }
