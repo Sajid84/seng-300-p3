@@ -1,9 +1,7 @@
 package managers.interfaces;
 
 import com.tdc.banknote.BanknoteStorageUnit;
-import com.tdc.banknote.IBanknoteDispenser;
 import com.tdc.coin.CoinStorageUnit;
-import com.tdc.coin.ICoinDispenser;
 
 import java.math.BigDecimal;
 
@@ -22,16 +20,16 @@ public interface IAttendantManagerNotify {
     /**
      * This notifies the manager that the observed coin dispenser has full coins.
      *
-     * @param dispenser the dispenser that triggered this event
+     * @param denom the dispenser that triggered this event
      */
-    void notifyCoinsFull(ICoinDispenser dispenser);
+    void notifyCoinsFull(BigDecimal denom);
 
     /**
      * This notifies the manager that the observed coin storage unit has full coins.
      *
      * @param unit the storage unit that triggered this event
      */
-    void notifyBanknotesFull(CoinStorageUnit unit);
+    void notifyCoinsFull(CoinStorageUnit unit);
 
     /**
      * This notifies the manager that the observed coin dispenser has no coins.
@@ -43,9 +41,9 @@ public interface IAttendantManagerNotify {
     /**
      * This notifies the manager that the observed banknote dispenser has full banknotes.
      *
-     * @param dispenser the dispenser that triggered this event
+     * @param denom the denomination of dispenser that triggered this event
      */
-    void notifyBanknotesFull(IBanknoteDispenser dispenser);
+    void notifyBanknotesFull(BigDecimal denom);
 
     /**
      * This notifies the manager that the observed banknote storage unit has full banknotes.
@@ -74,5 +72,33 @@ public interface IAttendantManagerNotify {
      * @param denom the denomination of the coin
      */
     void notifyBanknoteEmitted(BigDecimal denom);
+
+    /**
+     * This tells the manager that a coin was added and to check the state of the coin dispensers.
+     *
+     * @param denom the denomination of the coin
+     */
+    void notifyCoinAdded(BigDecimal denom);
+
+    /**
+     * This tells the manager that a banknote was added and to check the state of the banknote dispensers.
+     *
+     * @param denom the denomination of the coin
+     */
+    void notifyBanknoteAdded(BigDecimal denom);
+
+    /**
+     * This tells the manager that a coin was emitted and to check the state of the coin storage unit.
+     *
+     * @param unit the storage unit that called this event
+     */
+    void notifyCoinAdded(CoinStorageUnit unit);
+
+    /**
+     * This tells the manager that a banknote was emitted and to check the state of the banknote storage unit.
+     *
+     * @param unit the storage unit that called this event
+     */
+    void notifyBanknoteAdded(BanknoteStorageUnit unit);
 
 }

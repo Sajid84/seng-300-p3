@@ -62,8 +62,6 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	protected boolean banknotesFull = false;
 	protected Map<BigDecimal, Boolean> coinDispenserLow = new HashMap<>();
 	protected Map<BigDecimal, Boolean> banknoteDispenserLow = new HashMap<>();
-    protected Map<BigDecimal, Boolean> coinDispenserFull = new HashMap<>();
-    protected Map<BigDecimal, Boolean> banknoteDispenserFull = new HashMap<>();
 
 
 	public AttendantManager(SystemManager sm) {
@@ -85,11 +83,9 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
         // initializing the maps
         for (BigDecimal denom : machine.getCoinDenominations()) {
             coinDispenserLow.put(denom, false);
-            coinDispenserFull.put(denom, false);
         }
         for (BigDecimal denom : machine.getBanknoteDenominations()) {
             banknoteDispenserLow.put(denom, false);
-            banknoteDispenserFull.put(denom, false);
         }
 
 		// creating coin dispenser observers
@@ -146,12 +142,12 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	}
 
 	@Override
-	public void notifyCoinsFull(ICoinDispenser dispenser) {
+	public void notifyCoinsFull(BigDecimal denom) {
 
 	}
 
 	@Override
-	public void notifyBanknotesFull(CoinStorageUnit unit) {
+	public void notifyCoinsFull(CoinStorageUnit unit) {
 
 	}
 
@@ -161,7 +157,7 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	}
 
 	@Override
-	public void notifyBanknotesFull(IBanknoteDispenser dispenser) {
+	public void notifyBanknotesFull(BigDecimal denom) {
 
 	}
 
@@ -183,6 +179,32 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	@Override
 	public void notifyBanknoteEmitted(BigDecimal denom) {
 		checkBanknoteDispenserState(denom);
+	}
+
+	@Override
+	public void notifyCoinAdded(BigDecimal denom) {
+		checkCoinDispenserState(denom);
+	}
+
+	@Override
+	public void notifyBanknoteAdded(BigDecimal denom) {
+		checkBanknoteDispenserState(denom);
+	}
+
+	@Override
+	public void notifyCoinAdded(CoinStorageUnit unit) {
+		// TODO check state of the coin storage unit
+
+		// if coins full
+		notifyCoinsFull(unit);
+	}
+
+	@Override
+	public void notifyBanknoteAdded(BanknoteStorageUnit unit) {
+		// TODO check state of the banknote storage unit
+
+		// if banknotes full
+		notifyBanknotesFull(unit);
 	}
 
 	protected void checkCoinDispenserState(BigDecimal denom) {
