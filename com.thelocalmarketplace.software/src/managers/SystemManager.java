@@ -17,6 +17,7 @@ import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import com.thelocalmarketplace.hardware.PLUCodedItem;
+import com.thelocalmarketplace.hardware.Product;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
 import driver.SystemManagerForm;
 import managers.enums.PaymentType;
@@ -262,6 +263,28 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 			blockSession();
 		}
 	}
+	
+	public void addSearchedItemToOrder(Item item) {
+		// not performing action if session is blocked
+		if (getState() != SessionStatus.NORMAL)
+			throw new IllegalStateException("cannot add item when in a non-normal state");
+
+		// adding the item to the order
+		this.om.addSearchedItemToOrder(item);
+
+		if (!errorAddingItem()) {
+			// publishing the event
+			notifyItemAdded(item);
+		} else {
+			notifyAttendant("There was an error scanning the item.");
+		}
+
+		// checking if the scales were overloaded
+		if (this.om.isScaleOverloaded()) {
+			notifyAttendant("A scale was overloaded due to an item that's too heavy.");
+			blockSession();
+		}
+    }
 
 	@Override
 	public void blockSession() {
@@ -532,4 +555,20 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 			observer.notifyPaymentAdded(value);
 		}
 	}
+
+	public IOrderManager getOrderManager() {
+		return om;
+	}
+
+	/**
+     * Searches for products based on a provided description in both PLU-coded and Barcoded product databases.
+     *
+     * @param description The text used for keyword search to find products.
+     * @return A list of pairs, each containing a product (either PLU-coded or Barcoded) and a boolean value indicating whether the product is found.
+     */
+    public List<Pair<Product, Boolean>> searchProductsByText(String description) {
+        // Delegate the search to AttendantManager
+        List<Pair<Product, Boolean>> foundItems = am.searchProductsByText(description);
+        return foundItems;
+    }
 }

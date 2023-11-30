@@ -237,6 +237,25 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
         // reset bagging request tracker for the next item
         bagItem = true;
     }
+    
+	@Override
+	public void addSearchedItemToOrder(Item item) {
+		// Check for null
+	    if (item == null) {
+	        throw new IllegalArgumentException("Cannot add a null item to the order.");
+	    }
+
+	    // Adding the searched item to the order
+	    items.add(new Pair<>(item, bagItem));
+
+	    // Check if the customer wants to bag the item (bulky item handler extension)
+	    if (bagItem) {
+	        this.machine.getBaggingArea().addAnItem(item);
+	    }
+
+	    // Reset bagging request tracker for the next item
+	    bagItem = true;
+	}
 
     /**
      * Simulates adding an {@link BarcodedItem} to the order.
