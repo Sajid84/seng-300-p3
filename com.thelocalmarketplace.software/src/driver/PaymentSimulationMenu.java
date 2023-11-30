@@ -8,9 +8,19 @@ import java.io.IOException;
 import javax.swing.*;
 
 import com.jjjwelectronics.card.Card;
+import com.tdc.CashOverloadException;
+import com.tdc.DisabledException;
 
 import managers.PaymentManager;
 import utils.CardHelper;
+
+/*
+ * DO NOT USE THIS! THIS IS OLD!
+ * 
+ * use PaymentSimulatorGui.java instead, its a lot better!
+ * 
+ * I REPEAT, DO NOT USE THIS!
+ */
 
 public class PaymentSimulationMenu {
 	
@@ -99,7 +109,11 @@ public class PaymentSimulationMenu {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				pm.insertCoin(null); // TODO: put an actual coin here
+				try {
+					pm.insertCoin(null);
+				} catch (DisabledException | CashOverloadException e1) {
+					// do nothing
+				} // TODO: put an actual coin here
 				
 			}
 			
@@ -108,7 +122,11 @@ public class PaymentSimulationMenu {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				pm.insertBanknote(null); // TODO: put an actual banknote here
+				try {
+					pm.insertBanknote(null);
+				} catch (DisabledException | CashOverloadException e1) {
+					// do nothing
+				} // TODO: put an actual banknote here
 				
 			}
 			
