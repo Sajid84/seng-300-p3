@@ -10,6 +10,8 @@ import com.jjjwelectronics.Item;
 import com.jjjwelectronics.card.Card;
 import com.jjjwelectronics.card.Card.CardData;
 import com.jjjwelectronics.screen.ITouchScreen;
+import com.tdc.CashOverloadException;
+import com.tdc.DisabledException;
 import com.tdc.NoCashAvailableException;
 import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
@@ -141,7 +143,20 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 		if (getState() != SessionStatus.NORMAL)
 			throw new IllegalStateException("cannot insert coin when in a non-normal state");
 
-		this.pm.insertCoin(coin);
+		try {
+            // trying to insert a coin into the system
+            this.pm.insertCoin(coin);
+
+            // publishing the event
+            notifyPaymentAdded(coin.getValue());
+		} catch (DisabledException e) {
+			blockSession();
+			notifyAttendant("Device Powered Off");
+		} catch (CashOverloadException e) {
+			// Should never happen
+			blockSession();
+			notifyAttendant("Machine cannot accept coins");
+		}
 	}
 
 	@Override
@@ -150,7 +165,20 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 		if (getState() != SessionStatus.NORMAL)
 			throw new IllegalStateException("cannot insert banknote when in a non-normal state");
 
-		this.pm.insertBanknote(banknote);
+		try {
+            // trying to insert a banknote into the system
+            this.pm.insertBanknote(banknote);
+
+            // publishing the event
+            notifyPaymentAdded(banknote.getDenomination());
+		} catch (DisabledException e) {
+			blockSession();
+			notifyAttendant("Device Powered Off");
+		} catch (CashOverloadException e) {
+			// Should never happen
+			blockSession();
+			notifyAttendant("Machine cannot accept banknotes");
+		}
 	}
 
 	@Override
