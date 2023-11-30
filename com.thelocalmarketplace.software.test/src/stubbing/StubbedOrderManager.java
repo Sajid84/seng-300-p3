@@ -6,22 +6,18 @@ package stubbing;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
-
-import javax.naming.OperationNotSupportedException;
 
 import com.jjjwelectronics.Item;
 import com.jjjwelectronics.scale.IElectronicScale;
-import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 
-import ca.ucalgary.seng300.simulation.NullPointerSimulationException;
 import managers.OrderManager;
 import managers.enums.ScanType;
 import managers.enums.SessionStatus;
 import managers.interfaces.IOrderManagerNotify;
 import observers.order.BarcodeScannerObserver;
 import observers.order.ScaleObserver;
+import utils.Pair;
 
 public class StubbedOrderManager extends OrderManager {
 	public StubbedSystemManager smStub;
@@ -154,7 +150,7 @@ public class StubbedOrderManager extends OrderManager {
 	}
 
 	@Override
-	public Map<Item, Boolean> getItems() {
+	public List<Pair<Item, Boolean>> getItems() {
 		getProductsCalled = true;
 		return super.getItems();
 	}
@@ -166,15 +162,15 @@ public class StubbedOrderManager extends OrderManager {
 	}
 
 	@Override
-	public void onDoNotBagRequest(Item item) {
+	public void doNotBagRequest(boolean bagRequest) {
 		onDoNotBagRequestCalled = true;
-		super.onDoNotBagRequest(item);
+		super.doNotBagRequest(bagRequest);
 	}
 
 	@Override
-	public void removeItemFromOrder(Item item) {
+	public void removeItemFromOrder(Pair<Item, Boolean> pair) {
 		removeItemFromOrderCalled = true;
-		super.removeItemFromOrder(item);
+		super.removeItemFromOrder(pair);
 	}
 
 }

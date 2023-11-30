@@ -9,9 +9,10 @@ import com.jjjwelectronics.scale.IElectronicScale;
 import com.jjjwelectronics.scanner.BarcodedItem;
 import com.thelocalmarketplace.hardware.PLUCodedItem;
 import managers.enums.ScanType;
+import utils.Pair;
 
 import java.math.BigDecimal;
-import java.util.Map;
+import java.util.List;
 
 /**
  * A unified interface of what the order manager should and should not do.
@@ -38,6 +39,13 @@ public interface IOrderManager extends IManager {
     void doNotBagRequest(boolean bagRequest);
 
     /**
+     * This gets the do not bag request.
+     *
+     * @return true if the item is to be bagged, false otherwise.
+     */
+    boolean getDoNotBagRequest();
+
+    /**
      * Allows customer to add their own bags. The scale and weight is updated
      * according to to new weight and adjustment.
      *
@@ -56,9 +64,9 @@ public interface IOrderManager extends IManager {
     /**
      * This removes an {@link Item} from the order and the bagging area.
      *
-     * @param item the {@link Item} to remove
+     * @param pair the {@link Item} to remove
      */
-    void removeItemFromOrder(Item item);
+    void removeItemFromOrder(Pair<Item, Boolean> pair);
 
     /**
      * Returns the expected mass of the items the customer has scanned.
@@ -72,7 +80,7 @@ public interface IOrderManager extends IManager {
      *
      * @return a map of {@link Item} and whether they are to be bagged or not
      */
-    Map<Item, Boolean> getItems();
+    List<Pair<Item, Boolean>> getItems();
 
     /**
      * This function returns an {@link IElectronicScale} object if any of the scales
@@ -97,4 +105,18 @@ public interface IOrderManager extends IManager {
      * @return true if the item wasn't added properly, false otherwise
      */
     boolean errorAddingItem();
+
+    /**
+     * This returns the last received actual weight that the manager received.
+     *
+     * @return the actual weight
+     */
+    BigDecimal getActualWeight();
+
+    /**
+     * Gets the current weight adjustment.
+     *
+     * @return the weight adjustment
+     */
+    BigDecimal getWeightAdjustment();
 }
