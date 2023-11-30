@@ -51,19 +51,24 @@ public class SystemManagerForm implements IScreen {
     private JCheckBox doNotBagItemCheckBox;
     private JButton exitSessionButton;
 
+    // TABLE HEADERS
+    private final String nameColumn = "Name";
+    private final String priceColumn = "Price";
+    private final String baggedColumn = "Bagged?";
+
+    private final String[] defaultTableHeaders = new String[]{
+            nameColumn,
+            priceColumn,
+            baggedColumn
+    };
+
+
     public SystemManagerForm(SystemManager sm) {
         // copying the system manager reference
         this.sm = sm;
 
-        // setup the table
-        DefaultTableModel model = new DefaultTableModel(new Object[]{
-                "Name",
-                "Price",
-                "Bagged?"
-        }, 0);
-
         // setting the model
-        itemsTable.setModel(model);
+        itemsTable.setModel(generateModelSkeleton());
 
         // setting the label
         updateFeedbackLabel();
@@ -191,6 +196,28 @@ public class SystemManagerForm implements IScreen {
                 sm.removeItemFromOrder(sm.getItems().get(sm.getItems().size() - 1));
             }
         });
+        purchaseBagsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("The customer wishes to purchase bags.");
+            }
+        });
+        payForOrderButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("The customer wishes to pay for their order.");
+            }
+        });
+        exitSessionButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Exiting the session.");
+            }
+        });
+    }
+
+    protected DefaultTableModel generateModelSkeleton() {
+        return new DefaultTableModel(defaultTableHeaders, 0);
     }
 
     /**
@@ -212,14 +239,17 @@ public class SystemManagerForm implements IScreen {
     }
 
     /**
-     * TODO this function is subject to be redone
-     *
-     * @param item
-     * @param append
+     * This function regenerates the table each time that an item is added or removed from the managers.
      */
     protected void updateTable() {
         // getting the model
-        DefaultTableModel model = (DefaultTableModel) itemsTable.getModel();
+        /**
+         * I really have no idea why, but whenever I remove all the rows from the model and re-add them,
+         * I get duplicate clusters, i.e., an item will appear n items for each function call.
+         * So, I'm creating a new model for each iteration. I really hope the JVM has good
+         * garbage collection.
+         */
+        DefaultTableModel model = generateModelSkeleton();
 
         // clearing the table
         for (int i = 0; i < model.getRowCount(); ++i) {
@@ -256,6 +286,9 @@ public class SystemManagerForm implements IScreen {
         } else {
             tableLabel.setText("Items (" + sm.getItems().size() + ")");
         }
+
+        // updating the table object
+        itemsTable.setModel(model);
     }
 
     @Override
