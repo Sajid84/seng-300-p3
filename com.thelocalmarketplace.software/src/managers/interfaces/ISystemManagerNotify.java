@@ -28,4 +28,16 @@ public interface ISystemManagerNotify {
      */
     void notifyStateChange(SessionStatus state);
 
+    /**
+     * This tells all listeners to refresh their contents, views, etc.
+     */
+    void notifyRefresh();
+
+    /**
+     * This notifies all listeners that some form of payment was added.
+     *
+     * @param value the value of the payment
+     */
+    void notifyPaymentAdded(BigDecimal value);
+
 }
