@@ -6,13 +6,18 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import com.jjjwelectronics.Item;
 import com.jjjwelectronics.card.Card;
+import com.jjjwelectronics.screen.ITouchScreen;
 import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
 import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
 
 import managers.PaymentManager;
+import managers.SystemManager;
+import managers.enums.SessionStatus;
+import managers.interfaces.IScreen;
 import utils.CardHelper;
 
 import java.awt.FlowLayout;
@@ -31,20 +36,30 @@ import java.awt.Component;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JSeparator;
 
-public class PaymentSimualtorGui extends JFrame {
+public class PaymentSimualtorGui extends JFrame implements IScreen{
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	private PaymentManager pm;
+	private SystemManager sm;
 	private Card SimulatedCard = CardHelper.createCard(CardHelper.createCardIssuer());
 
-
+	@Override
+	public JPanel getPanel() {
+		return contentPane;
+		
+	}
+	
+	@Override
+	public JFrame getFrame() {
+		return this;
+	}
+	
 
 	/**
 	 * Create the frame.
 	 */
-	public PaymentSimualtorGui(PaymentManager pm) {
-		this.pm = pm;
+	public PaymentSimualtorGui(SystemManager sm) {
+		this.sm = sm;
 		
 		setTitle("Payment Simulation");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -72,7 +87,7 @@ public class PaymentSimualtorGui extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					pm.swipeCard(SimulatedCard);
+					sm.swipeCard(SimulatedCard);
 				} catch (IOException e1) {
 					// shouldn't happen
 				}
@@ -86,7 +101,7 @@ public class PaymentSimualtorGui extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//pm.tapCard(SimulatedCard); TODO: get actual implementation
+				//sm.tapCard(SimulatedCard); TODO: get actual implementation
 			}});
 		CardPanel.add(TapCardButton);
 		
@@ -96,7 +111,7 @@ public class PaymentSimualtorGui extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//pm.insertCard(SimulatedCard); TODO: get actual implementation
+				//sm.insertCard(SimulatedCard); TODO: get actual implementation
 				
 			}});
 		CardPanel.add(InsertCardButton);
@@ -125,12 +140,7 @@ public class PaymentSimualtorGui extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				try {
-					pm.insertCoin(new Coin( Currency.getInstance("CAD"),new BigDecimal((char[]) CoinValueDropdown.getSelectedItem())));
-				} catch (DisabledException | CashOverloadException e1) {
-					// GUI doesn't care if this happens
-				}
-				
+					sm.insertCoin(new Coin( Currency.getInstance("CAD"),new BigDecimal((char[]) CoinValueDropdown.getSelectedItem())));
 			}});
 		CoinPanel.add(InsertCoinButton);
 		
@@ -153,15 +163,46 @@ public class PaymentSimualtorGui extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				try {
-					pm.insertBanknote(new Banknote( Currency.getInstance("CAD"),new BigDecimal((char[]) CashValueDropdown.getSelectedItem())));
-				} catch (DisabledException | CashOverloadException e1) {
-					// GUI doesn't care if this happens
-				}
+				sm.insertBanknote(new Banknote( Currency.getInstance("CAD"),new BigDecimal((char[]) CashValueDropdown.getSelectedItem())));
 			}});
 		CashPanel.add(InsertBanknoteButton);
 		
 		this.setVisible(true);
+	}
+	
+	@Override
+	public void configure(ITouchScreen ts) {
+		// does nothing
+	}
+
+	@Override
+	public void notifyItemAdded(Item item) {
+		// does nothing
+		
+	}
+
+	@Override
+	public void notifyItemRemoved(Item item) {
+		// does nothing
+		
+	}
+
+	@Override
+	public void notifyStateChange(SessionStatus state) {
+		// does nothing
+		
+	}
+
+	@Override
+	public void notifyRefresh() {
+		// does nothing
+		
+	}
+
+	@Override
+	public void notifyPaymentAdded(BigDecimal value) {
+		// does nothing
+		
 	}
 
 }
