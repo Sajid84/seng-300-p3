@@ -229,9 +229,6 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
         // adding the item
         items.add(new Pair<>(item, bagItem));
 
-        // notifying the system manager
-        sm.notifyItemAdded(item);
-
         // check if customer wants to bag item (bulky item handler extension)
         if (bagItem) {
             this.machine.getBaggingArea().addAnItem(item);
@@ -277,8 +274,6 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 
         // removing the item from the map
         if (this.items.remove(pair)) {
-            // publishing event
-            sm.notifyItemRemoved(pair.getKey());
             for (IOrderManagerNotify listener : listeners) {
                 listener.onItemRemovedFromOrder(pair.getKey());
             }

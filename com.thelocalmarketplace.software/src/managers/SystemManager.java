@@ -59,6 +59,7 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	protected CardIssuer issuer;
 	protected Map<String, List<Pair<Long, Double>>> records;
 	protected boolean disabledRequest = false;
+	protected List<ISystemManagerNotify> observers = new ArrayList<>();
 
 	/**
 	 * This object is responsible for the needs of the customer. This is how the
@@ -135,6 +136,9 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 
 		// not restricting this function, this is used to resolve discrepancies
 		this.om.removeItemFromOrder(pair);
+
+		// notifying that an item was removed
+		notifyItemRemoved(pair.getKey());
 	}
 
 	@Override
@@ -242,7 +246,21 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 		if (getState() != SessionStatus.NORMAL)
 			throw new IllegalStateException("cannot add item when in a non-normal state");
 
+		// adding the item to the order
 		this.om.addItemToOrder(item, method);
+
+		if (!errorAddingItem()) {
+			// publishing the event
+			notifyItemAdded(item);
+		} else {
+			notifyAttendant("There was an error scanning the item.");
+		}
+
+		// checking if the scales were overloaded
+		if (this.om.isScaleOverloaded()) {
+			notifyAttendant("A scale was overloaded due to an item that's too heavy.");
+			blockSession();
+		}
 	}
 
 	@Override
@@ -379,6 +397,16 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	}
 
 	@Override
+	public BigDecimal getActualWeight() {
+		return om.getActualWeight();
+	}
+
+	@Override
+	public BigDecimal getWeightAdjustment() {
+		return om.getWeightAdjustment();
+	}
+
+	@Override
 	public void signalForAttendant() {
 		am.signalForAttendant();
 	}
@@ -441,6 +469,20 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	}
 
 	@Override
+	public void attach(ISystemManagerNotify observer) {
+		observers.add(observer);
+	}
+
+	@Override
+	public boolean detach(ISystemManagerNotify observer) {
+		if (observers.contains(observer)) {
+			observers.remove(observer);
+			return true;
+		}
+		return false;
+	}
+
+	@Override
 	public void requestDisableMachine() {
 		disabledRequest = true;
 	}
@@ -458,17 +500,36 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 
 	@Override
 	public void notifyItemAdded(Item item) {
-		smf.notifyItemAdded(item);
+		for (ISystemManagerNotify observer : observers) {
+			observer.notifyItemAdded(item);
+		}
 	}
 
 	@Override
 	public void notifyItemRemoved(Item item) {
-		smf.notifyItemRemoved(item);
+		for (ISystemManagerNotify observer : observers) {
+			observer.notifyItemRemoved(item);
+		}
 	}
 
 	@Override
 	public void notifyStateChange(SessionStatus state) {
-		// ТОDO revisit this method as it probably isn't the best way to do things
-		smf.notifyStateChange(state);
+		for (ISystemManagerNotify observer : observers) {
+			observer.notifyStateChange(state);
+		}
+	}
+
+	@Override
+	public void notifyRefresh() {
+		for (ISystemManagerNotify observer : observers) {
+			observer.notifyRefresh();
+		}
+	}
+
+	@Override
+	public void notifyPaymentAdded(BigDecimal value) {
+		for (ISystemManagerNotify observer : observers) {
+			observer.notifyPaymentAdded(value);
+		}
 	}
 }
