@@ -22,10 +22,7 @@
 
 package managers;
 
-import java.util.Currency;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.math.BigDecimal;
 
 import com.jjjwelectronics.OverloadedDevice;
@@ -216,7 +213,7 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	}
 
 	@Override
-	public void maintainBanknotes() {
+	public void maintainBanknoteDispensers() {
         // loading the dispensers if they're low
 		for (BigDecimal denom : machine.getBanknoteDenominations()) {
             Boolean low = banknoteDispenserLow.get(denom);
@@ -256,7 +253,7 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	}
 
 	@Override
-	public void maintainCoins() {
+	public void maintainCoinDispensers() {
         // loading the dispensers if they're low
         for (BigDecimal denom : machine.getCoinDenominations()) {
             Boolean low = coinDispenserLow.get(denom);
@@ -292,6 +289,38 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 			} catch (OverloadedDevice e) {
 				notifyAttendant("Adding ink to the printer cause an overload.");
 			}
+		}
+	}
+
+	@Override
+	public void maintainBanknoteStorage() {
+		if (banknotesFull) {
+			List<Banknote> notes = machine.getBanknoteStorage().unload();
+
+			// summation
+			BigDecimal total = BigDecimal.ZERO;
+			for (Banknote note : notes) {
+				total = total.add(note.getDenomination());
+			}
+
+			// notifying the station
+			notifyAttendant("Unloaded $" + total.toString() + " from the banknote storage unit.");
+		}
+	}
+
+	@Override
+	public void maintainCoinStorage() {
+		if (coinsFull) {
+			List<Coin> coins = machine.getCoinStorage().unload();
+
+			// summation
+			BigDecimal total = BigDecimal.ZERO;
+			for (Coin coin : coins) {
+				total = total.add(coin.getValue());
+			}
+
+			// notifying the station
+			notifyAttendant("Unloaded $" + total.toString() + " from the coin storage unit.");
 		}
 	}
 
