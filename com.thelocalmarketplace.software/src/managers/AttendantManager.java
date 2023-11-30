@@ -22,17 +22,26 @@
 
 package managers;
 
+import java.util.Currency;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.math.BigDecimal;
 
-import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
+import com.jjjwelectronics.OverloadedDevice;
+import com.tdc.CashOverloadException;
+import com.tdc.banknote.Banknote;
+import com.tdc.banknote.BanknoteStorageUnit;
+import com.tdc.banknote.IBanknoteDispenser;
+import com.tdc.coin.Coin;
+import com.tdc.coin.CoinStorageUnit;
+import com.tdc.coin.ICoinDispenser;
 
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import managers.enums.SessionStatus;
 import managers.interfaces.IAttendantManager;
 import managers.interfaces.IAttendantManagerNotify;
-import observers.CoinMonitor;
+import observers.payment.CoinMonitor;
 
 public class AttendantManager implements IAttendantManager, IAttendantManagerNotify {
 
@@ -42,27 +51,27 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	// object references
 	protected SystemManager sm;
 
+	// object ownership
+	protected Map<BigDecimal, CoinMonitor> coinMonitorMap = new HashMap<BigDecimal, CoinMonitor>();
+	protected Map<BigDecimal, CoinMonitor> bankNoteMonitorMap = new HashMap<BigDecimal, CoinMonitor>();
+
+	// vars
+	protected boolean paperLow = false;
+	protected boolean inkLow = false;
+	protected boolean coinsFull = false;
+	protected boolean banknotesFull = false;
+	protected Map<BigDecimal, Boolean> coinDispenserLow = new HashMap<>();
+	protected Map<BigDecimal, Boolean> banknoteDispenserLow = new HashMap<>();
+    protected Map<BigDecimal, Boolean> coinDispenserFull = new HashMap<>();
+    protected Map<BigDecimal, Boolean> banknoteDispenserFull = new HashMap<>();
+
+
 	public AttendantManager(SystemManager sm) {
+
 		// checking arguments
 		if (sm == null) {
 			throw new IllegalArgumentException("the system manager cannot be null");
 		}
-
-		// create observers to for each demonination
-		Map<BigDecimal, CoinMonitor> coinMonitorMap = new HashMap<BigDecimal, CoinMonitor>();
-		coinMonitorMap.put(new BigDecimal(0.01), new CoinMonitor());
-		coinMonitorMap.put(new BigDecimal(0.05), new CoinMonitor());
-		coinMonitorMap.put(new BigDecimal(0.10), new CoinMonitor());
-		coinMonitorMap.put(new BigDecimal(0.25), new CoinMonitor());
-		coinMonitorMap.put(new BigDecimal(1.00), new CoinMonitor());
-		coinMonitorMap.put(new BigDecimal(2.00), new CoinMonitor());
-
-		Map<BigDecimal, CoinMonitor> bankNoteMonitorMap = new HashMap<BigDecimal, CoinMonitor>();
-		coinMonitorMap.put(new BigDecimal(5.00), new CoinMonitor());
-		coinMonitorMap.put(new BigDecimal(10.00), new CoinMonitor());
-		coinMonitorMap.put(new BigDecimal(20.00), new CoinMonitor());
-		coinMonitorMap.put(new BigDecimal(50.00), new CoinMonitor());
-		coinMonitorMap.put(new BigDecimal(100.00), new CoinMonitor());
 
 		// copying the system manager
 		this.sm = sm;
@@ -73,8 +82,30 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 		// saving reference
 		this.machine = machine;
 
-		// creating observers
+        // initializing the maps
+        for (BigDecimal denom : machine.getCoinDenominations()) {
+            coinDispenserLow.put(denom, false);
+            coinDispenserFull.put(denom, false);
+        }
+        for (BigDecimal denom : machine.getBanknoteDenominations()) {
+            banknoteDispenserLow.put(denom, false);
+            banknoteDispenserFull.put(denom, false);
+        }
 
+		// creating coin dispenser observers
+		coinMonitorMap.put(new BigDecimal(0.01), new CoinMonitor());
+		coinMonitorMap.put(new BigDecimal(0.05), new CoinMonitor());
+		coinMonitorMap.put(new BigDecimal(0.10), new CoinMonitor());
+		coinMonitorMap.put(new BigDecimal(0.25), new CoinMonitor());
+		coinMonitorMap.put(new BigDecimal(1.00), new CoinMonitor());
+		coinMonitorMap.put(new BigDecimal(2.00), new CoinMonitor());
+
+		// banknote dispenser observers
+		bankNoteMonitorMap.put(new BigDecimal(5.00), new CoinMonitor());
+		bankNoteMonitorMap.put(new BigDecimal(10.00), new CoinMonitor());
+		bankNoteMonitorMap.put(new BigDecimal(20.00), new CoinMonitor());
+		bankNoteMonitorMap.put(new BigDecimal(50.00), new CoinMonitor());
+		bankNoteMonitorMap.put(new BigDecimal(100.00), new CoinMonitor());
 	}
 
 	@Override
@@ -106,62 +137,120 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 	@Override
 	public void notifyPaperLow() {
-		this.notifyAttendant("LOW PAPER!");
-		this.blockSession();
+		paperLow = true;
 	}
 
 	@Override
 	public void notifyInkLow() {
-		this.notifyAttendant("LOW INK!");
-		this.blockSession();
+		inkLow = true;
 	}
 
 	@Override
-	public void notifyCoinsFull() {
-		this.notifyAttendant("COINS FULL!");
-		this.blockSession();
+	public void notifyCoinsFull(ICoinDispenser dispenser) {
+
 	}
 
 	@Override
-	public void notifyCoinsEmpty() {
-		this.notifyAttendant("COINS EMPTY!");
-		this.blockSession();
+	public void notifyBanknotesFull(CoinStorageUnit unit) {
+
 	}
 
 	@Override
-	public void notifyBanknotesFull() {
-		this.notifyAttendant("BANKNOTES FULL!");
-		this.blockSession();
+	public void notifyCoinsEmpty(ICoinDispenser dispenser) {
+
 	}
 
 	@Override
-	public void notifyBanknotesEmpty() {
-		this.notifyAttendant("BANKNOTES EMPTY!");
-		this.blockSession();
+	public void notifyBanknotesFull(IBanknoteDispenser dispenser) {
+
+	}
+
+	@Override
+	public void notifyBanknotesFull(BanknoteStorageUnit unit) {
+
+	}
+
+	@Override
+	public void notifyBanknotesEmpty(IBanknoteDispenser dispenser) {
+
 	}
 
 	@Override
 	public void maintainBanknotes() {
-		// TODO Auto-generated method stub
+		for (BigDecimal denom : machine.getBanknoteDenominations()) {
+            Boolean low = banknoteDispenserLow.get(denom);
 
+            // filling the dispenser if it's low
+            if (low) {
+                // getting the dispenser object
+                IBanknoteDispenser dispenser = machine.getBanknoteDispensers().get(denom);
+
+                // creating an array of banknotes
+                int amount = (int) (dispenser.getCapacity() * 0.5);
+                Banknote[] notes = new Banknote[amount];
+
+                for (int i = 0; i < amount; ++i) {
+                    notes[i] = new Banknote(Currency.getInstance(Locale.CANADA), denom);
+                }
+
+                // loading the machine
+                try {
+                    dispenser.load(notes);
+                } catch (CashOverloadException e) {
+                    notifyAttendant("Loading banknotes into the machine caused an overload.");
+                }
+            }
+        }
 	}
 
 	@Override
 	public void maintainPaper() {
-		// TODO Auto-generated method stub
-
+		if (paperLow) {
+			try {
+				machine.getPrinter().addPaper(1 << 5); // this is hardcoded because there's no getter!
+			} catch (OverloadedDevice e) {
+				notifyAttendant("Adding paper to the printer cause an overload.");
+			}
+		}
 	}
 
 	@Override
 	public void maintainCoins() {
-		// TODO Auto-generated method stub
+        for (BigDecimal denom : machine.getCoinDenominations()) {
+            Boolean low = coinDispenserLow.get(denom);
 
+            // filling the dispenser if it's low
+            if (low) {
+                // getting the dispenser object
+                ICoinDispenser dispenser = machine.getCoinDispensers().get(denom);
+
+                // creating an array of banknotes
+                int amount = (int) (dispenser.getCapacity() * 0.5);
+                Coin[] coins = new Coin[amount];
+
+                for (int i = 0; i < amount; ++i) {
+                    coins[i] = new Coin(Currency.getInstance(Locale.CANADA), denom);
+                }
+
+                // loading the machine
+                try {
+                    dispenser.load(coins);
+                } catch (CashOverloadException e) {
+                    notifyAttendant("Loading banknotes into the machine caused an overload.");
+                }
+            }
+        }
 	}
 
 	@Override
 	public void maintainInk() {
-		// TODO Auto-generated method stub
-
+		if (inkLow) {
+			try {
+				machine.getPrinter().addInk(1 << 10); // this is hardcoded because there's no getter!
+			} catch (OverloadedDevice e) {
+				notifyAttendant("Adding ink to the printer cause an overload.");
+			}
+		}
 	}
 
 	@Override

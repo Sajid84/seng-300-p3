@@ -1,12 +1,27 @@
-package observers;
+package observers.payment;
 
 import com.tdc.IComponent;
 import com.tdc.IComponentObserver;
 import com.tdc.coin.Coin;
 import com.tdc.coin.CoinDispenserObserver;
 import com.tdc.coin.ICoinDispenser;
+import managers.PaymentManager;
+import observers.AbstractComponentObserver;
 
-public class CoinMonitor implements CoinDispenserObserver {
+public class CoinMonitor extends AbstractComponentObserver implements CoinDispenserObserver {
+    // object references
+    PaymentManager pm;
+
+    public CoinMonitor(PaymentManager pm, ICoinDispenser disp) {
+        super(disp);
+
+        if (pm == null) {
+            throw new IllegalArgumentException("The PaymentManager cannot be null.");
+        }
+
+        // saving the reference
+        this.pm = pm;
+    }
 
     @Override
     public void enabled(IComponent<? extends IComponentObserver> component) {
