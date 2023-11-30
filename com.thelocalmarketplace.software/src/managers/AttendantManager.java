@@ -63,37 +63,49 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	@Override
 	public void notifyPaperLow() {
 		// TODO Auto-generated method stub
+		this.notifyAttendant("LOW PAPER!");
 
+		this.blockSession();
 	}
 
 	@Override
 	public void notifyInkLow() {
 		// TODO Auto-generated method stub
+		this.notifyAttendant("LOW INK!");
 
+		this.blockSession();
 	}
 
 	@Override
 	public void notifyCoinsFull() {
 		// TODO Auto-generated method stub
+		this.notifyAttendant("COINS FULL!");
 
+		this.blockSession();
 	}
 
 	@Override
 	public void notifyCoinsEmpty() {
 		// TODO Auto-generated method stub
+		this.notifyAttendant("COINS EMPTY!");
 
+		this.blockSession();
 	}
 
 	@Override
 	public void notifyBanknotesFull() {
 		// TODO Auto-generated method stub
+		this.notifyAttendant("BANKNOTES FULL!");
 
+		this.blockSession();
 	}
 
 	@Override
 	public void notifyBanknotesEmpty() {
 		// TODO Auto-generated method stub
+		this.notifyAttendant("BANKNOTES EMPTY!");
 
+		this.blockSession();
 	}
 
 	@Override
