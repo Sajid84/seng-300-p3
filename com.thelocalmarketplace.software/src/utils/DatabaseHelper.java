@@ -3,6 +3,7 @@
 package utils;
 
 import ca.ucalgary.seng300.simulation.InvalidArgumentSimulationException;
+import com.jjjwelectronics.Item;
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Numeral;
 import com.jjjwelectronics.scanner.Barcode;
@@ -17,16 +18,14 @@ import java.util.Random;
  */
 public class DatabaseHelper {
 
-    private static String[] names = {"Milk", "Bread", "Eggs", "Cheese", "Sugar", "Cereal", "Beef", "Abacus",};
+    private static final String[] names = {"Milk", "Bread", "Eggs", "Cheese", "Sugar", "Cereal", "Beef", "Abacus",};
 
-    private static String[] adjectives = {"Inedible", "Tasty", "Pasty", "Wooden", "Super", "Proud", "Big", "Small",
+    private static final String[] adjectives = {"Inedible", "Tasty", "Pasty", "Wooden", "Super", "Proud", "Big", "Small",
             "Puny", "Dandriff-infused", "Feline", "Canine"};
 
-    private static Random random = new Random();
+    private static final Random random = new Random();
 
     public static final int DEFAULT_BARCODE_LENGTH = 10;
-
-    public static final int DEFAULT_PLU_CODE_LENGTH = 5;
 
 
     /**
@@ -46,6 +45,10 @@ public class DatabaseHelper {
      */
     public static long createRandomPrice() {
         return DatabaseHelper.random.nextLong(1, 100);
+    }
+
+    public static long createRandomSignifier() {
+        return DatabaseHelper.random.nextLong(100, 1_000);
     }
 
     /**
@@ -131,12 +134,13 @@ public class DatabaseHelper {
         // creating the barcode
         Barcode barcode = DatabaseHelper.createRandomBarcode(length);
         double mass = DatabaseHelper.createRandomMass();
+        String desc = "B" + DatabaseHelper.createRandomSignifier() + " " + DatabaseHelper.createRandomDescription();
 
         // need to create the item
         BarcodedItem item = new BarcodedItem(barcode, new Mass(mass));
 
         // need to create the corresponding product
-        BarcodedProduct prod = new BarcodedProduct(barcode, DatabaseHelper.createRandomDescription(),
+        BarcodedProduct prod = new BarcodedProduct(barcode, desc,
                 DatabaseHelper.createRandomPrice(), mass);
 
         // add both to database
@@ -173,12 +177,38 @@ public class DatabaseHelper {
         // creating the barcode
         Barcode barcode = DatabaseHelper.createRandomBarcode(DEFAULT_BARCODE_LENGTH);
         double mass = DatabaseHelper.createRandomMass();
+        String desc = "(DISCREP) " + DatabaseHelper.createRandomDescription();
 
         // need to create the item
-        BarcodedItem item = new BarcodedItem(barcode, new Mass(mass + 100));
+        BarcodedItem item = new BarcodedItem(barcode, new Mass(mass));
 
         // need to create the corresponding product
-        BarcodedProduct prod = new BarcodedProduct(barcode, DatabaseHelper.createRandomDescription(),
+        BarcodedProduct prod = new BarcodedProduct(barcode, desc,
+                DatabaseHelper.createRandomPrice(), mass + 1_000);
+
+        // add both to database
+        ProductDatabases.BARCODED_PRODUCT_DATABASE.put(barcode, prod);
+
+        // return item to caller
+        return item;
+    }
+
+    /**
+     * This creates a bad {@link BarcodedItem} that's too heavy for the scales. It will cause a scale overload.
+     *
+     * @return a barcoded item
+     */
+    public static BarcodedItem createItemTooHeavy() {
+        // creating the barcode
+        Barcode barcode = DatabaseHelper.createRandomBarcode(DEFAULT_BARCODE_LENGTH);
+        double mass = DatabaseHelper.createRandomMass();
+        String desc = "(HEAVY) " + DatabaseHelper.createRandomDescription();
+
+        // this will definitely overload the scale
+        BarcodedItem item = new BarcodedItem(barcode, new Mass(mass + 999999999));
+
+        // need to create the corresponding product
+        BarcodedProduct prod = new BarcodedProduct(barcode, desc,
                 DatabaseHelper.createRandomPrice(), mass);
 
         // add both to database
@@ -217,7 +247,7 @@ public class DatabaseHelper {
         // creating random fields
         PriceLookUpCode code = DatabaseHelper.createRandomPLUCode();
         long price = DatabaseHelper.createRandomPrice();
-        String desc = DatabaseHelper.createRandomDescription();
+        String desc = "P" + DatabaseHelper.createRandomSignifier() + " " + DatabaseHelper.createRandomDescription();
         double weight = DatabaseHelper.createRandomMass();
 
         // creating product & item pair
