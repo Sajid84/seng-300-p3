@@ -27,6 +27,7 @@ import utils.DatabaseHelper;
 import utils.Pair;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
@@ -134,8 +135,22 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 
             // no bagging request for this item, don't add this to the expected weight
             if (p.getValue()) {
-                // the item class guarantees a non-null positive mass
-                total = total.add(i.getMass().inGrams());
+                if (i instanceof BarcodedItem) {
+                    /**
+                     * I don't know why, but barcoded items have an expected mass whilst PLU items do
+                     * not. This threw off my implementation and thus this code exists.
+                     */
+                    BarcodedProduct prod = DatabaseHelper.get((BarcodedItem) i);
+
+                    // I love floating point numbers
+                    BigInteger before = BigDecimal.valueOf(prod.getExpectedWeight()).toBigInteger();
+
+                    // adding the weight to the total
+                    total = total.add(new BigDecimal(before));
+                } else {
+                    // the item class guarantees a non-null positive mass
+                    total = total.add(i.getMass().inGrams());
+                }
             }
         }
 
