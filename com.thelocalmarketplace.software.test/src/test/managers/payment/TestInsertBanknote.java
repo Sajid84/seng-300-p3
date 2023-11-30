@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.Locale;
 
+import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -24,7 +25,7 @@ import stubbing.StubbedSystemManager;
 
 public class TestInsertBanknote {
 
-	public AbstractSelfCheckoutStation machine;
+	public ISelfCheckoutStation machine;
 
 	// vars
 	private StubbedPaymentManager pm;
@@ -60,7 +61,7 @@ public class TestInsertBanknote {
 
 	@Test
 	public void testDisabledInsert() {
-		this.machine.banknoteInput.disable();
+		this.machine.getBanknoteInput().disable();
 		this.pm.insertBanknote(fiveNote);
 		assertTrue("attendant was called", this.sm.notifyAttendantCalled);
 		assertTrue("Session was blocked", this.sm.blockSessionCalled);
@@ -75,8 +76,8 @@ public class TestInsertBanknote {
 	@Test
 	public void testOverloadedInsert() throws CashOverloadException {
 		// loading storage to max
-		for (int i = 0; i < this.machine.banknoteStorage.getCapacity(); i++) {
-			this.machine.banknoteStorage.load(fiveNote);
+		for (int i = 0; i < this.machine.getBanknoteStorage().getCapacity(); i++) {
+			this.machine.getBanknoteStorage().load(fiveNote);
 		}
 
 		// inserting a banknote, this should trigger a cash overload exception

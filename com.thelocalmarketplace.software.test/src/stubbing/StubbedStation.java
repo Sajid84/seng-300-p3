@@ -8,6 +8,7 @@ import java.util.Locale;
 
 import com.jjjwelectronics.scale.ElectronicScaleGold;
 import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
+import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import com.thelocalmarketplace.hardware.SelfCheckoutStationGold;
 
 public class StubbedStation extends SelfCheckoutStationGold {
@@ -19,7 +20,7 @@ public class StubbedStation extends SelfCheckoutStationGold {
 	public static final int coinDispenserCapacity = 100;
 	public static final int banknoteStorageCapacity = 100;
 
-	public AbstractSelfCheckoutStation machine;
+	public ISelfCheckoutStation machine;
 
 	public StubbedStation() {
 		machine = new SelfCheckoutStationGold();
