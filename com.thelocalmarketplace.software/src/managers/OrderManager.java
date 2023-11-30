@@ -142,12 +142,8 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
         return total;
     }
 
-    /**
-     * Gets the current weight adjustment.
-     *
-     * @return the weight adjustment
-     */
-    protected BigDecimal getWeightAdjustment() {
+    @Override
+    public BigDecimal getWeightAdjustment() {
         return this.adjustment;
     }
 
@@ -434,6 +430,11 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
         // since we know that the notifyBarcodeScanned() function sets this back to null
         // we can assume that the scanner malfunctioned if this variable is not null
         return last_item != null;
+    }
+
+    @Override
+    public BigDecimal getActualWeight() {
+        return actualWeight;
     }
 
     @Override
