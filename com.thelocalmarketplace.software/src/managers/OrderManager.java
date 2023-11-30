@@ -122,8 +122,6 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
     public BigDecimal getExpectedMass() {
         BigDecimal total = BigDecimal.ZERO;
 
-        System.out.println(this.items.size());
-
         for (Pair<Item, Boolean> p : this.items) {
             // destructure
             Item i = p.getKey();
