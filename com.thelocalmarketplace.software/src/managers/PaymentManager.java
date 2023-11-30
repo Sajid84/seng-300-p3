@@ -39,6 +39,7 @@ import observers.payment.CardReaderObserver;
 import observers.payment.CoinCollector;
 import observers.payment.ReceiptPrinterObserver;
 import utils.DatabaseHelper;
+import utils.Pair;
 
 public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 
@@ -57,7 +58,6 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 
 	// vars
 	protected BigDecimal payment = BigDecimal.ZERO;
-	protected String signature;
 	protected boolean hasPaper = false;
 	protected boolean hasInk = false;
 
@@ -145,33 +145,13 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 	}
 
 	@Override
-	public void insertCoin(Coin coin) {
-		try {
-			this.machine.getCoinSlot().receive(coin);
-		} catch (DisabledException e) {
-			this.sm.blockSession();
-			this.sm.notifyAttendant("Device Powered Off");
-
-			// Should never happen
-		} catch (CashOverloadException e) {
-			this.sm.blockSession();
-			this.sm.notifyAttendant("Machine cannot accept coins");
-
-		}
+	public void insertCoin(Coin coin) throws DisabledException, CashOverloadException {
+		this.machine.getCoinSlot().receive(coin);
 	}
 
 	@Override
-	public void insertBanknote(Banknote banknote) {
-		try {
-			this.machine.getBanknoteInput().receive(banknote);
-		} catch (DisabledException e) {
-			this.sm.blockSession();
-			this.sm.notifyAttendant("Device Powered Off");
-		} catch (CashOverloadException e) {
-			// Should never happen
-			this.sm.blockSession();
-			this.sm.notifyAttendant("Machine cannot accept bank notes");
-		}
+	public void insertBanknote(Banknote banknote) throws DisabledException, CashOverloadException {
+		this.machine.getBanknoteInput().receive(banknote);
 	}
 
 	// Determines if the machine can provide
@@ -311,10 +291,7 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 				// and updates change balance
 				try {
 					coinDispenser.emit();
-				} catch (CashOverloadException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (DisabledException | NoCashAvailableException e) {
+				} catch (NoCashAvailableException | DisabledException | CashOverloadException e) {
 					this.sm.blockSession();
 					this.sm.notifyAttendant("Coin was not emitted");
 					return false;
@@ -399,7 +376,10 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 		// printing the receipt
 		try {
 			printLine("----- Receipt -----\n");
-			for (Item item : sm.getItems().keySet()) {
+			for (Pair<Item, Boolean> pair : sm.getItems()) {
+				// destructuring
+				Item item = pair.getKey();
+
 				// printing the item
 				if (item instanceof BarcodedItem) {
 					BarcodedProduct p = DatabaseHelper.get((BarcodedItem) item);
