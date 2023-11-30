@@ -21,12 +21,12 @@ public class Database {
     public static final Map<Barcode, BarcodedProduct> BARCODED_PRODUCT_DATABASE = new HashMap<>();
 
     /**
-     * The known PLU-coded products, indexed by PLU code.
+     * The known PLU-coded items, indexed by PLU code.
      */
     public static final Map<PriceLookUpCode, PLUCodedItem> PLU_ITEM_DATABASE = new HashMap<>();
 
     /**
-     * The known barcoded products, indexed by barcode.
+     * The known barcoded items, indexed by barcode.
      */
     public static final Map<Barcode, BarcodedItem> BARCODED_ITEM_DATABASE = new HashMap<>();
 
