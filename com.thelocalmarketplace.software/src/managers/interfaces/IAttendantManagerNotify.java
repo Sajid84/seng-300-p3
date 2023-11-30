@@ -5,6 +5,8 @@ import com.tdc.banknote.IBanknoteDispenser;
 import com.tdc.coin.CoinStorageUnit;
 import com.tdc.coin.ICoinDispenser;
 
+import java.math.BigDecimal;
+
 public interface IAttendantManagerNotify {
 
     /**
@@ -34,9 +36,9 @@ public interface IAttendantManagerNotify {
     /**
      * This notifies the manager that the observed coin dispenser has no coins.
      *
-     * @param dispenser the dispenser that triggered this event
+     * @param denom the denomination of coin dispenser that triggered this event
      */
-    void notifyCoinsEmpty(ICoinDispenser dispenser);
+    void notifyCoinsEmpty(BigDecimal denom);
 
     /**
      * This notifies the manager that the observed banknote dispenser has full banknotes.
@@ -55,8 +57,22 @@ public interface IAttendantManagerNotify {
     /**
      * This notifies the manager that the observed banknote dispenser has no banknotes.
      *
-     * @param dispenser the dispenser that triggered this event
+     * @param denom the denomination of coin dispenser that triggered this event
      */
-    void notifyBanknotesEmpty(IBanknoteDispenser dispenser);
+    void notifyBanknotesEmpty(BigDecimal denom);
+
+    /**
+     * This tells the manager that a coin was emitted and to check the state of the coin dispensers.
+     *
+     * @param denom the denomination of the coin
+     */
+    void notifyCoinEmitted(BigDecimal denom);
+
+    /**
+     * This tells the manager that a banknote was emitted and to check the state of the banknote dispensers.
+     *
+     * @param denom the denomination of the coin
+     */
+    void notifyBanknoteEmitted(BigDecimal denom);
 
 }

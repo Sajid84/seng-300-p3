@@ -156,7 +156,7 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	}
 
 	@Override
-	public void notifyCoinsEmpty(ICoinDispenser dispenser) {
+	public void notifyCoinsEmpty(BigDecimal denom) {
 
 	}
 
@@ -171,12 +171,31 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	}
 
 	@Override
-	public void notifyBanknotesEmpty(IBanknoteDispenser dispenser) {
+	public void notifyBanknotesEmpty(BigDecimal denom) {
+
+	}
+
+	@Override
+	public void notifyCoinEmitted(BigDecimal denom) {
+		checkCoinDispenserState(denom);
+	}
+
+	@Override
+	public void notifyBanknoteEmitted(BigDecimal denom) {
+		checkBanknoteDispenserState(denom);
+	}
+
+	protected void checkCoinDispenserState(BigDecimal denom) {
+
+	}
+
+	protected void checkBanknoteDispenserState(BigDecimal denom) {
 
 	}
 
 	@Override
 	public void maintainBanknotes() {
+        // loading the dispensers if they're low
 		for (BigDecimal denom : machine.getBanknoteDenominations()) {
             Boolean low = banknoteDispenserLow.get(denom);
 
@@ -216,6 +235,7 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 	@Override
 	public void maintainCoins() {
+        // loading the dispensers if they're low
         for (BigDecimal denom : machine.getCoinDenominations()) {
             Boolean low = coinDispenserLow.get(denom);
 
