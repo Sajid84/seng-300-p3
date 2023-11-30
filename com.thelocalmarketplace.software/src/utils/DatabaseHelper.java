@@ -9,7 +9,7 @@ import com.jjjwelectronics.Numeral;
 import com.jjjwelectronics.scanner.Barcode;
 import com.jjjwelectronics.scanner.BarcodedItem;
 import com.thelocalmarketplace.hardware.*;
-import com.thelocalmarketplace.hardware.external.ProductDatabases;
+import database.Database;
 
 import java.util.Random;
 
@@ -18,7 +18,7 @@ import java.util.Random;
  */
 public class DatabaseHelper {
 
-    private static final String[] names = {"Milk", "Bread", "Eggs", "Cheese", "Sugar", "Cereal", "Beef", "Abacus",};
+    private static final String[] names = {"Milk", "Bread", "Eggs", "Cheese", "Sugar", "Cereal", "Beef", "Abacus", "Butter"};
 
     private static final String[] adjectives = {"Inedible", "Tasty", "Pasty", "Wooden", "Super", "Proud", "Big", "Small",
             "Puny", "Dandriff-infused", "Feline", "Canine"};
@@ -100,20 +100,47 @@ public class DatabaseHelper {
     }
 
     /**
-     * <p>
-     * Creates a {@link BarcodedItem} with a randomized mass and barcode. This
-     * method also creates a {@link BarcodedProduct} with a randomized barcode,
-     * description, price and mass.
-     * </p>
-     * <p>
-     * This method guarantees that the {@link Barcode}s of both item and product are
-     * the same and that they are put into respective databases in {@link ProductDatabases}.
-     * </p>
+     * This is a shorthand to insert something into the database.
      *
-     * @return the {@link BarcodedItem}
+     * @param item the barcoded item to insert
+     * @param prod the barcoded product to insert
+     * @return true if successful, false otherwise
      */
-    public static BarcodedItem createRandomBarcodedItem() {
-        return DatabaseHelper.createRandomBarcodedItem(DEFAULT_BARCODE_LENGTH);
+    private static boolean insertIntoDatabase(BarcodedItem item, BarcodedProduct prod) {
+        if (item.getBarcode() != prod.getBarcode()) {
+            throw new IllegalArgumentException("Both item and product have different barcodes");
+        }
+
+        if (Database.BARCODED_ITEM_DATABASE.containsKey(item.getBarcode()) ||
+                Database.BARCODED_PRODUCT_DATABASE.containsKey(prod.getBarcode())) {
+            return false;
+        }
+
+        Database.BARCODED_ITEM_DATABASE.put(item.getBarcode(), item);
+        Database.BARCODED_PRODUCT_DATABASE.put(prod.getBarcode(), prod);
+        return true;
+    }
+
+    /**
+     * This is a shorthand to insert something into the database.
+     *
+     * @param item the PLU coded item to insert
+     * @param prod the PLU coded product to insert
+     * @return true if successful, false otherwise
+     */
+    private static boolean insertIntoDatabase(PLUCodedItem item, PLUCodedProduct prod) {
+        if (item.getPLUCode() != prod.getPLUCode()) {
+            throw new IllegalArgumentException("Both item and product have different barcodes");
+        }
+
+        if (Database.PLU_ITEM_DATABASE.containsKey(item.getPLUCode()) ||
+                Database.PLU_PRODUCT_DATABASE.containsKey(prod.getPLUCode())) {
+            return false;
+        }
+
+        Database.PLU_ITEM_DATABASE.put(item.getPLUCode(), item);
+        Database.PLU_PRODUCT_DATABASE.put(prod.getPLUCode(), prod);
+        return true;
     }
 
     /**
@@ -124,27 +151,33 @@ public class DatabaseHelper {
      * </p>
      * <p>
      * This method guarantees that the {@link Barcode}s of both item and product are
-     * the same and that they are put into respective databases in {@link ProductDatabases}.
+     * the same and that they are put into respective databases in {@link Database}.
      * </p>
      *
-     * @param length how many digits to generate for the {@link Barcode}
      * @return the {@link BarcodedItem}
      */
-    public static BarcodedItem createRandomBarcodedItem(int length) {
+    public static BarcodedItem createRandomBarcodedItem() {
         // creating the barcode
-        Barcode barcode = DatabaseHelper.createRandomBarcode(length);
         double mass = DatabaseHelper.createRandomMass();
         String desc = "B" + DatabaseHelper.createRandomSignifier() + " " + DatabaseHelper.createRandomDescription();
+        long price = DatabaseHelper.createRandomPrice();
 
-        // need to create the item
-        BarcodedItem item = new BarcodedItem(barcode, new Mass(mass));
+        // temp vars
+        Barcode barcode;
+        BarcodedItem item;
+        BarcodedProduct prod;
 
-        // need to create the corresponding product
-        BarcodedProduct prod = new BarcodedProduct(barcode, desc,
-                DatabaseHelper.createRandomPrice(), mass);
+        // trying to insert the pair into the database
+        do {
+            // creating the random barcode
+            barcode = DatabaseHelper.createRandomBarcode(DEFAULT_BARCODE_LENGTH);
 
-        // add both to database
-        ProductDatabases.BARCODED_PRODUCT_DATABASE.put(barcode, prod);
+            // need to create the item
+            item = new BarcodedItem(barcode, new Mass(mass));
+
+            // need to create the corresponding product
+            prod = new BarcodedProduct(barcode, desc, price, mass);
+        } while (!DatabaseHelper.insertIntoDatabase(item, prod));
 
         // return item to caller
         return item;
@@ -175,19 +208,26 @@ public class DatabaseHelper {
      */
     public static BarcodedItem createWeightDiscrepancy() {
         // creating the barcode
-        Barcode barcode = DatabaseHelper.createRandomBarcode(DEFAULT_BARCODE_LENGTH);
         double mass = DatabaseHelper.createRandomMass();
         String desc = "(DISCREP) " + DatabaseHelper.createRandomDescription();
+        long price = DatabaseHelper.createRandomPrice();
 
-        // need to create the item
-        BarcodedItem item = new BarcodedItem(barcode, new Mass(mass));
+        // temp vars
+        Barcode barcode;
+        BarcodedItem item;
+        BarcodedProduct prod;
 
-        // need to create the corresponding product
-        BarcodedProduct prod = new BarcodedProduct(barcode, desc,
-                DatabaseHelper.createRandomPrice(), mass + 1_000);
+        // trying to insert the pair into the database
+        do {
+            // creating the random barcode
+            barcode = DatabaseHelper.createRandomBarcode(DEFAULT_BARCODE_LENGTH);
 
-        // add both to database
-        ProductDatabases.BARCODED_PRODUCT_DATABASE.put(barcode, prod);
+            // need to create the item
+            item = new BarcodedItem(barcode, new Mass(mass));
+
+            // need to create the corresponding product
+            prod = new BarcodedProduct(barcode, desc, price, mass + 1_000);
+        } while (!DatabaseHelper.insertIntoDatabase(item, prod));
 
         // return item to caller
         return item;
@@ -200,19 +240,26 @@ public class DatabaseHelper {
      */
     public static BarcodedItem createItemTooHeavy() {
         // creating the barcode
-        Barcode barcode = DatabaseHelper.createRandomBarcode(DEFAULT_BARCODE_LENGTH);
         double mass = DatabaseHelper.createRandomMass();
         String desc = "(HEAVY) " + DatabaseHelper.createRandomDescription();
+        long price = DatabaseHelper.createRandomPrice();
 
-        // this will definitely overload the scale
-        BarcodedItem item = new BarcodedItem(barcode, new Mass(mass + 999999999));
+        // temp vars
+        Barcode barcode;
+        BarcodedItem item;
+        BarcodedProduct prod;
 
-        // need to create the corresponding product
-        BarcodedProduct prod = new BarcodedProduct(barcode, desc,
-                DatabaseHelper.createRandomPrice(), mass);
+        // trying to insert the pair into the database
+        do {
+            // creating the random barcode
+            barcode = DatabaseHelper.createRandomBarcode(DEFAULT_BARCODE_LENGTH);
 
-        // add both to database
-        ProductDatabases.BARCODED_PRODUCT_DATABASE.put(barcode, prod);
+            // need to create the item
+            item = new BarcodedItem(barcode, new Mass(mass + 999999999));
+
+            // need to create the corresponding product
+            prod = new BarcodedProduct(barcode, desc, price, mass);
+        } while (!DatabaseHelper.insertIntoDatabase(item, prod));
 
         // return item to caller
         return item;
@@ -225,7 +272,7 @@ public class DatabaseHelper {
      * @return the corresponding product, if there is one
      */
     public static BarcodedProduct get(BarcodedItem item) {
-        return ProductDatabases.BARCODED_PRODUCT_DATABASE.get(item.getBarcode());
+        return Database.BARCODED_PRODUCT_DATABASE.get(item.getBarcode());
     }
 
     /**
@@ -235,7 +282,7 @@ public class DatabaseHelper {
      * @return the corresponding product, if there is one
      */
     public static PLUCodedProduct get(PLUCodedItem item) {
-        return ProductDatabases.PLU_PRODUCT_DATABASE.get(item.getPLUCode());
+        return Database.PLU_PRODUCT_DATABASE.get(item.getPLUCode());
     }
 
     /**
@@ -245,17 +292,26 @@ public class DatabaseHelper {
      */
     public static PLUCodedItem createRandomPLUCodedItem() {
         // creating random fields
-        PriceLookUpCode code = DatabaseHelper.createRandomPLUCode();
         long price = DatabaseHelper.createRandomPrice();
         String desc = "P" + DatabaseHelper.createRandomSignifier() + " " + DatabaseHelper.createRandomDescription();
         double weight = DatabaseHelper.createRandomMass();
 
-        // creating product & item pair
-        PLUCodedProduct prod = new PLUCodedProduct(code, desc, price);
-        PLUCodedItem item = new PLUCodedItem(code, new Mass(weight));
+        // temp vars
+        PriceLookUpCode code;
+        PLUCodedProduct prod;
+        PLUCodedItem item;
 
-        // putting prod in database
-        ProductDatabases.PLU_PRODUCT_DATABASE.put(code, prod);
+        // trying to insert the pair into the database
+        do {
+            // creating the random barcode
+            code = DatabaseHelper.createRandomPLUCode();
+
+            // need to create the item
+            item = new PLUCodedItem(code, new Mass(weight));
+
+            // need to create the corresponding product
+            prod = new PLUCodedProduct(code, desc, price);
+        } while (!DatabaseHelper.insertIntoDatabase(item, prod));
 
         // returning the item
         return item;
