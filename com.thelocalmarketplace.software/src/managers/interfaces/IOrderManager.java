@@ -105,4 +105,18 @@ public interface IOrderManager extends IManager {
      * @return true if the item wasn't added properly, false otherwise
      */
     boolean errorAddingItem();
+
+    /**
+     * This returns the last received actual weight that the manager received.
+     *
+     * @return the actual weight
+     */
+    BigDecimal getActualWeight();
+
+    /**
+     * Gets the current weight adjustment.
+     *
+     * @return the weight adjustment
+     */
+    BigDecimal getWeightAdjustment();
 }
