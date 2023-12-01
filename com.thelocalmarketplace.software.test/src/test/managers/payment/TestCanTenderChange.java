@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.Locale;
 
+import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,7 +28,7 @@ import stubbing.StubbedSystemManager;
 
 public class TestCanTenderChange {
 
-	public AbstractSelfCheckoutStation machine;
+	public ISelfCheckoutStation machine;
 
 	// vars
 	private StubbedPaymentManager pm;

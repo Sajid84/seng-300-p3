@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 
 import javax.naming.OperationNotSupportedException;
 
+import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -29,7 +30,7 @@ import utils.DatabaseHelper;
 
 public class TestDoNotBag {
 	// machine
-	private AbstractSelfCheckoutStation machine;
+	private ISelfCheckoutStation machine;
 
 	// vars
 	private StubbedOrderManager om;

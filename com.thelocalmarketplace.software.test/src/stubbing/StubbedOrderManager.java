@@ -92,7 +92,7 @@ public class StubbedOrderManager extends OrderManager {
 	}
 
 	public void addItem(Item i, boolean donotbag) {
-		super.items.put(i, donotbag);
+		super.items.add(new Pair<>(i, donotbag));
 	}
 
 	public void setState(SessionStatus s) {
@@ -165,6 +165,10 @@ public class StubbedOrderManager extends OrderManager {
 	public void doNotBagRequest(boolean bagRequest) {
 		onDoNotBagRequestCalled = true;
 		super.doNotBagRequest(bagRequest);
+	}
+
+	public void removeItemFromOrder(Item item) {
+		removeItemFromOrder(new Pair<>(item, false));
 	}
 
 	@Override

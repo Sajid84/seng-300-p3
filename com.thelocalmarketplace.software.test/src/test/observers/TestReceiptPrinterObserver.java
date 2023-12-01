@@ -4,6 +4,7 @@ package test.observers;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,7 +21,7 @@ public class TestReceiptPrinterObserver {
     private StubbedPaymentManager pm;
     private StubbedSystemManager sm;
     private ReceiptPrinterObserver rpls;
-    private AbstractSelfCheckoutStation machine;
+    private ISelfCheckoutStation machine;
 
     @Before
     public void setup() {
@@ -43,7 +44,7 @@ public class TestReceiptPrinterObserver {
 
     @Test(expected = IllegalArgumentException.class)
     public void testNullPaymentManager() {
-        new ReceiptPrinterObserver(null, machine.printer);
+        new ReceiptPrinterObserver(null, machine.getPrinter());
     }
 
     @Test(expected = IllegalArgumentException.class)

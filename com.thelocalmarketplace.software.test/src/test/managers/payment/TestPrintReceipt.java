@@ -10,6 +10,8 @@ import static org.junit.Assert.fail;
 
 import javax.naming.OperationNotSupportedException;
 
+import com.jjjwelectronics.scanner.BarcodedItem;
+import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,20 +24,16 @@ import com.thelocalmarketplace.hardware.external.CardIssuer;
 
 import managers.enums.PaymentType;
 import managers.enums.SessionStatus;
-import stubbing.StubbedBarcodedProduct;
-import stubbing.StubbedGrid;
-import stubbing.StubbedOrderManager;
-import stubbing.StubbedPaymentManager;
-import stubbing.StubbedStation;
-import stubbing.StubbedSystemManager;
+import stubbing.*;
 import utils.CardHelper;
+import utils.DatabaseHelper;
 
 public class TestPrintReceipt {
 	// vars
 	private StubbedPaymentManager pm;
 	private StubbedSystemManager sm;
 	private StubbedOrderManager om;
-	private AbstractSelfCheckoutStation machine;
+	private ISelfCheckoutStation machine;
 	private CardIssuer issuer;
 	private Card card;
 
@@ -70,8 +68,8 @@ public class TestPrintReceipt {
 	@Test
 	public void testPrintLineWithLineTooLong() throws OverloadedDevice {
 		// loading the machine with paper
-		machine.printer.addInk(MAXIMUM_INK);
-		machine.printer.addPaper(MAXIMUM_PAPER);
+		machine.getPrinter().addInk(MAXIMUM_INK);
+		machine.getPrinter().addPaper(MAXIMUM_PAPER);
 
 		// creating a string that's too big for the printer
 		StringBuilder sb = new StringBuilder();
@@ -94,12 +92,13 @@ public class TestPrintReceipt {
 	public void testPrintReceiptRunsOutOfPaperBlocks() throws OverloadedDevice {
 		// loading the machine with paper, this updates the internal state of payment
 		// manager
-		machine.printer.addInk(MAXIMUM_INK);
-		machine.printer.addPaper(1);
+		machine.getPrinter().addInk(MAXIMUM_INK);
+		machine.getPrinter().addPaper(1);
 
 		// adding a product to the order
-		BarcodedProduct prod = new StubbedBarcodedProduct();
-		om.addItem(prod);
+		BarcodedItem item = DatabaseHelper.createRandomBarcodedItem();
+		BarcodedProduct prod = DatabaseHelper.get(item);
+		om.addItem(item);
 		pm.setPayment(prod.getPrice());
 
 		// this should pass
@@ -114,12 +113,13 @@ public class TestPrintReceipt {
 	public void testPrintReceiptRunsOutOfInkBlocks() throws OverloadedDevice {
 		// loading the machine with paper, this updates the internal state of payment
 		// manager
-		machine.printer.addInk(1);
-		machine.printer.addPaper(MAXIMUM_PAPER);
+		machine.getPrinter().addInk(1);
+		machine.getPrinter().addPaper(MAXIMUM_PAPER);
 
 		// adding a product to the order
-		BarcodedProduct prod = new StubbedBarcodedProduct();
-		om.addItem(prod);
+		BarcodedItem item = DatabaseHelper.createRandomBarcodedItem();
+		BarcodedProduct prod = DatabaseHelper.get(item);
+		om.addItem(item);
 		pm.setPayment(prod.getPrice());
 
 		// this should pass
@@ -134,12 +134,13 @@ public class TestPrintReceipt {
 	public void testPrintReceiptWithCard() throws OverloadedDevice {
 		// loading the machine with paper, this updates the internal state of payment
 		// manager
-		machine.printer.addInk(MAXIMUM_INK);
-		machine.printer.addPaper(MAXIMUM_PAPER);
+		machine.getPrinter().addInk(MAXIMUM_INK);
+		machine.getPrinter().addPaper(MAXIMUM_PAPER);
 
 		// adding a product to the order
-		BarcodedProduct prod = new StubbedBarcodedProduct();
-		om.addItem(prod);
+		BarcodedItem item = DatabaseHelper.createRandomBarcodedItem();
+		BarcodedProduct prod = DatabaseHelper.get(item);
+		om.addItem(item);
 		pm.setPayment(prod.getPrice());
 
 		// this should pass
@@ -154,12 +155,13 @@ public class TestPrintReceipt {
 	public void testPrintReceiptWithoutCard() throws OverloadedDevice {
 		// loading the machine with paper, this updates the internal state of payment
 		// manager
-		machine.printer.addInk(MAXIMUM_INK);
-		machine.printer.addPaper(MAXIMUM_PAPER);
+		machine.getPrinter().addInk(MAXIMUM_INK);
+		machine.getPrinter().addPaper(MAXIMUM_PAPER);
 
 		// adding a product to the order
-		BarcodedProduct prod = new StubbedBarcodedProduct();
-		om.addItem(prod);
+		BarcodedItem item = DatabaseHelper.createRandomBarcodedItem();
+		BarcodedProduct prod = DatabaseHelper.get(item);
+		om.addItem(item);
 		pm.setPayment(prod.getPrice());
 
 		// this should pass
@@ -177,8 +179,9 @@ public class TestPrintReceipt {
 		pm.setHasInk(true);
 
 		// adding a product to the order
-		BarcodedProduct prod = new StubbedBarcodedProduct();
-		om.addItem(prod);
+		BarcodedItem item = DatabaseHelper.createRandomBarcodedItem();
+		BarcodedProduct prod = DatabaseHelper.get(item);
+		om.addItem(item);
 		pm.setPayment(prod.getPrice());
 
 		// this should fail
@@ -196,8 +199,9 @@ public class TestPrintReceipt {
 		pm.setHasInk(false);
 
 		// adding a product to the order
-		BarcodedProduct prod = new StubbedBarcodedProduct();
-		om.addItem(prod);
+		BarcodedItem item = DatabaseHelper.createRandomBarcodedItem();
+		BarcodedProduct prod = DatabaseHelper.get(item);
+		om.addItem(item);
 		pm.setPayment(prod.getPrice());
 
 		// this should fail
@@ -215,8 +219,9 @@ public class TestPrintReceipt {
 		pm.setHasInk(false);
 
 		// adding a product to the order
-		BarcodedProduct prod = new StubbedBarcodedProduct();
-		om.addItem(prod);
+		BarcodedItem item = DatabaseHelper.createRandomBarcodedItem();
+		BarcodedProduct prod = DatabaseHelper.get(item);
+		om.addItem(item);
 		pm.setPayment(prod.getPrice());
 
 		// this should fail
@@ -230,8 +235,8 @@ public class TestPrintReceipt {
 	@Test(expected = RuntimeException.class)
 	public void testPaymentLessThanPrice() {
 		// adding a product to the order
-		BarcodedProduct prod = new StubbedBarcodedProduct();
-		om.addItem(prod);
+		BarcodedItem item = new StubbedBarcodedItem();
+		om.addItem(item);
 
 		pm.printReceipt(PaymentType.CASH, null);
 	}

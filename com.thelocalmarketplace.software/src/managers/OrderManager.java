@@ -169,6 +169,14 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
         this.adjustment = a;
     }
 
+    protected void increaseWeightAdjustment(BigDecimal a) {
+        setWeightAdjustment(getWeightAdjustment().add(a));
+    }
+
+    protected void resetWeightAdjustment() {
+        adjustment = BigDecimal.ZERO;
+    }
+
     @Override
     public BigDecimal getTotalPrice() throws IllegalArgumentException {
         BigDecimal total = BigDecimal.ZERO;
@@ -300,7 +308,10 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
         BigDecimal bagWeight = bags.getMass().inGrams();
 
         // Update adjustment for weight of bag
-        this.adjustment = this.adjustment.add(bagWeight);
+        increaseWeightAdjustment(bagWeight);
+
+        System.out.println("Bag Weight: " + bagWeight.toString());
+        System.out.println("Weight adjustment: " + getWeightAdjustment().toString());
 
         // Placing the bags in the bagging area
         this.machine.getBaggingArea().addAnItem(bags);
@@ -324,7 +335,7 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
     @Override
     public void onAttendantOverride() {
         // updating the mass
-        adjustment = this.getExpectedMass().subtract(actualWeight);
+        setWeightAdjustment(actualWeight.subtract(getExpectedMass()));
 
         // unblocking the session
         unblockSession();
@@ -368,7 +379,7 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
          * calculating the magnitude of the difference, the expected weight should be
          * greater than the actual weight.
          */
-        BigDecimal expected = getExpectedMass().subtract(getWeightAdjustment());
+        BigDecimal expected = getExpectedMass().add(getWeightAdjustment());
         BigDecimal actual = actualWeight;
         BigDecimal difference = expected.subtract(actual).abs();
 
@@ -463,6 +474,15 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
     @Override
     public boolean isDisabled() {
         return sm.isDisabled();
+    }
+
+    @Override
+    public void reset() {
+        resetWeightAdjustment();
+        actualWeight = BigDecimal.ZERO;
+        bagItem = true;
+        items = new ArrayList<>();
+        last_item = null;
     }
 
 }

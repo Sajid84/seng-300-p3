@@ -101,6 +101,11 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	}
 
 	@Override
+	public JFrame getFrame() {
+		throw new UnsupportedOperationException("This object does not have a JFrame");
+	}
+
+	@Override
 	public void configure(ITouchScreen touchScreen) {
 		smf.configure(touchScreen);
 	}
@@ -496,6 +501,17 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	@Override
 	public boolean isDisabled() {
 		return getState() == SessionStatus.DISABLED;
+	}
+
+	@Override
+	public void reset() {
+		// resetting the managers
+		am.reset();
+		pm.reset();
+		om.reset();
+
+		// resetting self
+
 	}
 
 	@Override
