@@ -159,7 +159,7 @@ public class DatabaseHelper {
     public static BarcodedItem createCustomerBags() {
         Barcode barcode = DatabaseHelper.createRandomBarcode(10);
 
-        return new BarcodedItem(barcode, new Mass(200));
+        return new BarcodedItem(barcode, new Mass(createRandomMass()));
     }
 
     /**
@@ -180,11 +180,11 @@ public class DatabaseHelper {
         String desc = "(DISCREP) " + DatabaseHelper.createRandomDescription();
 
         // need to create the item
-        BarcodedItem item = new BarcodedItem(barcode, new Mass(mass));
+        BarcodedItem item = new BarcodedItem(barcode, new Mass(mass + 1_000));
 
         // need to create the corresponding product
         BarcodedProduct prod = new BarcodedProduct(barcode, desc,
-                DatabaseHelper.createRandomPrice(), mass + 1_000);
+                DatabaseHelper.createRandomPrice(), mass);
 
         // add both to database
         ProductDatabases.BARCODED_PRODUCT_DATABASE.put(barcode, prod);
