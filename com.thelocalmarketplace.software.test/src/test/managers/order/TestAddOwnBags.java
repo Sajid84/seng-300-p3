@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 
+import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,7 +28,7 @@ import stubbing.StubbedSystemManager;
 public class TestAddOwnBags {
 	// stubs
 	private StubbedOrderManager om;
-	private AbstractSelfCheckoutStation machine;
+	private ISelfCheckoutStation machine;
 	private StubbedStation station;
 	private StubbedSystemManager sm;
 
@@ -133,7 +134,7 @@ public class TestAddOwnBags {
 	 */
 	@Test
 	public void testAddingTooHeavyBag() {
-		Item heavyBag = new StubbedItem(station.getBaggingAreaScale().getMassLimit().inGrams().add(BigDecimal.TEN));
+		Item heavyBag = new StubbedItem(machine.getBaggingArea().getMassLimit().inGrams().add(BigDecimal.TEN));
 		om.addCustomerBags(heavyBag);
 		assertTrue("Bag is too heavy", om.isScaleOverloaded());
 	}

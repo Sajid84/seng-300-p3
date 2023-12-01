@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.jjjwelectronics.Item;
+import com.jjjwelectronics.scanner.BarcodedItem;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,6 +19,8 @@ import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.Product;
 
 import stubbing.*;
+import utils.DatabaseHelper;
+import utils.Pair;
 
 public class TestGetters {
 	// vars
@@ -35,12 +38,12 @@ public class TestGetters {
 	public void testGetProductsContainsAllAdded() {
 		om.addItem(new StubbedBarcodedItem());
 
-		Map<Item, Boolean> items = om.getItems();
+		List<Pair<Item, Boolean>> items = om.getItems();
 
-		assertEquals(prods.size(), 1);
+		assertEquals(items.size(), 1);
 
 		// cheating because I know that I just added a barcoded product
-		BarcodedProduct prod = (BarcodedProduct) prods.get(0);
+		BarcodedProduct prod = DatabaseHelper.get((BarcodedItem) items.get(0).getKey());
 
 		// asserting
 		assertNotNull(prod);
@@ -50,21 +53,21 @@ public class TestGetters {
 
 	@Test
 	public void testGetProductsHasNonOnCreation() {
-		List<Product> prods = om.getItems();
+		List<Pair<Item, Boolean>> prods = om.getItems();
 
 		assertEquals(prods.size(), 0);
 	}
 
 	@Test(expected = UnsupportedOperationException.class)
 	public void testTotalPriceThrowsOnPLU() {
-		om.addItem(new StubbedPLUProduct());
+		om.addItem(new StubbedPLUItem());
 
 		om.getTotalPrice();
 	}
 
 	@Test(expected = UnsupportedOperationException.class)
 	public void testExpectedMassThrowsOnPLU() {
-		om.addItem(new StubbedPLUProduct());
+		om.addItem(new StubbedPLUItem());
 
 		om.getExpectedMass();
 	}
@@ -85,7 +88,7 @@ public class TestGetters {
 
 	@Test
 	public void testExpectedMassEqualsProductMasses() {
-		om.addItem(new StubbedBarcodedProduct());
+		om.addItem(new StubbedBarcodedItem());
 
 		BigDecimal mass = om.getExpectedMass();
 

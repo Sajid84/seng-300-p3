@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.math.BigDecimal;
 
+import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,7 +16,7 @@ import stubbing.*;
 
 public class TestAttendantOverride {
 	// machine
-	private AbstractSelfCheckoutStation machine;
+	private ISelfCheckoutStation machine;
 
 	// vars
 	private StubbedOrderManager om;

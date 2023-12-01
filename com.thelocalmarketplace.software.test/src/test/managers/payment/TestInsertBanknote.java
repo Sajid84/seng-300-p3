@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.Locale;
 
+import com.tdc.DisabledException;
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,12 +56,12 @@ public class TestInsertBanknote {
 
 	// Expect no errors
 	@Test
-	public void testValidInsert() {
+	public void testValidInsert() throws DisabledException, CashOverloadException {
 		this.pm.insertBanknote(fiveNote);
 	}
 
 	@Test
-	public void testDisabledInsert() {
+	public void testDisabledInsert() throws DisabledException, CashOverloadException {
 		this.machine.getBanknoteInput().disable();
 		this.pm.insertBanknote(fiveNote);
 		assertTrue("attendant was called", this.sm.notifyAttendantCalled);
@@ -74,7 +75,7 @@ public class TestInsertBanknote {
 	 * @throws CashOverloadException
 	 */
 	@Test
-	public void testOverloadedInsert() throws CashOverloadException {
+	public void testOverloadedInsert() throws CashOverloadException, DisabledException {
 		// loading storage to max
 		for (int i = 0; i < this.machine.getBanknoteStorage().getCapacity(); i++) {
 			this.machine.getBanknoteStorage().load(fiveNote);

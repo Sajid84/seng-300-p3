@@ -101,6 +101,11 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	}
 
 	@Override
+	public JFrame getFrame() {
+		throw new UnsupportedOperationException("This object does not have a JFrame");
+	}
+
+	@Override
 	public void configure(ITouchScreen touchScreen) {
 		smf.configure(touchScreen);
 	}

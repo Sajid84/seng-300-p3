@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 
 import javax.naming.OperationNotSupportedException;
 
+import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,13 +29,14 @@ import stubbing.StubbedOrderManagerNotify;
 import stubbing.StubbedStation;
 import stubbing.StubbedSystemManager;
 import utils.DatabaseHelper;
+import utils.Pair;
 
 import static org.junit.Assert.*;
 
 public class TestRemoveItem {
 	private StubbedOrderManager om;
 	private StubbedSystemManager sm;
-	private AbstractSelfCheckoutStation machine;
+	private ISelfCheckoutStation machine;
 
 	/**
 	 * Sets up a selfcheckout station, and an ordermanager to test Establishes some
@@ -65,7 +67,7 @@ public class TestRemoveItem {
 	 */
 	@Test(expected = IllegalArgumentException.class)
 	public void testWhenItemTypeNotRecognized() {
-		om.removeItemFromOrder(null);
+		om.removeItemFromOrder((Item) null);
 	}
 
 	/**
@@ -75,7 +77,7 @@ public class TestRemoveItem {
 	public void testWhenItemIsPLUCoded() throws OperationNotSupportedException {
 		// Currently, PLU codes are not accepted so we expect this exception.
 		PLUCodedItem item = new PLUCodedItem(new PriceLookUpCode("1234"), new Mass(1));
-		om.removeItemFromOrder((Item) item);
+		om.removeItemFromOrder(new Pair<>(item, true));
 	}
 
 	/**
@@ -110,7 +112,7 @@ public class TestRemoveItem {
 	public void testSystemManagerItemIsPLUCoded() throws OperationNotSupportedException {
 		// Currently, PLU codes are not accepted so we expect this exception.
 		PLUCodedItem item = new PLUCodedItem(new PriceLookUpCode("1234"), new Mass(1));
-		sm.removeItemFromOrder((Item) item);
+		sm.removeItemFromOrder(new Pair<>(item, true));
 	}
 
 	/**
@@ -123,7 +125,7 @@ public class TestRemoveItem {
 	public void testSystemManagerItemNotInOrder() throws OperationNotSupportedException {
 		Barcode otherBarcode = new Barcode(new Numeral[] { Numeral.nine, Numeral.nine, Numeral.nine, });
 		BarcodedItem item = new BarcodedItem(otherBarcode, new Mass(2));
-		sm.removeItemFromOrder((Item) item);
+		sm.removeItemFromOrder(new Pair<>(item, true));
 	}
 
 	/**
@@ -147,7 +149,7 @@ public class TestRemoveItem {
 		sm.addItemToOrder(item, ScanType.MAIN);
 
 		// removing
-		sm.removeItemFromOrder((Item) item);
+		sm.removeItemFromOrder(new Pair<>(item, true));
 
 		// We expect our listeners to hear about this.
 		assertTrue(omnStub.gotOnItemRemovedFromOrderMessage);

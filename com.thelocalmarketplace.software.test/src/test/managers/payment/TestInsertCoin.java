@@ -9,6 +9,8 @@ import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.Locale;
 
+import com.tdc.DisabledException;
+import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,7 +27,7 @@ import stubbing.StubbedSystemManager;
 
 public class TestInsertCoin {
 
-	public AbstractSelfCheckoutStation machine;
+	public ISelfCheckoutStation machine;
 
 	// vars
 	private StubbedPaymentManager pm;
@@ -57,13 +59,13 @@ public class TestInsertCoin {
 
 	// Expect no errors
 	@Test
-	public void testValidInsert() {
+	public void testValidInsert() throws DisabledException, CashOverloadException {
 		this.pm.insertCoin(fiveCent);
 	}
 
 	@Test
-	public void testDisabledInsert() {
-		this.machine.coinSlot.disable();
+	public void testDisabledInsert() throws DisabledException, CashOverloadException {
+		this.machine.getCoinSlot().disable();
 		this.pm.insertCoin(fiveCent);
 		assertTrue("attendant was called", this.sm.notifyAttendantCalled);
 		assertTrue("Session was blocked", this.sm.blockSessionCalled);
@@ -76,13 +78,13 @@ public class TestInsertCoin {
 	 */
 
 	@Test
-	public void testOverloadedInsert() throws CashOverloadException {
-		CoinStorageUnit csu = this.machine.coinStorage;
+	public void testOverloadedInsert() throws CashOverloadException, DisabledException {
+		CoinStorageUnit csu = this.machine.getCoinStorage();
 
 		// loading the dispensers to the max
-		for (int i = 0; i < this.machine.coinDenominations.size(); i++) {
-			BigDecimal denomination = this.machine.coinDenominations.get(i);
-			ICoinDispenser coinDispenser = this.machine.coinDispensers.get(denomination);
+		for (int i = 0; i < this.machine.getCoinDenominations().size(); i++) {
+			BigDecimal denomination = this.machine.getCoinDenominations().get(i);
+			ICoinDispenser coinDispenser = this.machine.getCoinDispensers().get(denomination);
 			for (int j = 0; j < coinDispenser.getCapacity(); j++) {
 				coinDispenser.load(fiveCent);
 			}
