@@ -461,6 +461,11 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	}
 
 	@Override
+	public void maintainBags() {
+		am.maintainBags();
+	}
+
+	@Override
 	public void maintainCoinStorage() {
 		am.maintainCoinStorage();
 	}
@@ -556,6 +561,15 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	@Override
 	public boolean canPrint() {
 		return am.canPrint();
+	}
+
+	@Override
+	public void requestPurchaseBags(int count) {
+		if (!isUnblocked()) {
+			throw new IllegalStateException("Cannot add bags when not in a normal state");
+		}
+
+		am.requestPurchaseBags(count);
 	}
 
 	@Override

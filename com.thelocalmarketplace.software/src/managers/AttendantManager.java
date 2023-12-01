@@ -315,6 +315,11 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	}
 
 	@Override
+	public void maintainBags() {
+		// TODO implement this method
+	}
+
+	@Override
 	public void maintainCoinStorage() {
 		if (coinsFull) {
 			List<Coin> coins = machine.getCoinStorage().unload();
@@ -377,8 +382,18 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	}
 
 	@Override
+	public void notifyBagDispensed() {
+		// TODO implement this method
+	}
+
+	@Override
 	public boolean canPrint() {
 		return hasInk && hasPaper;
+	}
+
+	@Override
+	public void requestPurchaseBags(int count) {
+		// TODO implement this method
 	}
 
 	/**

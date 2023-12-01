@@ -8,6 +8,7 @@
 package managers;
 
 import com.jjjwelectronics.Item;
+import com.jjjwelectronics.bag.ReusableBag;
 import com.jjjwelectronics.scale.ElectronicScaleListener;
 import com.jjjwelectronics.scale.IElectronicScale;
 import com.jjjwelectronics.scanner.Barcode;
@@ -208,6 +209,10 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
                 continue;
             }
 
+            if (i instanceof ReusableBag) {
+                total = total.add(DatabaseHelper.PRICE_OF_BAG);
+            }
+
             // Temporary exception, while item types other than Barcode are unsupported.
             throw new UnsupportedOperationException();
         }
@@ -281,18 +286,22 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
          * any other kind of item
          */
 
-        // removing the item from the map
-        if (this.items.remove(pair)) {
-            for (IOrderManagerNotify listener : listeners) {
-                listener.onItemRemovedFromOrder(pair.getKey());
-            }
+        // checking if the pair is in the order
+        if (!items.contains(pair)) {
+            throw new IllegalArgumentException("Cannot remove an item from the order that isn't in the order");
         }
 
-        // removing if the item was bagged
-        if (pair.getValue()) {
-            // removing the item from the bagging area
-            // this function needs to be here to work with the bags too heavy use case
-            this.machine.getBaggingArea().removeAnItem(pair.getKey());
+        // removing the item from the map
+        if (this.items.remove(pair)) {
+            // removing if the item was bagged
+            if (pair.getValue()) {
+                // removing the item from the bagging area
+                // this function needs to be here to work with the bags too heavy use case
+                this.machine.getBaggingArea().removeAnItem(pair.getKey());
+            }
+        } else {
+            // this should never happen
+            throw new RuntimeException("There was an error removing the item from the list");
         }
     }
 
@@ -345,11 +354,6 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
     @Override
     public List<Pair<Item, Boolean>> getItems() {
         return items;
-    }
-
-    @Override
-    public void onItemRemovedFromOrder(Item item) {
-        // Note: Do Not Use! OrderManager calls this for others!
     }
 
     @Override
