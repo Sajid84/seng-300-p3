@@ -142,32 +142,32 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 	@Override
 	public void notifyCoinsFull(BigDecimal denom) {
-
+		notifyAttendant("The " + denom + " coin dispenser is full!");
 	}
 
 	@Override
 	public void notifyCoinsFull(CoinStorageUnit unit) {
-
+		notifyAttendant("The " + unit + " coin unit is full!");
 	}
 
 	@Override
 	public void notifyCoinsEmpty(BigDecimal denom) {
-
+		notifyAttendant("The " + denom + " coin dispenser is empty!");
 	}
 
 	@Override
 	public void notifyBanknotesFull(BigDecimal denom) {
-
+		notifyAttendant("The " + denom + " banknote dispenser is full!");
 	}
 
 	@Override
 	public void notifyBanknotesFull(BanknoteStorageUnit unit) {
-
+		notifyAttendant("The " + unit + " banknote unit is full!");
 	}
 
 	@Override
 	public void notifyBanknotesEmpty(BigDecimal denom) {
-
+		notifyAttendant("The " + denom + " banknote dispenser is empty!");
 	}
 
 	@Override
