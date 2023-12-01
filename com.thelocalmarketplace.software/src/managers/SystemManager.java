@@ -417,8 +417,8 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	}
 
 	@Override
-	public void maintainBanknotes() {
-		am.maintainBanknotes();
+	public void maintainBanknoteDispensers() {
+		am.maintainBanknoteDispensers();
 	}
 
 	@Override
@@ -427,8 +427,8 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	}
 
 	@Override
-	public void maintainCoins() {
-		am.maintainCoins();
+	public void maintainCoinDispensers() {
+		am.maintainCoinDispensers();
 	}
 
 	@Override
