@@ -15,21 +15,26 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.math.BigDecimal;
 import java.util.Currency;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PaymentSimualtorGui extends JFrame implements IScreen {
 
     private static final long serialVersionUID = 1L;
     private JPanel contentPane;
     private SystemManager sm;
-    private Card SimulatedCard = CardHelper.createCard(CardHelper.createCardIssuer());
+    private Card simulatedCard;
+
+    private Map<String, BigDecimal> stringToCoinDenom = new HashMap<>();
+    private Map<String, BigDecimal> stringToBanknoteDenom = new HashMap<>();
 
     @Override
     public JPanel getPanel() {
         return contentPane;
-
     }
 
     @Override
@@ -37,6 +42,15 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
         return this;
     }
 
+    protected void createDenominationMapping() {
+        for (BigDecimal denom : sm.getBanknoteDenominations()) {
+            stringToBanknoteDenom.put(denom.toString(), denom);
+        }
+
+        for (BigDecimal denom : sm.getCoinDenominations()) {
+            stringToCoinDenom.put(denom.toString(), denom);
+        }
+    }
 
     /**
      * Create the frame.
@@ -44,8 +58,14 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
     public PaymentSimualtorGui(SystemManager sm) {
         this.sm = sm;
 
+        // creating the denominations
+        createDenominationMapping();
+
+        // creating a card
+        simulatedCard = CardHelper.createCard(sm.getIssuer());
+
         setTitle("Payment Simulation");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setBounds(100, 100, 400, 150);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -66,15 +86,10 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
         JButton SwipeCardButton = new JButton("Swipe Card");
         SwipeCardButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         SwipeCardButton.addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    sm.swipeCard(SimulatedCard);
-                } catch (IOException e1) {
-                    // shouldn't happen
-                }
-
+                System.out.println("Swiping a card.");
+                sm.swipeCard(simulatedCard);
             }
         });
         CardPanel.add(SwipeCardButton);
@@ -117,7 +132,7 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
         CoinPanel.add(CoinLabel);
 
         JComboBox CoinValueDropdown = new JComboBox();
-        CoinValueDropdown.setModel(new DefaultComboBoxModel(new String[]{"0.01", "0.05", "0.10", "0.25", "1.00", "2.00"}));
+        CoinValueDropdown.setModel(new DefaultComboBoxModel(stringToCoinDenom.keySet().toArray()));
         CoinPanel.add(CoinValueDropdown);
 
         JButton InsertCoinButton = new JButton("Insert Coin");
@@ -126,7 +141,9 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                sm.insertCoin(new Coin(Currency.getInstance("CAD"), new BigDecimal((char[]) CoinValueDropdown.getSelectedItem())));
+                BigDecimal denom = stringToCoinDenom.get(CoinValueDropdown.getSelectedItem());
+                sm.insertCoin(new Coin(Currency.getInstance("CAD"), denom));
+                System.out.println("Inserted a coin of value: " + denom.toString());
             }
         });
         CoinPanel.add(InsertCoinButton);
@@ -141,7 +158,7 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
         CashPanel.add(CashLabel);
 
         JComboBox CashValueDropdown = new JComboBox();
-        CashValueDropdown.setModel(new DefaultComboBoxModel(new String[]{"5", "10", "20", "50", "100"}));
+        CashValueDropdown.setModel(new DefaultComboBoxModel(stringToBanknoteDenom.keySet().toArray()));
         CashPanel.add(CashValueDropdown);
 
         JButton InsertBanknoteButton = new JButton("Insert Banknote");
@@ -150,12 +167,19 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                sm.insertBanknote(new Banknote(Currency.getInstance("CAD"), new BigDecimal((char[]) CashValueDropdown.getSelectedItem())));
+                BigDecimal denom = stringToBanknoteDenom.get(CashValueDropdown.getSelectedItem());
+                sm.insertBanknote(new Banknote(Currency.getInstance("CAD"), denom));
+                System.out.println("Inserted a banknote of value: " + denom.toString());
             }
         });
         CashPanel.add(InsertBanknoteButton);
 
-        this.setVisible(true);
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                sm.notifyPaymentWindowClosed();
+            }
+        });
     }
 
     @Override
@@ -165,32 +189,49 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
 
     @Override
     public void notifyItemAdded(Item item) {
-        // does nothing
-
+        // if the window is visible and this event was triggered, we
+        // can assume that the customer did something that they weren't supposed to
+        if (this.isVisible()) {
+            sm.blockSession();
+            sm.notifyAttendant("An item was removed when the customer was paying for an order.");
+        }
     }
 
     @Override
     public void notifyItemRemoved(Item item) {
-        // does nothing
-
+        // if the window is visible and this event was triggered, we
+        // can assume that the customer did something that they weren't supposed to
+        if (this.isVisible()) {
+            sm.blockSession();
+            sm.notifyAttendant("An item was removed when the customer was paying for an order.");
+        }
     }
 
     @Override
     public void notifyStateChange(SessionStatus state) {
-        // does nothing
-
+        if (sm.isPaid() || sm.isDisabled()) {
+            this.dispose();
+        }
     }
 
     @Override
     public void notifyRefresh() {
-        // does nothing
-
+        // TODO update some feedback label
     }
 
     @Override
     public void notifyPaymentAdded(BigDecimal value) {
-        // does nothing
+        // TODO update some feedback label
+    }
 
+    @Override
+    public void notifyPaymentWindowClosed() {
+        // does nothing
+    }
+
+    @Override
+    public void notifyInvalidCardRead(Card card) {
+        // TODO update some feedback label
     }
 
 }
