@@ -1,8 +1,9 @@
 *.zip
 old*
-bin/
-*.class
 .idea/
 qodana.yml
 *.iml
 *.eml
+com.thelocalmarketplace.hardware*/bin/
+com.thelocalmarketplace.software.test/bin/
+bin/
