@@ -22,9 +22,6 @@
 
 package managers;
 
-import java.util.*;
-import java.math.BigDecimal;
-
 import com.jjjwelectronics.OverloadedDevice;
 import com.tdc.CashOverloadException;
 import com.tdc.banknote.Banknote;
@@ -33,24 +30,15 @@ import com.tdc.banknote.IBanknoteDispenser;
 import com.tdc.coin.Coin;
 import com.tdc.coin.CoinStorageUnit;
 import com.tdc.coin.ICoinDispenser;
-
-import com.jjjwelectronics.Item;
-import com.jjjwelectronics.scanner.Barcode;
-import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
-import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
-import com.thelocalmarketplace.hardware.PLUCodedProduct;
-import com.thelocalmarketplace.hardware.PriceLookUpCode;
-import com.thelocalmarketplace.hardware.Product;
-import com.thelocalmarketplace.hardware.external.ProductDatabases;
-
 import managers.enums.SessionStatus;
 import managers.interfaces.IAttendantManager;
 import managers.interfaces.IAttendantManagerNotify;
-import managers.interfaces.IOrderManager;
-import utils.Pair;
 import observers.payment.CoinMonitor;
 import observers.payment.ReceiptPrinterObserver;
+
+import java.math.BigDecimal;
+import java.util.*;
 
 public class AttendantManager implements IAttendantManager, IAttendantManagerNotify {
 

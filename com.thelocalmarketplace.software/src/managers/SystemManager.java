@@ -17,7 +17,6 @@ import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import com.thelocalmarketplace.hardware.PLUCodedItem;
-import com.thelocalmarketplace.hardware.Product;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
 import driver.SystemManagerForm;
 import managers.enums.PaymentType;
@@ -281,6 +280,11 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 			notifyAttendant("A scale was overloaded due to an item that's too heavy.");
 			blockSession();
 		}
+	}
+
+	@Override
+	public Item searchItemsByText(String description) {
+		return om.searchItemsByText(description);
 	}
 
 	@Override
