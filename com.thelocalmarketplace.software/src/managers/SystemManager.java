@@ -564,6 +564,13 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 		}
 	}
 
+	public boolen checkIfMembershipCard(Card card){
+		if (card.kind.toLowerCase() == "membership"){
+			return true;
+		}
+		return false;
+	}
+
 	@Override
 	public CardIssuer getIssuer() {
 		return issuer;
