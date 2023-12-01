@@ -592,4 +592,18 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 			observer.notifyPaymentAdded(value);
 		}
 	}
+
+	@Override
+	public void notifyPaymentWindowClosed() {
+		for (ISystemManagerNotify observer : observers) {
+			observer.notifyPaymentWindowClosed();
+		}
+	}
+
+	@Override
+	public void notifyInvalidCardRead(Card card) {
+		for (ISystemManagerNotify observer : observers) {
+			observer.notifyInvalidCardRead(card);
+		}
+	}
 }
