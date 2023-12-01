@@ -19,7 +19,7 @@ public interface IPaymentManagerNotify {
 	 * This method notifies the {@link IPaymentManager} that a child object received
 	 * a card swipe.
 	 * 
-	 * @param the swiped card data
+	 * @param cardData the swiped card data
 	 * @return
 	 */
 	void notifyCardSwipe(CardData cardData);

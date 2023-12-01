@@ -30,7 +30,7 @@ public interface IPaymentManager extends IManager {
 	/**
 	 * Allows the customer to swipe their credit card
 	 * 
-	 * @param creditCard a credit card
+	 * @param card a credit card
 	 * @throws IOException
 	 */
 	void swipeCard(Card card) throws IOException;
