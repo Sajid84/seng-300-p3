@@ -44,12 +44,15 @@ public class CardReaderObserver extends AbstractDeviceObserver implements CardRe
 		else if (cardTapped){
 			this.ref.notifyCardTap(data);
 			cardTapped = false;
+		} else if (cardInserted) {
+			this.red.notifyInsertCard(data);
+			cardInserted = false;
 		}
 	}
 
 	@Override
 	public void aCardHasBeenInserted() {
-		// TODO Auto-generated method stub
+		cardInserted = true;
 
 	}
 

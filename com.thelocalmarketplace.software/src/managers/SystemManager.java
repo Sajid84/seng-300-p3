@@ -217,18 +217,30 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	}
 	@Override
 	public void insertCard(Card card, String pin) throws IOException {
-		if (getState() != SessionStatus.NORMAL)
-			throw new IllegalStateException("cannot insert card when PAID");
-		this.pm.insertCard(card, pin);
+		if (!isUnblocked()) {throw new IllegalStateException("cannot insert card when PAID");}
+
+		try{
+			this.pm.insertCard(card, pin);
+		} catch (IOException e) {
+			notifyInvalidCardRead(card);
+		} finally {
+			checkPaid();
+		}
 	}
 
 	@Override
 	public void tapCard(Card card) throws IOException {
 		// not performing action if session is blocked
-		if (getState() != SessionStatus.NORMAL)
-			throw new IllegalStateException("cannot tap card when PAID");
+		if (!isUnblocked()) {throw new IllegalStateException("cannot tap card when PAID");}
 
-		this.pm.tapCard(card);
+		try{
+			this.pm.tapCard(card);
+		} catch (IOException e) {
+			notifyInvalidCardRead(card);
+		} finally {
+			checkPaid();
+		}
+
 	}
 
 	public boolean tenderChange() {
