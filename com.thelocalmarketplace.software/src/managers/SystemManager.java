@@ -18,7 +18,7 @@ import com.tdc.coin.Coin;
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import com.thelocalmarketplace.hardware.PLUCodedItem;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
-import driver.SystemManagerForm;
+import driver.MainScreenForm;
 import managers.enums.PaymentType;
 import managers.enums.ScanType;
 import managers.enums.SessionStatus;
@@ -49,7 +49,7 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	protected PaymentManager pm;
 	protected OrderManager om;
 	protected AttendantManager am;
-	protected SystemManagerForm smf;
+	protected MainScreenForm msf;
 
 	// vars
 	protected SessionStatus state;
@@ -86,7 +86,7 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 		this.am = new AttendantManager(this);
 
 		// creating the GUI
-		smf = new SystemManagerForm(this);
+		msf = new MainScreenForm(this);
 
 		// setting the initial state
 		setState(SessionStatus.NORMAL);
@@ -94,7 +94,7 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 
 	@Override
 	public JPanel getPanel() {
-		return smf.getPanel();
+		return msf.getPanel();
 	}
 
 	@Override
@@ -104,7 +104,7 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 
 	@Override
 	public void configure(ITouchScreen touchScreen) {
-		smf.configure(touchScreen);
+		msf.configure(touchScreen);
 	}
 
 	@Override
@@ -432,6 +432,7 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 
 	@Override
 	public void signalForAttendant() {
+		notifyAttendant("Station wishes the attention of the attendant manager");
 		am.signalForAttendant();
 	}
 

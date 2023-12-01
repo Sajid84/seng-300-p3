@@ -3,6 +3,7 @@
 package driver;
 
 import com.jjjwelectronics.Item;
+import com.jjjwelectronics.bag.ReusableBag;
 import com.jjjwelectronics.card.Card;
 import com.jjjwelectronics.scanner.BarcodedItem;
 import com.jjjwelectronics.screen.ITouchScreen;
@@ -231,9 +232,6 @@ public class SystemManagerForm implements IScreen {
         debugView.setLayout(new GridLayout());
         debugView.add(debug.getPanel());
 
-        // updating the touch screen
-        touchScreen.getFrame().setContentPane(root);
-
         // creating the payment gui
         this.paymentGui = new PaymentSimualtorGui(sm);
         sm.attach(paymentGui);
@@ -275,6 +273,10 @@ public class SystemManagerForm implements IScreen {
                 PLUCodedProduct prod = DatabaseHelper.get((PLUCodedItem) item);
                 description = prod.getDescription();
                 price = prod.getPrice();
+            }
+            if (item instanceof ReusableBag) {
+                description = "Reusable Bag";
+                price = DatabaseHelper.PRICE_OF_BAG.doubleValue();
             }
 
             // adding the row
