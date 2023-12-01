@@ -34,6 +34,14 @@ public interface IPaymentManagerNotify {
 	void notifyCardTap(CardData cardData);
 
 	/**
+	 * This method notifies that a card has been inserted
+	 *
+	 * @param cardData the data of the inserted card
+	 */
+	void notifyInsertCard(CardData cardData);
+
+
+	/**
 	 * This method notifies the {@link IPaymentManager} that a child object has
 	 * received some payment, either from a banknote or from a coin.
 	 * 

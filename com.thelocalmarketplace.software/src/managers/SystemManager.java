@@ -215,6 +215,12 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 			checkPaid();
 		}
 	}
+	@Override
+	public void insertCard(Card card, String pin) throws IOException {
+		if (getState() != SessionStatus.NORMAL)
+			throw new IllegalStateException("cannot insert card when PAID");
+		this.pm.insertCard(card, pin);
+	}
 
 	@Override
 	public void tapCard(Card card) throws IOException {

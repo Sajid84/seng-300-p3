@@ -42,6 +42,13 @@ public interface IPaymentManager extends IManager {
 	void tapCard(Card card) throws IOException;
 
 	/**
+	 * Allows the customer to insert their credit card
+	 *
+	 * @param card
+	 * @throws IOException
+	 */
+	void insertCard(Card card, String pin) throws IOException;
+	/**
 	 * Allows the customer to insert a coin into the system.
 	 * 
 	 * @param coin a coin
