@@ -476,4 +476,13 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
         return sm.isDisabled();
     }
 
+    @Override
+    public void reset() {
+        resetWeightAdjustment();
+        actualWeight = BigDecimal.ZERO;
+        bagItem = true;
+        items = new ArrayList<>();
+        last_item = null;
+    }
+
 }

@@ -61,4 +61,9 @@ public interface IManager extends IManagerNotify {
 	 * @return true if the machine is disabled, false otherwise.
 	 */
 	boolean isDisabled();
+
+	/**
+	 * This resets the managers to their beginning state.
+	 */
+	void reset();
 }

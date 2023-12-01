@@ -504,6 +504,17 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	}
 
 	@Override
+	public void reset() {
+		// resetting the managers
+		am.reset();
+		pm.reset();
+		om.reset();
+
+		// resetting self
+
+	}
+
+	@Override
 	public void notifyItemAdded(Item item) {
 		for (ISystemManagerNotify observer : observers) {
 			observer.notifyItemAdded(item);

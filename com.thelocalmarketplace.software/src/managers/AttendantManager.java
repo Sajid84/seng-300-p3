@@ -150,4 +150,9 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 		return sm.isDisabled();
 	}
 
+	@Override
+	public void reset() {
+		// TODO do something here
+	}
+
 }
