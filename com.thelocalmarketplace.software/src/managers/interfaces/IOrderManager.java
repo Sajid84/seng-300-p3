@@ -60,15 +60,6 @@ public interface IOrderManager extends IManager {
      * @param method the method of scanning
      */
     void addItemToOrder(Item item, ScanType method);
-
-    /**
-     * This method is called when an item, obtained through a search by the attendant,
-     * needs to be added to the order.
-     *
-     * @param searchedItem The item obtained through a search.
-     * @throws IllegalArgumentException If the searched item is null.
-     */
-	void addSearchedItemToOrder(Item searchedItem);
     
     /**
      * This removes an {@link Item} from the order and the bagging area.

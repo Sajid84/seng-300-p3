@@ -45,54 +45,6 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 		// creating observers
 	}
-
-	/**
-	 * Searches for products based on a provided description in both PLU-coded and Barcoded product databases.
-	 *
-	 * @param description The text used for keyword search to find products.
-	 * @return A list of pairs, each containing a product (either PLU-coded or Barcoded) and a boolean value indicating whether the product is found.
-	 */
-	public List<Pair<Product, Boolean>> searchProductsByText(String description) {
-
-	    List<Pair<Product, Boolean>> foundItems = new ArrayList<>();
-
-	    String lowDescription = description.toLowerCase();
-
-	    // Search in PLU-coded product database
-	    for (Map.Entry<PriceLookUpCode, PLUCodedProduct> entry : ProductDatabases.PLU_PRODUCT_DATABASE.entrySet()) {
-	        String pluLowDescription = entry.getValue().getDescription().toLowerCase();
-	        if (pluLowDescription.startsWith(lowDescription)) {
-	            foundItems.add(new Pair<>(entry.getValue(), false));
-	        }
-	    }
-
-	    // Search in Barcoded product database
-	    for (Map.Entry<Barcode, BarcodedProduct> entry : ProductDatabases.BARCODED_PRODUCT_DATABASE.entrySet()) {
-	        String barcodeLowDescription = entry.getValue().getDescription().toLowerCase();
-	        if (barcodeLowDescription.startsWith(lowDescription)) {
-	            foundItems.add(new Pair<>(entry.getValue(), false));
-	        }
-	    }
-
-	    return foundItems;
-	}
-	
-    /**
-     * Add a searched item to the order.
-     *
-     * @param searchedItem The item obtained through a search.
-     */
-    public void addSearchedItemToOrder(Item item) {
-        // Assuming that the searched item is always valid when added through search
-        if (item != null) {
-            // Get the OrderManager instance from the SystemManager
-        	// Unsure about this
-            IOrderManager orderManager = sm.getOrderManager();
-
-            // Call the method to add the searched item
-            orderManager.addSearchedItemToOrder(item);
-        }
-    }
 	
 	@Override
 	public SessionStatus getState() {
