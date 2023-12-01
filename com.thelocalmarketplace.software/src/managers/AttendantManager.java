@@ -172,22 +172,22 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 	@Override
 	public void notifyCoinEmitted(BigDecimal denom) {
-		checkCoinDispenserState(denom);
+		checkCoinDispenserState(denom, false);
 	}
 
 	@Override
 	public void notifyBanknoteEmitted(BigDecimal denom) {
-		checkBanknoteDispenserState(denom);
+		checkBanknoteDispenserState(denom, false);
 	}
 
 	@Override
 	public void notifyCoinAdded(BigDecimal denom) {
-		checkCoinDispenserState(denom);
+		checkCoinDispenserState(denom, true);
 	}
 
 	@Override
 	public void notifyBanknoteAdded(BigDecimal denom) {
-		checkBanknoteDispenserState(denom);
+		checkBanknoteDispenserState(denom, true);
 	}
 
 	@Override
@@ -195,7 +195,9 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 		// TODO check state of the coin storage unit
 
 		// if coins full
-		notifyCoinsFull(unit);
+		if (unit.getCapacity() <= unit.getCoinCount()){
+			notifyCoinsFull(unit);
+		}
 	}
 
 	@Override
@@ -203,15 +205,34 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 		// TODO check state of the banknote storage unit
 
 		// if banknotes full
-		notifyBanknotesFull(unit);
+		if (unit.getCapacity() <= unit.getBanknoteCount()){
+			notifyBanknotesFull(unit);
+		}
 	}
 
-	protected void checkCoinDispenserState(BigDecimal denom) {
+	protected void checkCoinDispenserState(BigDecimal denom, boolean added) {
+		// coin added
+		if (added){
+			coinMonitorMap.get(denom).coinAdded(machine.getCoinDispensers().get(denom), new Coin(denom));
+		} 
+		// coin removed
+		else {
+			coinMonitorMap.get(denom).coinRemoved(machine.getCoinDispensers().get(denom), new Coin(denom));
+		}
 
 	}
 
-	protected void checkBanknoteDispenserState(BigDecimal denom) {
-
+	protected void checkBanknoteDispenserState(BigDecimal denom, boolean added) {
+		// banknote added
+		if (added){
+			bankNoteMonitorMap.get(denom).banknoteAdded(machine.getBanknoteDispensers().get(denom),
+			new Banknote(Currency.getInstance(Locale.CANADA), denom));
+		} 
+		// banknote removed
+		else {
+			bankNoteMonitorMap.get(denom).banknoteRemoved(machine.getBanknoteDispensers().get(denom),
+			new Banknote(Currency.getInstance(Locale.CANADA), denom));
+		}
 	}
 
 	@Override
