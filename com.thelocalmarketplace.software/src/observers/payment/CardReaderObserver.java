@@ -14,6 +14,10 @@ public class CardReaderObserver extends AbstractDeviceObserver implements CardRe
 	// object references
 	private PaymentManager ref;
 
+	//var
+	private boolean cardSwiped = false;
+	private boolean cardTapped = false;
+
 	public CardReaderObserver(PaymentManager pm, ICardReader device) {
 		super(device);
 
@@ -27,11 +31,19 @@ public class CardReaderObserver extends AbstractDeviceObserver implements CardRe
 
 	@Override
 	public void aCardHasBeenSwiped() {
+		cardSwiped = true;
 	}
 
 	@Override
 	public void theDataFromACardHasBeenRead(CardData data) {
-		this.ref.notifyCardSwipe(data);
+		if (cardSwiped) {
+			this.ref.notifyCardSwipe(data);
+			cardSwiped = false;
+		}
+		else if (cardTapped){
+			this.ref.notifyCardTap(data);
+			cardTapped = false;
+		}
 	}
 
 	@Override
@@ -48,8 +60,7 @@ public class CardReaderObserver extends AbstractDeviceObserver implements CardRe
 
 	@Override
 	public void aCardHasBeenTapped() {
-		// TODO Auto-generated method stub
-
+		cardTapped = false;
 	}
 
 }

@@ -58,6 +58,7 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 
 	// vars
 	protected BigDecimal payment = BigDecimal.ZERO;
+	protected boolean isMembershipCard = false;
 
 	/**
 	 * This controls everything relating to customer payment.
@@ -117,13 +118,8 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 		if (card == null) {
 			throw new IllegalArgumentException("cannot tap a null card");
 		}
-		try {
-			this.machine.cardReader.tap(card);
-			// Happens if there is a problem with the chip
-		} catch (ChipFailureException e){
-			this.sm.blockSession();
-			this.sm.notifyAttendant("Card tap failed");
-		}
+		this.machine.cardReader.tap(card);
+
 	}
 
 	@Override
