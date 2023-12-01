@@ -17,6 +17,7 @@ public class CardReaderObserver extends AbstractDeviceObserver implements CardRe
 	//var
 	private boolean cardSwiped = false;
 	private boolean cardTapped = false;
+	private boolean cardInserted = false;
 
 	public CardReaderObserver(PaymentManager pm, ICardReader device) {
 		super(device);
