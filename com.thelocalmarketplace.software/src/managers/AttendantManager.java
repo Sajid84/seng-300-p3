@@ -39,6 +39,7 @@ import managers.enums.SessionStatus;
 import managers.interfaces.IAttendantManager;
 import managers.interfaces.IAttendantManagerNotify;
 import observers.payment.CoinMonitor;
+import observers.payment.ReceiptPrinterObserver;
 
 public class AttendantManager implements IAttendantManager, IAttendantManagerNotify {
 
@@ -51,8 +52,11 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	// object ownership
 	protected Map<BigDecimal, CoinMonitor> coinMonitorMap = new HashMap<BigDecimal, CoinMonitor>();
 	protected Map<BigDecimal, CoinMonitor> bankNoteMonitorMap = new HashMap<BigDecimal, CoinMonitor>();
+	protected ReceiptPrinterObserver rpls;
 
 	// vars
+	protected boolean hasPaper = false;
+	protected boolean hasInk = false;
 	protected boolean paperLow = false;
 	protected boolean inkLow = false;
 	protected boolean coinsFull = false;
@@ -85,20 +89,23 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
             banknoteDispenserLow.put(denom, false);
         }
 
-		// creating coin dispenser observers
-		coinMonitorMap.put(new BigDecimal(0.01), new CoinMonitor());
-		coinMonitorMap.put(new BigDecimal(0.05), new CoinMonitor());
-		coinMonitorMap.put(new BigDecimal(0.10), new CoinMonitor());
-		coinMonitorMap.put(new BigDecimal(0.25), new CoinMonitor());
-		coinMonitorMap.put(new BigDecimal(1.00), new CoinMonitor());
-		coinMonitorMap.put(new BigDecimal(2.00), new CoinMonitor());
+		// creating the printer observer
+		rpls = new ReceiptPrinterObserver(this, machine.getPrinter());
 
-		// banknote dispenser observers
-		bankNoteMonitorMap.put(new BigDecimal(5.00), new CoinMonitor());
-		bankNoteMonitorMap.put(new BigDecimal(10.00), new CoinMonitor());
-		bankNoteMonitorMap.put(new BigDecimal(20.00), new CoinMonitor());
-		bankNoteMonitorMap.put(new BigDecimal(50.00), new CoinMonitor());
-		bankNoteMonitorMap.put(new BigDecimal(100.00), new CoinMonitor());
+		// creating coin dispenser observers
+//		coinMonitorMap.put(new BigDecimal(0.01), new CoinMonitor());
+//		coinMonitorMap.put(new BigDecimal(0.05), new CoinMonitor());
+//		coinMonitorMap.put(new BigDecimal(0.10), new CoinMonitor());
+//		coinMonitorMap.put(new BigDecimal(0.25), new CoinMonitor());
+//		coinMonitorMap.put(new BigDecimal(1.00), new CoinMonitor());
+//		coinMonitorMap.put(new BigDecimal(2.00), new CoinMonitor());
+//
+//		// banknote dispenser observers
+//		bankNoteMonitorMap.put(new BigDecimal(5.00), new CoinMonitor());
+//		bankNoteMonitorMap.put(new BigDecimal(10.00), new CoinMonitor());
+//		bankNoteMonitorMap.put(new BigDecimal(20.00), new CoinMonitor());
+//		bankNoteMonitorMap.put(new BigDecimal(50.00), new CoinMonitor());
+//		bankNoteMonitorMap.put(new BigDecimal(100.00), new CoinMonitor());
 	}
 
 	@Override
@@ -356,7 +363,42 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 	@Override
 	public void reset() {
-		// TODO do something here
+		// setting has papper & ink
+		getPrinterStatus();
+	}
+
+	@Override
+	public void notifyPaper(boolean hasPaper) {
+		this.hasPaper = hasPaper;
+	}
+
+	@Override
+	public void notifyInk(boolean hasInk) {
+		this.hasInk = hasInk;
+	}
+
+	@Override
+	public boolean canPrint() {
+		return hasInk && hasPaper;
+	}
+
+	/**
+	 * Getting the state of the printer's ink & paper.
+	 */
+	protected void getPrinterStatus() {
+		try {
+			hasInk = machine.getPrinter().inkRemaining() > 0;
+		} catch (UnsupportedOperationException e) {
+			// WHYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
+			hasInk = true;
+		}
+
+		try {
+			hasPaper = machine.getPrinter().paperRemaining() > 0;
+		} catch (UnsupportedOperationException e) {
+			// WHYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
+			hasPaper = true;
+		}
 	}
 
 }

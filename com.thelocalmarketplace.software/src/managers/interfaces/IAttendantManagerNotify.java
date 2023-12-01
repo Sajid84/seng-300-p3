@@ -101,4 +101,19 @@ public interface IAttendantManagerNotify {
      */
     void notifyBanknoteAdded(BanknoteStorageUnit unit);
 
+    /**
+     * Notifies the system about the paper status.
+     *
+     * @param hasPaper A boolean indicating whether there is paper available (true) or not (false).
+     */
+    void notifyPaper(boolean hasPaper);
+
+    /**
+     * Notifies the system about the ink status.
+     *
+     * @param hasInk A boolean indicating whether there is ink available (true) or not (false).
+     */
+    void notifyInk(boolean hasInk);
+
+
 }

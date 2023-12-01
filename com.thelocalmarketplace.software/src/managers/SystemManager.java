@@ -499,6 +499,11 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	}
 
 	@Override
+	public boolean canPrint() {
+		return am.canPrint();
+	}
+
+	@Override
 	public boolean isDisabled() {
 		return getState() == SessionStatus.DISABLED;
 	}

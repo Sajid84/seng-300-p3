@@ -47,4 +47,11 @@ public interface IAttendantManager extends IManager {
      */
     void requestEnableMachine();
 
+    /**
+     * Tests whether the machine can print or not.
+     *
+     * @return true if the machine can print, false otherwise
+     */
+    boolean canPrint();
+
 }
