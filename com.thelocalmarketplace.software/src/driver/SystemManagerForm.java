@@ -205,6 +205,8 @@ public class SystemManagerForm implements IScreen {
      * item check boxes.
      */
     protected void updateRemoveItemButtonState() {
+        // TODO edge case where adding the first item doesn't scan properly
+
         // enabling the buttom if there is at least one item in the order
         removeItemButton.setEnabled(!sm.getItems().isEmpty());
 
