@@ -451,6 +451,16 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	}
 
 	@Override
+	public void maintainBanknoteStorage() {
+		am.maintainBanknoteStorage();
+	}
+
+	@Override
+	public void maintainCoinStorage() {
+		am.maintainCoinStorage();
+	}
+
+	@Override
 	public boolean isBlocked() {
 		return getState() == SessionStatus.BLOCKED;
 	}
