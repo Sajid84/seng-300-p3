@@ -1,6 +1,7 @@
 package driver;
 
 import com.jjjwelectronics.Item;
+import com.jjjwelectronics.card.Card;
 import com.jjjwelectronics.scanner.BarcodedItem;
 import com.jjjwelectronics.screen.ITouchScreen;
 import managers.SystemManager;
@@ -30,6 +31,7 @@ public class DebugForm implements IScreen {
     private JPanel root;
     private JButton refreshButton;
     private JLabel customerPaymentLabel;
+    private JLabel priceLabel;
 
     public DebugForm(SystemManager sm) {
         this.sm = sm;
@@ -100,6 +102,11 @@ public class DebugForm implements IScreen {
     }
 
     @Override
+    public JFrame getFrame() {
+        throw new UnsupportedOperationException("This object does not have a JFrame");
+    }
+
+    @Override
     public void configure(ITouchScreen touchScreen) {
         // do nothing here
     }
@@ -110,6 +117,7 @@ public class DebugForm implements IScreen {
         weightAdjustmentLabel.setText("Weight Adjustment: " + sm.getWeightAdjustment());
         stateLabel.setText("State: " + sm.getState().toString());
         scaleOverloadedLabel.setText("Scale Overloaded? " + sm.isScaleOverloaded());
+        priceLabel.setText("Price of Order: " + sm.getTotalPrice());
         customerPaymentLabel.setText("Customer Payment: " + sm.getCustomerPayment());
     }
 
@@ -136,5 +144,15 @@ public class DebugForm implements IScreen {
     @Override
     public void notifyPaymentAdded(BigDecimal value) {
         updateLabels();
+    }
+
+    @Override
+    public void notifyPaymentWindowClosed() {
+        // do nothing with this
+    }
+
+    @Override
+    public void notifyInvalidCardRead(Card card) {
+        // do nothing here
     }
 }

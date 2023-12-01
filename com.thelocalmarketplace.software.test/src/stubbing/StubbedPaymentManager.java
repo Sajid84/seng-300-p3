@@ -6,6 +6,8 @@ import java.math.BigDecimal;
 
 import com.jjjwelectronics.EmptyDevice;
 import com.jjjwelectronics.card.Card;
+import com.tdc.CashOverloadException;
+import com.tdc.DisabledException;
 import com.tdc.NoCashAvailableException;
 import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
@@ -41,22 +43,6 @@ public class StubbedPaymentManager extends PaymentManager {
 		tenderChangeCalled = false;
 		getCustomerPaymentCalled = false;
 		printReceiptCalled = false;
-	}
-	
-	public boolean getHasPaper() {
-		return super.hasPaper;
-	}
-	
-	public boolean getHasInk() {
-		return super.hasInk;
-	}
-	
-	public void setHasPaper(boolean has) {
-		super.hasPaper = has;
-	}
-	
-	public void setHasInk(boolean has) {
-		super.hasInk = has;
 	}
 	
 	public CoinCollector getCoinCollector() {
@@ -115,13 +101,13 @@ public class StubbedPaymentManager extends PaymentManager {
 	}
 
 	@Override
-	public void insertCoin(Coin coin) {
+	public void insertCoin(Coin coin) throws DisabledException, CashOverloadException {
 		insertCoinCalled = true;
 		super.insertCoin(coin);
 	}
 
 	@Override
-	public void insertBanknote(Banknote banknote) {
+	public void insertBanknote(Banknote banknote) throws DisabledException, CashOverloadException {
 		insertBanknoteCalled = true;
 		super.insertBanknote(banknote);
 	}

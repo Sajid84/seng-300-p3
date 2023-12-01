@@ -29,10 +29,7 @@ import utils.Pair;
 import javax.swing.*;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This class is meant to contain everything that is hardware related, this acts
@@ -102,6 +99,11 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	}
 
 	@Override
+	public JFrame getFrame() {
+		throw new UnsupportedOperationException("This object does not have a JFrame");
+	}
+
+	@Override
 	public void configure(ITouchScreen touchScreen) {
 		smf.configure(touchScreen);
 	}
@@ -131,8 +133,8 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 
 	@Override
 	public void removeItemFromOrder(Pair<Item, Boolean> pair) {
-		if (getState() == SessionStatus.PAID) {
-			throw new IllegalStateException("cannot remove item from state PAID");
+		if (isPaid() || isDisabled()) {
+			throw new IllegalStateException("cannot remove item from state paid or disabled");
 		}
 
 		// not restricting this function, this is used to resolve discrepancies
@@ -145,7 +147,7 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	@Override
 	public void insertCoin(Coin coin) {
 		// not performing action if session is blocked
-		if (getState() != SessionStatus.NORMAL)
+		if (!isUnblocked())
 			throw new IllegalStateException("cannot insert coin when in a non-normal state");
 
 		try {
@@ -161,13 +163,15 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 			// Should never happen
 			blockSession();
 			notifyAttendant("Machine cannot accept coins");
+		} finally {
+			checkPaid();
 		}
 	}
 
 	@Override
 	public void insertBanknote(Banknote banknote) {
 		// not performing action if session is blocked
-		if (getState() != SessionStatus.NORMAL)
+		if (!isUnblocked())
 			throw new IllegalStateException("cannot insert banknote when in a non-normal state");
 
 		try {
@@ -183,6 +187,8 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 			// Should never happen
 			blockSession();
 			notifyAttendant("Machine cannot accept banknotes");
+		} finally {
+			checkPaid();
 		}
 	}
 
@@ -197,19 +203,31 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	}
 
 	@Override
-	public void swipeCard(Card card) throws IOException {
+	public void swipeCard(Card card) {
 		// not performing action if session is blocked
-		if (getState() != SessionStatus.NORMAL)
+		if (!isUnblocked())
 			throw new IllegalStateException("cannot swipe card when PAID");
 
-		this.pm.swipeCard(card);
+		try {
+			this.pm.swipeCard(card);
+		} catch (IOException e) {
+			notifyInvalidCardRead(card);
+		} finally {
+			checkPaid();
+		}
 	}
 
-	public boolean tenderChange() throws RuntimeException, NoCashAvailableException {
-		if (getState() != SessionStatus.NORMAL)
-			throw new IllegalStateException("cannot tender change when in a non-normal state");
+	public boolean tenderChange() {
+		if (!isPaid())
+			throw new IllegalStateException("cannot tender change when not in a PAID state");
 
-		return this.pm.tenderChange();
+		// trying to dispense change
+		try {
+			return this.pm.tenderChange();
+		} catch (NoCashAvailableException e) {
+			notifyAttendant("Not enough cash available in the machine. Blocking the session.");
+			return false;
+		}
 	}
 
 	@Override
@@ -224,7 +242,7 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 
 	@Override
 	public void onAttendantOverride() {
-		if (getState() == SessionStatus.PAID) {
+		if (isPaid() || isDisabled()) {
 			throw new IllegalStateException("attendant cannot override from state PAID");
 		}
 
@@ -244,7 +262,7 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	@Override
 	public void addItemToOrder(Item item, ScanType method) {
 		// not performing action if session is blocked
-		if (getState() != SessionStatus.NORMAL)
+		if (!isUnblocked())
 			throw new IllegalStateException("cannot add item when in a non-normal state");
 
 		// adding the item to the order
@@ -255,6 +273,7 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 			notifyItemAdded(item);
 		} else {
 			notifyAttendant("There was an error scanning the item.");
+			blockSession();
 		}
 
 		// checking if the scales were overloaded
@@ -275,8 +294,8 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 
 	@Override
 	public void unblockSession() {
-		if (getState() == SessionStatus.PAID) {
-			throw new IllegalStateException("cannot unblock from state PAID");
+		if (isPaid() || isDisabled()) {
+			throw new IllegalStateException("cannot unblock from state a non-NORMAL state");
 		}
 
 		setState(SessionStatus.NORMAL);
@@ -413,8 +432,8 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	}
 
 	@Override
-	public void maintainBanknotes() {
-		am.maintainBanknotes();
+	public void maintainBanknoteDispensers() {
+		am.maintainBanknoteDispensers();
 	}
 
 	@Override
@@ -423,13 +442,23 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	}
 
 	@Override
-	public void maintainCoins() {
-		am.maintainCoins();
+	public void maintainCoinDispensers() {
+		am.maintainCoinDispensers();
 	}
 
 	@Override
 	public void maintainInk() {
 		am.maintainInk();
+	}
+
+	@Override
+	public void maintainBanknoteStorage() {
+		am.maintainBanknoteStorage();
+	}
+
+	@Override
+	public void maintainCoinStorage() {
+		am.maintainCoinStorage();
 	}
 
 	@Override
@@ -484,6 +513,32 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	}
 
 	@Override
+	public List<BigDecimal> getCoinDenominations() {
+		return machine.getCoinDenominations();
+	}
+
+	@Override
+	public List<BigDecimal> getBanknoteDenominations() {
+        return new ArrayList<>(Arrays.asList(machine.getBanknoteDenominations()));
+	}
+
+	@Override
+	public void checkPaid() {
+		System.out.println("Checking if the order is fully paid for or not.");
+		if (getRemainingBalance().compareTo(BigDecimal.ZERO) <= 0) {
+			System.out.println("Session is paid for.");
+			notifyPaid();
+			System.out.println("Dispensing change.");
+			tenderChange();
+		}
+	}
+
+	@Override
+	public CardIssuer getIssuer() {
+		return issuer;
+	}
+
+	@Override
 	public void requestDisableMachine() {
 		disabledRequest = true;
 	}
@@ -495,8 +550,23 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	}
 
 	@Override
+	public boolean canPrint() {
+		return am.canPrint();
+	}
+
+	@Override
 	public boolean isDisabled() {
 		return getState() == SessionStatus.DISABLED;
+	}
+
+	@Override
+	public void reset() {
+		// resetting the managers
+		am.reset();
+		pm.reset();
+		om.reset();
+
+		// resetting self
 	}
 
 	@Override
@@ -534,4 +604,17 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 		}
 	}
 
+	@Override
+	public void notifyPaymentWindowClosed() {
+		for (ISystemManagerNotify observer : observers) {
+			observer.notifyPaymentWindowClosed();
+		}
+	}
+
+	@Override
+	public void notifyInvalidCardRead(Card card) {
+		for (ISystemManagerNotify observer : observers) {
+			observer.notifyInvalidCardRead(card);
+		}
+	}
 }

@@ -12,6 +12,14 @@ public interface IScreen extends ISystemManagerNotify {
      * @return the object's root panel
      */
     JPanel getPanel();
+    
+    
+    /**
+     * This simply returns the root frame of the form.
+     *
+     * @return the object's root frame
+     */
+    JFrame getFrame();
 
     /**
      * This configures any implementor to take their internal root {@link JPanel}
