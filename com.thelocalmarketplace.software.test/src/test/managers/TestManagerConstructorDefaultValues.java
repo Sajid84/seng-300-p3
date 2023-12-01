@@ -43,7 +43,7 @@ public class TestManagerConstructorDefaultValues {
 	@Test
 	public void testSystemDefaultRecords() {
 		assertNotNull(sm.getRecords());
-		assertTrue(sm.getRecords().size() == 0);
+		assertTrue(sm.getRecords().isEmpty());
 	}
 
 	@Test
@@ -95,19 +95,19 @@ public class TestManagerConstructorDefaultValues {
 
 	@Test
 	public void testOrderDefaultProducts() {
-		assertNotNull(om.getProductsVar());
-		assertTrue(om.getProductsVar().size() == 0);
+		assertNotNull(om.getItems());
+		assertTrue(om.getItems().isEmpty());
 	}
 
 	@Test
 	public void testOrderDefaultListeners() {
 		assertNotNull(om.getListeners());
-		assertTrue(om.getListeners().size() == 0);
+		assertTrue(om.getListeners().isEmpty());
 	}
 
 	@Test
 	public void testOrderDefaultOverloadedScales() {
 		assertNotNull(om.getOverloadedScales());
-		assertTrue(om.getOverloadedScales().size() == 0);
+		assertTrue(om.getOverloadedScales().isEmpty());
 	}
 }

@@ -8,6 +8,8 @@ import java.math.BigDecimal;
 
 import com.jjjwelectronics.card.Card;
 import com.jjjwelectronics.card.Card.CardData;
+import com.tdc.CashOverloadException;
+import com.tdc.DisabledException;
 import com.tdc.NoCashAvailableException;
 import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
@@ -28,7 +30,7 @@ public interface IPaymentManager extends IManager {
 	/**
 	 * Allows the customer to swipe their credit card
 	 * 
-	 * @param creditCard a credit card
+	 * @param card a credit card
 	 * @throws IOException
 	 */
 	void swipeCard(Card card) throws IOException;
@@ -44,14 +46,14 @@ public interface IPaymentManager extends IManager {
 	 * 
 	 * @param coin a coin
 	 */
-	void insertCoin(Coin coin);
+	void insertCoin(Coin coin) throws DisabledException, CashOverloadException;
 
 	/**
 	 * Allows the customer to insert a banknote into the system.
 	 * 
 	 * @param banknote a banknote
 	 */
-	void insertBanknote(Banknote banknote);
+	void insertBanknote(Banknote banknote) throws DisabledException, CashOverloadException;
 
 	/**
 	 * Provides change back to customer after completion of payment

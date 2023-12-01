@@ -5,35 +5,30 @@
 
 package managers;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.naming.OperationNotSupportedException;
-
+import ca.ucalgary.seng300.simulation.NullPointerSimulationException;
 import com.jjjwelectronics.Item;
 import com.jjjwelectronics.card.Card;
 import com.jjjwelectronics.card.Card.CardData;
+import com.jjjwelectronics.screen.ITouchScreen;
+import com.tdc.CashOverloadException;
+import com.tdc.DisabledException;
 import com.tdc.NoCashAvailableException;
 import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
-import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
+import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import com.thelocalmarketplace.hardware.PLUCodedItem;
-import com.thelocalmarketplace.hardware.PLUCodedProduct;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
-
-import ca.ucalgary.seng300.simulation.NullPointerSimulationException;
+import driver.SystemManagerForm;
 import managers.enums.PaymentType;
 import managers.enums.ScanType;
 import managers.enums.SessionStatus;
-import managers.interfaces.IAttendantManager;
-import managers.interfaces.IOrderManager;
-import managers.interfaces.IPaymentManager;
-import managers.interfaces.ISystemManager;
+import managers.interfaces.*;
 import utils.Pair;
+
+import javax.swing.*;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  * This class is meant to contain everything that is hardware related, this acts
@@ -43,10 +38,10 @@ import utils.Pair;
  * This delegates all functionality (with some exceptions) to the other manager
  * classes.
  */
-public class SystemManager implements ISystemManager, IPaymentManager, IOrderManager, IAttendantManager {
+public class SystemManager implements IScreen, ISystemManager, IPaymentManager, IOrderManager, IAttendantManager {
 
 	// hardware references
-	protected AbstractSelfCheckoutStation machine;
+	protected ISelfCheckoutStation machine;
 
 	// object references
 
@@ -54,12 +49,14 @@ public class SystemManager implements ISystemManager, IPaymentManager, IOrderMan
 	protected PaymentManager pm;
 	protected OrderManager om;
 	protected AttendantManager am;
+	protected SystemManagerForm smf;
 
 	// vars
 	protected SessionStatus state;
 	protected CardIssuer issuer;
 	protected Map<String, List<Pair<Long, Double>>> records;
 	protected boolean disabledRequest = false;
+	protected List<ISystemManagerNotify> observers = new ArrayList<>();
 
 	/**
 	 * This object is responsible for the needs of the customer. This is how the
@@ -80,7 +77,6 @@ public class SystemManager implements ISystemManager, IPaymentManager, IOrderMan
 		}
 
 		// init vars
-		setState(SessionStatus.NORMAL);
 		this.issuer = issuer; // a reference to the bank
 		this.records = new HashMap<>();
 
@@ -88,12 +84,36 @@ public class SystemManager implements ISystemManager, IPaymentManager, IOrderMan
 		this.pm = new PaymentManager(this, issuer);
 		this.om = new OrderManager(this, leniency);
 		this.am = new AttendantManager(this);
+
+		// creating the GUI
+		smf = new SystemManagerForm(this);
+
+		// setting the initial state
+		setState(SessionStatus.NORMAL);
 	}
 
 	@Override
-	public void configure(AbstractSelfCheckoutStation machine) {
+	public JPanel getPanel() {
+		return smf.getPanel();
+	}
+
+	@Override
+	public JFrame getFrame() {
+		throw new UnsupportedOperationException("This object does not have a JFrame");
+	}
+
+	@Override
+	public void configure(ITouchScreen touchScreen) {
+		smf.configure(touchScreen);
+	}
+
+	@Override
+	public void configure(ISelfCheckoutStation machine) {
 		// saving a reference
 		this.machine = machine;
+
+		// configuring the jframe
+		configure(machine.getScreen());
 
 		// configuring the managers
 		this.pm.configure(this.machine);
@@ -111,31 +131,64 @@ public class SystemManager implements ISystemManager, IPaymentManager, IOrderMan
 	}
 
 	@Override
-	public void removeItemFromOrder(Item item) throws OperationNotSupportedException {
-		if (getState() == SessionStatus.PAID) {
-			throw new IllegalStateException("cannot remove item from state PAID");
+	public void removeItemFromOrder(Pair<Item, Boolean> pair) {
+		if (isPaid() || isDisabled()) {
+			throw new IllegalStateException("cannot remove item from state paid or disabled");
 		}
 
 		// not restricting this function, this is used to resolve discrepancies
-		this.om.removeItemFromOrder(item);
+		this.om.removeItemFromOrder(pair);
+
+		// notifying that an item was removed
+		notifyItemRemoved(pair.getKey());
 	}
 
 	@Override
 	public void insertCoin(Coin coin) {
 		// not performing action if session is blocked
-		if (getState() != SessionStatus.NORMAL)
+		if (!isUnblocked())
 			throw new IllegalStateException("cannot insert coin when in a non-normal state");
 
-		this.pm.insertCoin(coin);
+		try {
+            // trying to insert a coin into the system
+            this.pm.insertCoin(coin);
+
+            // publishing the event
+            notifyPaymentAdded(coin.getValue());
+		} catch (DisabledException e) {
+			blockSession();
+			notifyAttendant("Device Powered Off");
+		} catch (CashOverloadException e) {
+			// Should never happen
+			blockSession();
+			notifyAttendant("Machine cannot accept coins");
+		} finally {
+			checkPaid();
+		}
 	}
 
 	@Override
 	public void insertBanknote(Banknote banknote) {
 		// not performing action if session is blocked
-		if (getState() != SessionStatus.NORMAL)
+		if (!isUnblocked())
 			throw new IllegalStateException("cannot insert banknote when in a non-normal state");
 
-		this.pm.insertBanknote(banknote);
+		try {
+            // trying to insert a banknote into the system
+            this.pm.insertBanknote(banknote);
+
+            // publishing the event
+            notifyPaymentAdded(banknote.getDenomination());
+		} catch (DisabledException e) {
+			blockSession();
+			notifyAttendant("Device Powered Off");
+		} catch (CashOverloadException e) {
+			// Should never happen
+			blockSession();
+			notifyAttendant("Machine cannot accept banknotes");
+		} finally {
+			checkPaid();
+		}
 	}
 
 	@Override
@@ -149,28 +202,40 @@ public class SystemManager implements ISystemManager, IPaymentManager, IOrderMan
 	}
 
 	@Override
-	public void swipeCard(Card card) throws IOException {
+	public void swipeCard(Card card) {
 		// not performing action if session is blocked
-		if (getState() != SessionStatus.NORMAL)
+		if (!isUnblocked())
 			throw new IllegalStateException("cannot swipe card when PAID");
 
-		this.pm.swipeCard(card);
+		try {
+			this.pm.swipeCard(card);
+		} catch (IOException e) {
+			notifyInvalidCardRead(card);
+		} finally {
+			checkPaid();
+		}
 	}
-	
+
 	@Override
 	public void tapCard(Card card) throws IOException {
 		// not performing action if session is blocked
-		if (getState() != SessionStatus.NORMAL) 
+		if (getState() != SessionStatus.NORMAL)
 			throw new IllegalStateException("cannot tap card when PAID");
-		
+
 		this.pm.tapCard(card);
 	}
 
-	public boolean tenderChange() throws RuntimeException, NoCashAvailableException {
-		if (getState() != SessionStatus.NORMAL)
-			throw new IllegalStateException("cannot tender change when in a non-normal state");
+	public boolean tenderChange() {
+		if (!isPaid())
+			throw new IllegalStateException("cannot tender change when not in a PAID state");
 
-		return this.pm.tenderChange();
+		// trying to dispense change
+		try {
+			return this.pm.tenderChange();
+		} catch (NoCashAvailableException e) {
+			notifyAttendant("Not enough cash available in the machine. Blocking the session.");
+			return false;
+		}
 	}
 
 	@Override
@@ -179,13 +244,13 @@ public class SystemManager implements ISystemManager, IPaymentManager, IOrderMan
 	}
 
 	@Override
-	public Map<Item, Boolean> getItems() throws NullPointerSimulationException {
+	public List<Pair<Item, Boolean>> getItems() throws NullPointerSimulationException {
 		return this.om.getItems();
 	}
 
 	@Override
 	public void onAttendantOverride() {
-		if (getState() == SessionStatus.PAID) {
+		if (isPaid() || isDisabled()) {
 			throw new IllegalStateException("attendant cannot override from state PAID");
 		}
 
@@ -193,17 +258,42 @@ public class SystemManager implements ISystemManager, IPaymentManager, IOrderMan
 	}
 
 	@Override
-	public void onDoNotBagRequest(Item item) {
-		this.om.onDoNotBagRequest(item);
+	public void doNotBagRequest(boolean bagRequest) {
+		this.om.doNotBagRequest(bagRequest);
 	}
 
 	@Override
-	public void addItemToOrder(Item item, ScanType method) throws OperationNotSupportedException {
+	public boolean getDoNotBagRequest() {
+		return om.getDoNotBagRequest();
+	}
+
+	@Override
+	public void addItemToOrder(Item item, ScanType method) {
 		// not performing action if session is blocked
-		if (getState() != SessionStatus.NORMAL)
+		if (!isUnblocked())
 			throw new IllegalStateException("cannot add item when in a non-normal state");
 
+		// adding the item to the order
 		this.om.addItemToOrder(item, method);
+
+		if (!errorAddingItem()) {
+			// publishing the event
+			notifyItemAdded(item);
+		} else {
+			notifyAttendant("There was an error scanning the item.");
+			blockSession();
+		}
+
+		// checking if the scales were overloaded
+		if (this.om.isScaleOverloaded()) {
+			notifyAttendant("A scale was overloaded due to an item that's too heavy.");
+			blockSession();
+		}
+	}
+
+	@Override
+	public Item searchItemsByText(String description) {
+		return om.searchItemsByText(description);
 	}
 
 	@Override
@@ -217,8 +307,8 @@ public class SystemManager implements ISystemManager, IPaymentManager, IOrderMan
 
 	@Override
 	public void unblockSession() {
-		if (getState() == SessionStatus.PAID) {
-			throw new IllegalStateException("cannot unblock from state PAID");
+		if (isPaid() || isDisabled()) {
+			throw new IllegalStateException("cannot unblock from state a non-NORMAL state");
 		}
 
 		setState(SessionStatus.NORMAL);
@@ -229,7 +319,11 @@ public class SystemManager implements ISystemManager, IPaymentManager, IOrderMan
 			throw new IllegalArgumentException("cannot set the state of the manager to null");
 		}
 
+		// setting the state
 		this.state = state;
+
+		// publishing the state
+		notifyStateChange(state);
 	}
 
 	@Override
@@ -326,13 +420,23 @@ public class SystemManager implements ISystemManager, IPaymentManager, IOrderMan
 	}
 
 	@Override
-	public boolean wasBarcodeScanned() {
-		return om.wasBarcodeScanned();
+	public BigDecimal priceOf(PLUCodedItem item) {
+		return om.priceOf(item);
 	}
 
 	@Override
-	public BigDecimal priceOf(PLUCodedItem item) {
-		return om.priceOf(item);
+	public boolean errorAddingItem() {
+		return om.errorAddingItem();
+	}
+
+	@Override
+	public BigDecimal getActualWeight() {
+		return om.getActualWeight();
+	}
+
+	@Override
+	public BigDecimal getWeightAdjustment() {
+		return om.getWeightAdjustment();
 	}
 
 	@Override
@@ -341,8 +445,8 @@ public class SystemManager implements ISystemManager, IPaymentManager, IOrderMan
 	}
 
 	@Override
-	public void maintainBanknotes() {
-		am.maintainBanknotes();
+	public void maintainBanknoteDispensers() {
+		am.maintainBanknoteDispensers();
 	}
 
 	@Override
@@ -351,13 +455,23 @@ public class SystemManager implements ISystemManager, IPaymentManager, IOrderMan
 	}
 
 	@Override
-	public void maintainCoins() {
-		am.maintainCoins();
+	public void maintainCoinDispensers() {
+		am.maintainCoinDispensers();
 	}
 
 	@Override
 	public void maintainInk() {
 		am.maintainInk();
+	}
+
+	@Override
+	public void maintainBanknoteStorage() {
+		am.maintainBanknoteStorage();
+	}
+
+	@Override
+	public void maintainCoinStorage() {
+		am.maintainCoinStorage();
 	}
 
 	@Override
@@ -398,6 +512,46 @@ public class SystemManager implements ISystemManager, IPaymentManager, IOrderMan
 	}
 
 	@Override
+	public void attach(ISystemManagerNotify observer) {
+		observers.add(observer);
+	}
+
+	@Override
+	public boolean detach(ISystemManagerNotify observer) {
+		if (observers.contains(observer)) {
+			observers.remove(observer);
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public List<BigDecimal> getCoinDenominations() {
+		return machine.getCoinDenominations();
+	}
+
+	@Override
+	public List<BigDecimal> getBanknoteDenominations() {
+        return new ArrayList<>(Arrays.asList(machine.getBanknoteDenominations()));
+	}
+
+	@Override
+	public void checkPaid() {
+		System.out.println("Checking if the order is fully paid for or not.");
+		if (getRemainingBalance().compareTo(BigDecimal.ZERO) <= 0) {
+			System.out.println("Session is paid for.");
+			notifyPaid();
+			System.out.println("Dispensing change.");
+			tenderChange();
+		}
+	}
+
+	@Override
+	public CardIssuer getIssuer() {
+		return issuer;
+	}
+
+	@Override
 	public void requestDisableMachine() {
 		disabledRequest = true;
 	}
@@ -409,7 +563,71 @@ public class SystemManager implements ISystemManager, IPaymentManager, IOrderMan
 	}
 
 	@Override
+	public boolean canPrint() {
+		return am.canPrint();
+	}
+
+	@Override
 	public boolean isDisabled() {
 		return getState() == SessionStatus.DISABLED;
+	}
+
+	@Override
+	public void reset() {
+		// resetting the managers
+		am.reset();
+		pm.reset();
+		om.reset();
+
+		// resetting self
+	}
+
+	@Override
+	public void notifyItemAdded(Item item) {
+		for (ISystemManagerNotify observer : observers) {
+			observer.notifyItemAdded(item);
+		}
+	}
+
+	@Override
+	public void notifyItemRemoved(Item item) {
+		for (ISystemManagerNotify observer : observers) {
+			observer.notifyItemRemoved(item);
+		}
+	}
+
+	@Override
+	public void notifyStateChange(SessionStatus state) {
+		for (ISystemManagerNotify observer : observers) {
+			observer.notifyStateChange(state);
+		}
+	}
+
+	@Override
+	public void notifyRefresh() {
+		for (ISystemManagerNotify observer : observers) {
+			observer.notifyRefresh();
+		}
+	}
+
+	@Override
+	public void notifyPaymentAdded(BigDecimal value) {
+		for (ISystemManagerNotify observer : observers) {
+			observer.notifyPaymentAdded(value);
+		}
+	}
+
+	@Override
+	public void notifyPaymentWindowClosed() {
+		for (ISystemManagerNotify observer : observers) {
+			observer.notifyPaymentWindowClosed();
+		}
+	}
+
+	@Override
+	public void notifyInvalidCardRead(Card card) {
+		for (ISystemManagerNotify observer : observers) {
+			observer.notifyInvalidCardRead(card);
+		}
 	}
 }

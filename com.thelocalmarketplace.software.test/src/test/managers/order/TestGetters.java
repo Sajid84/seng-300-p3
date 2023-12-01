@@ -8,17 +8,19 @@ import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
+import com.jjjwelectronics.Item;
+import com.jjjwelectronics.scanner.BarcodedItem;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.Product;
 
-import stubbing.StubbedBarcodedProduct;
-import stubbing.StubbedOrderManager;
-import stubbing.StubbedPLUProduct;
-import stubbing.StubbedSystemManager;
+import stubbing.*;
+import utils.DatabaseHelper;
+import utils.Pair;
 
 public class TestGetters {
 	// vars
@@ -34,49 +36,38 @@ public class TestGetters {
 
 	@Test
 	public void testGetProductsContainsAllAdded() {
-		om.addItem(new StubbedBarcodedProduct());
+		om.addItem(new StubbedBarcodedItem());
 
-		List<Product> prods = om.getItems();
+		List<Pair<Item, Boolean>> items = om.getItems();
 
-		assertEquals(prods.size(), 1);
+		assertEquals(items.size(), 1);
 
 		// cheating because I know that I just added a barcoded product
-		BarcodedProduct prod = (BarcodedProduct) prods.get(0);
+		BarcodedProduct prod = DatabaseHelper.get((BarcodedItem) items.get(0).getKey());
 
 		// asserting
 		assertNotNull(prod);
-		assertEquals(prod.getBarcode(), StubbedBarcodedProduct.BARCODE);
-		assertEquals(prod.getDescription(), StubbedBarcodedProduct.DESCRIPTION);
-		assertTrue(prod.getExpectedWeight() == StubbedBarcodedProduct.WEIGHT);
-		assertEquals(prod.getPrice(), StubbedBarcodedProduct.PRICE);
-	}
-	
-	@Test
-	public void testGetTotalOfBarcodedItems() {
-		om.addItem(StubbedBarcodedProduct.getActual());
-
-		// asserting
-		assertNotNull(om.getTotalPrice());
-		assertEquals(new BigDecimal(StubbedBarcodedProduct.PRICE), om.getTotalPrice());
+		assertEquals(prod.getBarcode(), StubbedBarcodedItem.BARCODE);
+		assertTrue(prod.getExpectedWeight() == StubbedBarcodedItem.WEIGHT);
 	}
 
 	@Test
 	public void testGetProductsHasNonOnCreation() {
-		List<Product> prods = om.getItems();
+		List<Pair<Item, Boolean>> prods = om.getItems();
 
 		assertEquals(prods.size(), 0);
 	}
 
 	@Test(expected = UnsupportedOperationException.class)
 	public void testTotalPriceThrowsOnPLU() {
-		om.addItem(new StubbedPLUProduct());
+		om.addItem(new StubbedPLUItem());
 
 		om.getTotalPrice();
 	}
 
 	@Test(expected = UnsupportedOperationException.class)
 	public void testExpectedMassThrowsOnPLU() {
-		om.addItem(new StubbedPLUProduct());
+		om.addItem(new StubbedPLUItem());
 
 		om.getExpectedMass();
 	}
@@ -97,7 +88,7 @@ public class TestGetters {
 
 	@Test
 	public void testExpectedMassEqualsProductMasses() {
-		om.addItem(new StubbedBarcodedProduct());
+		om.addItem(new StubbedBarcodedItem());
 
 		BigDecimal mass = om.getExpectedMass();
 

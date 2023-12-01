@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.Locale;
 
+import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,7 +28,7 @@ import stubbing.StubbedSystemManager;
 
 public class TestCanTenderChange {
 
-	public AbstractSelfCheckoutStation machine;
+	public ISelfCheckoutStation machine;
 
 	// vars
 	private StubbedPaymentManager pm;
@@ -59,8 +60,8 @@ public class TestCanTenderChange {
 
 	//Loads money into machine
 	private void loadMoneyIntoTheMachine() throws SimulationException, CashOverloadException {
-		BigDecimal denomination = this.machine.coinDenominations.get(5);
-		coinDispenser = this.machine.coinDispensers.get(denomination);
+		BigDecimal denomination = this.machine.getCoinDenominations().get(5);
+		coinDispenser = this.machine.getCoinDispensers().get(denomination);
 		for (int i = 0; i < 10; i++) {
 			coinDispenser.load(coin);
 		}

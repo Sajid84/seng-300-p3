@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 
+import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,7 +26,7 @@ public class TestCoinCollector {
     private StubbedPaymentManager pm;
     private StubbedSystemManager sm;
     private CoinCollector cc;
-    private AbstractSelfCheckoutStation machine;
+    private ISelfCheckoutStation machine;
 
     @Before
     public void setup() {
@@ -44,12 +45,12 @@ public class TestCoinCollector {
         sm.configure(machine);
 
         cc = pm.getCoinCollector();
-        machine.coinValidator.disable(); // the component is enabled by default, OK
+        machine.getCoinValidator().disable(); // the component is enabled by default, OK
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testNullPaymentManager() {
-        new CoinCollector(null, machine.coinValidator);
+        new CoinCollector(null, machine.getCoinValidator());
     }
 
     @Test(expected = IllegalArgumentException.class)

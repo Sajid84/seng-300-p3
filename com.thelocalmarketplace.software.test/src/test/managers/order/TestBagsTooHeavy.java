@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 
 import javax.naming.OperationNotSupportedException;
 
+import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,12 +22,13 @@ import stubbing.StubbedItem;
 import stubbing.StubbedOrderManager;
 import stubbing.StubbedStation;
 import stubbing.StubbedSystemManager;
+import utils.Pair;
 
 public class TestBagsTooHeavy {
 
 	// machine
 	private StubbedStation station;
-	private AbstractSelfCheckoutStation machine;
+	private ISelfCheckoutStation machine;
 
 	// vars
 	private StubbedOrderManager om;
@@ -55,7 +57,7 @@ public class TestBagsTooHeavy {
 		om.configure(machine);
 
 		// getting the mass limit of the scale and creating masses for the test cases
-		baseline = station.getBaggingAreaScale().getMassLimit().inGrams();
+		baseline = station.getBaggingArea().getMassLimit().inGrams();
 		massBelow = baseline.subtract(BigDecimal.ONE);
 		massAbove = baseline.add(BigDecimal.ONE);
 		massHalf = baseline.divide(BigDecimal.valueOf(2));
@@ -86,7 +88,7 @@ public class TestBagsTooHeavy {
 		om.addItemToOrder(heavyItem, ScanType.MAIN);
 		assertTrue("Scale should be overloaded after adding a heavy item", om.isScaleOverloaded());
 
-		om.removeItemFromOrder(heavyItem);
+		om.removeItemFromOrder(new Pair<>(heavyItem, true));
 		assertFalse("Scale should not be overloaded after removing the heavy item", om.isScaleOverloaded());
 	}
 

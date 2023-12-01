@@ -7,16 +7,7 @@
 
 package driver;
 
-import java.math.BigDecimal;
-import java.util.Currency;
-import java.util.List;
-import java.util.Locale;
-import java.util.Scanner;
-
-import javax.naming.OperationNotSupportedException;
-import javax.swing.*;
-
-import com.jjjwelectronics.Item;
+import ca.ucalgary.seng300.simulation.SimulationException;
 import com.jjjwelectronics.OverloadedDevice;
 import com.jjjwelectronics.card.Card;
 import com.tdc.CashOverloadException;
@@ -24,22 +15,28 @@ import com.tdc.banknote.Banknote;
 import com.tdc.banknote.IBanknoteDispenser;
 import com.tdc.coin.Coin;
 import com.tdc.coin.ICoinDispenser;
-import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
+import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
-
-import ca.ucalgary.seng300.simulation.SimulationException;
 import managers.SystemManager;
 import managers.enums.SelfCheckoutTypes;
 import powerutility.PowerGrid;
 import utils.CardHelper;
 import utils.DriverHelper;
 
+import javax.swing.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.math.BigDecimal;
+import java.util.Currency;
+import java.util.Locale;
+import java.util.Scanner;
+
 // start session use case
 
 public class Driver {
 
     // hardware references
-    protected AbstractSelfCheckoutStation machine;
+    protected ISelfCheckoutStation machine;
 
     // object references
     protected static Scanner scanner = new Scanner(System.in);
@@ -49,13 +46,13 @@ public class Driver {
     protected CardIssuer cardIssuer;
 
     // vars
-    protected List<Item> items;
     protected BigDecimal leniency = BigDecimal.ONE;
     protected Card card;
+    protected JFrame gui;
 
     // denominations
-    protected final BigDecimal[] coinDenominations = new BigDecimal[]{new BigDecimal(0.01), new BigDecimal(0.05),
-            new BigDecimal(0.10), new BigDecimal(0.25), new BigDecimal(1), new BigDecimal(2)};
+    protected final BigDecimal[] coinDenominations = new BigDecimal[]{new BigDecimal("0.01"), new BigDecimal("0.05"),
+            new BigDecimal("0.10"), new BigDecimal("0.25"), new BigDecimal(1), new BigDecimal(2)};
     protected final BigDecimal[] banknoteDenominations = new BigDecimal[]{new BigDecimal(5), new BigDecimal(10),
             new BigDecimal(20), new BigDecimal(50)};
 
@@ -72,31 +69,57 @@ public class Driver {
 
         // creating the system manager
         this.system = new SystemManager(cardIssuer, leniency);
-    }
 
-    protected void setup() {
         // configuring the system
         this.system.configure(this.machine);
 
+        // creating the gui
+        gui = new JFrame("Self Checkout Station");
+        gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        gui.setVisible(false);
+        gui.addWindowListener(windowClosingHook());
+
+    }
+
+    protected void setup() {
         // so that no power surges happen
         PowerGrid.engageUninterruptiblePowerSource();
 
-        // TODO replace with java swing implementation
-        JFrame main = machine.screen.getFrame();
-
-        main.setSize(600, 400);
-        main.setContentPane(new SystemManagerForm().root);
-        main.pack();
+        // creating the GUI
+        createGUI();
 
         // plug in and turn on the machine
         this.machine.plugIn(PowerGrid.instance());
         this.machine.turnOn();
 
-        main.setVisible(true);
+        // loading the machine
+        loadMachine();
+    }
 
+    protected void setVisible(boolean visibility) {
+        gui.setVisible(visibility);
+    }
+
+    protected void createGUI() {
+        // configuring the main screen
+        gui.setUndecorated(false);
+        gui.setSize(600, 400);
+        gui.setResizable(false);
+
+        // getting the touch screen
+        JFrame screen = machine.getScreen().getFrame();
+
+        // putting the touch screen in the gui pane
+        gui.add(screen.getRootPane());
+
+        // pack & set the frame to visible
+        gui.pack();
+    }
+
+    protected void loadMachine() {
         // loading the coin dispensers
         for (BigDecimal coinDenomination : coinDenominations) {
-            ICoinDispenser cd = machine.coinDispensers.get(coinDenomination);
+            ICoinDispenser cd = machine.getCoinDispensers().get(coinDenomination);
             for (int j = 0; j < cd.getCapacity(); ++j) {
                 try {
                     cd.load(new Coin(coinDenomination));
@@ -108,7 +131,7 @@ public class Driver {
 
         // loading the banknote dispensers
         for (BigDecimal banknoteDenomination : banknoteDenominations) {
-            IBanknoteDispenser abd = machine.banknoteDispensers.get(banknoteDenomination);
+            IBanknoteDispenser abd = machine.getBanknoteDispensers().get(banknoteDenomination);
             for (int j = 0; j < abd.getCapacity(); ++j) {
                 try {
                     abd.load(new Banknote(Currency.getInstance(Locale.CANADA), banknoteDenomination));
@@ -120,11 +143,23 @@ public class Driver {
 
         // adding paper and ink to the printer
         try {
-            machine.printer.addInk(1 << 20);
-            machine.printer.addPaper(1 << 10);
+            machine.getPrinter().addInk(1 << 20);
+            machine.getPrinter().addPaper(1 << 10);
         } catch (OverloadedDevice e) {
             // shouldn't happen
         }
+    }
+
+    protected WindowAdapter windowClosingHook() {
+        return new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                super.windowClosing(e);
+
+                // doing closing actions
+                system.postTransactions();
+            }
+        };
     }
 
     /*
@@ -137,7 +172,7 @@ public class Driver {
         // setup driver class
         d.setup();
 
-        // posting the credit card transactions
-        d.system.postTransactions();
+        // setting the visibility of the frame
+        d.setVisible(true);
     }
 }

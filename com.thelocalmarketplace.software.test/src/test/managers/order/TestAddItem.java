@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 
 import javax.naming.OperationNotSupportedException;
 
+import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -23,13 +24,13 @@ import stubbing.StubbedBarcodedProduct;
 import stubbing.StubbedGrid;
 import stubbing.StubbedItem;
 import stubbing.StubbedOrderManager;
-import stubbing.StubbedPLUCodedItem;
+import stubbing.StubbedPLUItem;
 import stubbing.StubbedStation;
 import stubbing.StubbedSystemManager;
 
 public class TestAddItem {
 	// machine
-	private AbstractSelfCheckoutStation machine;
+	private ISelfCheckoutStation machine;
 
 	// vars
 	private StubbedOrderManager om;
@@ -87,13 +88,13 @@ public class TestAddItem {
 
 	@Test(expected = OperationNotSupportedException.class)
 	public void addingInstanceOfPLUViaMainScanner() throws OperationNotSupportedException {
-		PLUCodedItem pluCodedItem = new StubbedPLUCodedItem();
+		PLUCodedItem pluCodedItem = new StubbedPLUItem();
 		om.addItemToOrder(pluCodedItem, ScanType.MAIN);
 	}
 
 	@Test(expected = OperationNotSupportedException.class)
 	public void addingInstanceOfPLUViaHandheldScanner() throws OperationNotSupportedException {
-		PLUCodedItem pluCodedItem = new StubbedPLUCodedItem();
+		PLUCodedItem pluCodedItem = new StubbedPLUItem();
 		om.addItemToOrder(pluCodedItem, ScanType.HANDHELD);
 	}
 }

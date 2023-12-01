@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import managers.enums.SessionStatus;
+import stubbing.StubbedBarcodedItem;
 import stubbing.StubbedBarcodedProduct;
 import stubbing.StubbedOrderManager;
 import stubbing.StubbedSystemManager;
@@ -41,7 +42,7 @@ public class TestNotifyMassChanged {
 
 	@Test
 	public void testNotifyMassChangeThrowsWithAdjustmentDoesntBlock() {
-		om.addItem(new StubbedBarcodedProduct());
+		om.addItem(new StubbedBarcodedItem());
 		om.setWeightAdjustment(new BigDecimal(StubbedBarcodedProduct.WEIGHT));
 
 		om.notifyMassChanged(null, BigDecimal.ZERO);

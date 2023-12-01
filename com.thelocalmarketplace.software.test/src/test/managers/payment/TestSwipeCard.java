@@ -11,6 +11,8 @@ import java.math.BigDecimal;
 
 import javax.naming.OperationNotSupportedException;
 
+import com.jjjwelectronics.scanner.BarcodedItem;
+import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,12 +23,7 @@ import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
 
 import managers.enums.SessionStatus;
-import stubbing.StubbedBarcodedProduct;
-import stubbing.StubbedGrid;
-import stubbing.StubbedOrderManager;
-import stubbing.StubbedPaymentManager;
-import stubbing.StubbedStation;
-import stubbing.StubbedSystemManager;
+import stubbing.*;
 import utils.CardHelper;
 
 public class TestSwipeCard {
@@ -35,7 +32,7 @@ public class TestSwipeCard {
 	private StubbedPaymentManager pm;
 	private StubbedSystemManager sm;
 	private StubbedOrderManager om;
-	private AbstractSelfCheckoutStation machine;
+	private ISelfCheckoutStation machine;
 	private CardIssuer issuer;
 
 	@Before
@@ -52,7 +49,7 @@ public class TestSwipeCard {
 		sm = new StubbedSystemManager(BigDecimal.ZERO);
 		pm = sm.pmStub;
 		om = sm.omStub;
-		BarcodedProduct prod = new StubbedBarcodedProduct();
+		BarcodedItem prod = new StubbedBarcodedItem();
 		issuer = CardHelper.createCardIssuer();
 		sm.setIssuer(issuer);
 

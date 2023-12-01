@@ -7,6 +7,7 @@ package test.observers;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -29,7 +30,7 @@ public class TestBarcodeScannerObserver {
 	private StubbedSystemManager sm;
 	private BarcodeScannerObserver bso;
 	private BarcodedItem item;
-	private AbstractSelfCheckoutStation machine;
+	private ISelfCheckoutStation machine;
 
 	@Before
 	public void setup() {
@@ -55,7 +56,7 @@ public class TestBarcodeScannerObserver {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testNullOrderManager() {
-		new BarcodeScannerObserver(null, machine.handheldScanner);
+		new BarcodeScannerObserver(null, machine.getHandheldScanner());
 	}
 
 	@Test(expected = IllegalArgumentException.class)

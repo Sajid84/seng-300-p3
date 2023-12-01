@@ -5,4 +5,4 @@ bin/
 .idea/
 qodana.yml
 *.iml
-
+*.eml

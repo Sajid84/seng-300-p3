@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 
 import javax.naming.OperationNotSupportedException;
 
+import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -29,7 +30,7 @@ import utils.DatabaseHelper;
 
 public class TestDoNotBag {
 	// machine
-	private AbstractSelfCheckoutStation machine;
+	private ISelfCheckoutStation machine;
 
 	// vars
 	private StubbedOrderManager om;
@@ -56,18 +57,10 @@ public class TestDoNotBag {
 	@Test
 	public void testDoNotBagRequestSetsFlag() {
 		Item item = new StubbedItem(2);
-		om.onDoNotBagRequest(item);
+		om.doNotBagRequest(true);
 
 		// check if the flag for no bagging request is set to true
 		assertFalse(om.getBagItem());
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void testDoNotBagNullItem() {
-		Item item = null;
-
-		// call with a null item, expecting an exception
-		om.onDoNotBagRequest(item);
 	}
 
 	@Test
@@ -76,7 +69,7 @@ public class TestDoNotBag {
 
 		// set state to a state other than NORMAL
 		sm.setState(SessionStatus.BLOCKED);
-		om.onDoNotBagRequest(item);
+		om.doNotBagRequest(true);
 
 		// check if the weight adjustment remains unchanged
 		assertEquals(BigDecimal.ZERO, om.getWeightAdjustment());
@@ -87,7 +80,7 @@ public class TestDoNotBag {
 		Item item = new StubbedItem(4);
 
 		sm.setState(SessionStatus.NORMAL);
-		om.onDoNotBagRequest(item);
+		om.doNotBagRequest(true);
 
 		// check if the attendant is notified with the correct reason
 		assertEquals("do not bag request was received", sm.getAttendantNotification());
@@ -98,7 +91,7 @@ public class TestDoNotBag {
 		BarcodedItem item = DatabaseHelper.createRandomBarcodedItem();
 
 		sm.setState(SessionStatus.NORMAL);
-		om.onDoNotBagRequest(item);
+		om.doNotBagRequest(true);
 
 		// check if the attendant is notified with the correct reason
 		assertEquals("do not bag request was received", sm.getAttendantNotification());
