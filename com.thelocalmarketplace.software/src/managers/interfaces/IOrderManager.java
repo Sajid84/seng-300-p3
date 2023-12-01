@@ -62,6 +62,14 @@ public interface IOrderManager extends IManager {
     void addItemToOrder(Item item, ScanType method);
 
     /**
+     * Searches for products based on a provided description in both PLU-coded and Barcoded product databases.
+     *
+     * @param description The text used for keyword search to find products.
+     * @return A list of pairs, each containing a product (either PLU-coded or Barcoded) and a boolean value indicating whether the product is found.
+     */
+    Item searchItemsByText(String description);
+    
+    /**
      * This removes an {@link Item} from the order and the bagging area.
      *
      * @param pair the {@link Item} to remove

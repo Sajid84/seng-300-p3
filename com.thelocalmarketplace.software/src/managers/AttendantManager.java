@@ -22,9 +22,6 @@
 
 package managers;
 
-import java.util.*;
-import java.math.BigDecimal;
-
 import com.jjjwelectronics.OverloadedDevice;
 import com.tdc.CashOverloadException;
 import com.tdc.banknote.Banknote;
@@ -33,12 +30,15 @@ import com.tdc.banknote.IBanknoteDispenser;
 import com.tdc.coin.Coin;
 import com.tdc.coin.CoinStorageUnit;
 import com.tdc.coin.ICoinDispenser;
-
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import managers.enums.SessionStatus;
 import managers.interfaces.IAttendantManager;
 import managers.interfaces.IAttendantManagerNotify;
 import observers.payment.CoinMonitor;
+import observers.payment.ReceiptPrinterObserver;
+
+import java.math.BigDecimal;
+import java.util.*;
 
 public class AttendantManager implements IAttendantManager, IAttendantManagerNotify {
 
@@ -51,8 +51,11 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	// object ownership
 	protected Map<BigDecimal, CoinMonitor> coinMonitorMap = new HashMap<BigDecimal, CoinMonitor>();
 	protected Map<BigDecimal, CoinMonitor> bankNoteMonitorMap = new HashMap<BigDecimal, CoinMonitor>();
+	protected ReceiptPrinterObserver rpls;
 
 	// vars
+	protected boolean hasPaper = false;
+	protected boolean hasInk = false;
 	protected boolean paperLow = false;
 	protected boolean inkLow = false;
 	protected boolean coinsFull = false;
@@ -85,22 +88,25 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
             banknoteDispenserLow.put(denom, false);
         }
 
+		// creating the printer observer
+		rpls = new ReceiptPrinterObserver(this, machine.getPrinter());
+
 		// creating coin dispenser observers
-		coinMonitorMap.put(new BigDecimal(0.01), new CoinMonitor());
-		coinMonitorMap.put(new BigDecimal(0.05), new CoinMonitor());
-		coinMonitorMap.put(new BigDecimal(0.10), new CoinMonitor());
-		coinMonitorMap.put(new BigDecimal(0.25), new CoinMonitor());
-		coinMonitorMap.put(new BigDecimal(1.00), new CoinMonitor());
-		coinMonitorMap.put(new BigDecimal(2.00), new CoinMonitor());
-
-		// banknote dispenser observers
-		bankNoteMonitorMap.put(new BigDecimal(5.00), new CoinMonitor());
-		bankNoteMonitorMap.put(new BigDecimal(10.00), new CoinMonitor());
-		bankNoteMonitorMap.put(new BigDecimal(20.00), new CoinMonitor());
-		bankNoteMonitorMap.put(new BigDecimal(50.00), new CoinMonitor());
-		bankNoteMonitorMap.put(new BigDecimal(100.00), new CoinMonitor());
+//		coinMonitorMap.put(new BigDecimal(0.01), new CoinMonitor());
+//		coinMonitorMap.put(new BigDecimal(0.05), new CoinMonitor());
+//		coinMonitorMap.put(new BigDecimal(0.10), new CoinMonitor());
+//		coinMonitorMap.put(new BigDecimal(0.25), new CoinMonitor());
+//		coinMonitorMap.put(new BigDecimal(1.00), new CoinMonitor());
+//		coinMonitorMap.put(new BigDecimal(2.00), new CoinMonitor());
+//
+//		// banknote dispenser observers
+//		bankNoteMonitorMap.put(new BigDecimal(5.00), new CoinMonitor());
+//		bankNoteMonitorMap.put(new BigDecimal(10.00), new CoinMonitor());
+//		bankNoteMonitorMap.put(new BigDecimal(20.00), new CoinMonitor());
+//		bankNoteMonitorMap.put(new BigDecimal(50.00), new CoinMonitor());
+//		bankNoteMonitorMap.put(new BigDecimal(100.00), new CoinMonitor());
 	}
-
+	
 	@Override
 	public SessionStatus getState() {
 		return sm.getState();
@@ -309,6 +315,11 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	}
 
 	@Override
+	public void maintainBags() {
+		// TODO implement this method
+	}
+
+	@Override
 	public void maintainCoinStorage() {
 		if (coinsFull) {
 			List<Coin> coins = machine.getCoinStorage().unload();
@@ -356,7 +367,52 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 	@Override
 	public void reset() {
-		// TODO do something here
+		// setting has papper & ink
+		getPrinterStatus();
+	}
+
+	@Override
+	public void notifyPaper(boolean hasPaper) {
+		this.hasPaper = hasPaper;
+	}
+
+	@Override
+	public void notifyInk(boolean hasInk) {
+		this.hasInk = hasInk;
+	}
+
+	@Override
+	public void notifyBagDispensed() {
+		// TODO implement this method
+	}
+
+	@Override
+	public boolean canPrint() {
+		return hasInk && hasPaper;
+	}
+
+	@Override
+	public void requestPurchaseBags(int count) {
+		// TODO implement this method
+	}
+
+	/**
+	 * Getting the state of the printer's ink & paper.
+	 */
+	protected void getPrinterStatus() {
+		try {
+			hasInk = machine.getPrinter().inkRemaining() > 0;
+		} catch (UnsupportedOperationException e) {
+			// WHYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
+			hasInk = true;
+		}
+
+		try {
+			hasPaper = machine.getPrinter().paperRemaining() > 0;
+		} catch (UnsupportedOperationException e) {
+			// WHYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
+			hasPaper = true;
+		}
 	}
 
 }

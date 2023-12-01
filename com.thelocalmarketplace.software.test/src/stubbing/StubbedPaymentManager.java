@@ -45,22 +45,6 @@ public class StubbedPaymentManager extends PaymentManager {
 		printReceiptCalled = false;
 	}
 	
-	public boolean getHasPaper() {
-		return super.hasPaper;
-	}
-	
-	public boolean getHasInk() {
-		return super.hasInk;
-	}
-	
-	public void setHasPaper(boolean has) {
-		super.hasPaper = has;
-	}
-	
-	public void setHasInk(boolean has) {
-		super.hasInk = has;
-	}
-	
 	public CoinCollector getCoinCollector() {
 		return super.cc;
 	}

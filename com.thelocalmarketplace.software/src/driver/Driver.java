@@ -24,6 +24,7 @@ import utils.CardHelper;
 import utils.DriverHelper;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.math.BigDecimal;
@@ -77,8 +78,8 @@ public class Driver {
         gui = new JFrame("Self Checkout Station");
         gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gui.setVisible(false);
+        gui.setMinimumSize(new Dimension(800, 600));
         gui.addWindowListener(windowClosingHook());
-
     }
 
     protected void setup() {

@@ -54,12 +54,9 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 	protected CoinCollector cc;
 	protected BanknoteCollector bc;
 	protected CardReaderObserver cro;
-	protected ReceiptPrinterObserver rpls;
 
 	// vars
 	protected BigDecimal payment = BigDecimal.ZERO;
-	protected boolean hasPaper = false;
-	protected boolean hasInk = false;
 
 	/**
 	 * This controls everything relating to customer payment.
@@ -93,29 +90,6 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 		cc = new CoinCollector(this, machine.getCoinValidator());
 		bc = new BanknoteCollector(this, machine.getBanknoteValidator());
 		cro = new CardReaderObserver(this, machine.getCardReader());
-		rpls = new ReceiptPrinterObserver(this, machine.getPrinter());
-
-		// setting has papper & ink
-		getPrinterStatus();
-	}
-
-	/**
-	 * Getting the state of the printer's ink & paper.
-	 */
-	protected void getPrinterStatus() {
-		try {
-			hasInk = machine.getPrinter().inkRemaining() > 0;
-		} catch (UnsupportedOperationException e) {
-			// WHYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
-			hasInk = true;
-		}
-
-		try {
-			hasPaper = machine.getPrinter().paperRemaining() > 0;
-		} catch (UnsupportedOperationException e) {
-			// WHYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
-			hasPaper = true;
-		}
 	}
 
 	/**
@@ -157,12 +131,9 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 		long holdNumber = issuer.authorizeHold(cardData.getNumber(), amountDouble);
 
 		// testing the hold number
-		if (holdNumber == -1) {
-			return;
-		} else {
+		if (holdNumber != -1) {
 			payment = sm.getTotalPrice();
 			recordTransaction(cardData, holdNumber, amountDouble);
-			sm.notifyPaid();
 		}
 	}
 
@@ -227,8 +198,6 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 		// machine does not have enough cash
 		// to give change
 		if (!canTenderChange(change)) {
-			this.sm.blockSession();
-			this.sm.notifyAttendant("Not enough cash in machine to return change");
 			throw new NoCashAvailableException();
 		}
 
@@ -388,9 +357,9 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 		}
 
 		// ensuring that the printer can print
-		if (!canPrint()) {
+		if (!sm.canPrint()) {
 			// Notify the attendant and block the session
-			sm.notifyAttendant("Machine could not print receipt in full. Printer is empty.");
+			sm.notifyAttendant("Machine could not print receipt, printer is empty.");
 			sm.blockSession();
 			return;
 		}
@@ -462,20 +431,6 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 	}
 
 	@Override
-	public void notifyPaper(boolean hasPaper) {
-		this.hasPaper = hasPaper;
-	}
-
-	@Override
-	public void notifyInk(boolean hasInk) {
-		this.hasInk = hasInk;
-	}
-
-	protected boolean canPrint() {
-		return hasInk && hasPaper;
-	}
-
-	@Override
 	public boolean isBlocked() {
 		return sm.isBlocked();
 	}
@@ -498,6 +453,5 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 	@Override
 	public void reset() {
 		payment = BigDecimal.ZERO;
-		getPrinterStatus();
 	}
 }

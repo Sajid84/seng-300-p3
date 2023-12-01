@@ -24,59 +24,53 @@ package observers.payment;
 
 import com.jjjwelectronics.printer.IReceiptPrinter;
 import com.jjjwelectronics.printer.ReceiptPrinterListener;
-
 import managers.AttendantManager;
-import managers.PaymentManager;
 import observers.AbstractDeviceObserver;
 
 public class ReceiptPrinterObserver extends AbstractDeviceObserver implements ReceiptPrinterListener {
 
-	// object references
-	private PaymentManager ref;
-	private AttendantManager attRef;
+    // object references
+    private final AttendantManager ref;
 
-	public ReceiptPrinterObserver(PaymentManager paymentManager, AttendantManager attendantManager,
-			IReceiptPrinter device) {
-		super(device);
+    public ReceiptPrinterObserver(AttendantManager am, IReceiptPrinter device) {
+        super(device);
 
-		if (paymentManager == null) {
-			throw new IllegalArgumentException("payment manager cannot be null");
-		}
+        if (am == null) {
+            throw new IllegalArgumentException("attendant manager cannot be null");
+        }
 
-		this.ref = paymentManager;
-		this.attRef = attendantManager;
-		device.register(this);
-	}
+        this.ref = am;
+        device.register(this);
+    }
 
-	@Override
-	public void thePrinterIsOutOfPaper() {
-		this.ref.notifyPaper(false);
-	}
+    @Override
+    public void thePrinterIsOutOfPaper() {
+        this.ref.notifyPaper(false);
+    }
 
-	@Override
-	public void thePrinterIsOutOfInk() {
-		this.ref.notifyInk(false);
-	}
+    @Override
+    public void thePrinterIsOutOfInk() {
+        this.ref.notifyInk(false);
+    }
 
-	@Override
-	public void thePrinterHasLowInk() {
-		this.attRef.notifyPaperLow();
+    @Override
+    public void thePrinterHasLowInk() {
+        this.ref.notifyPaperLow();
+    }
 
-	}
+    @Override
+    public void thePrinterHasLowPaper() {
+        this.ref.notifyPaperLow();
+    }
 
-	@Override
-	public void thePrinterHasLowPaper() {
-		this.attRef.notifyPaperLow();
-	}
+    @Override
+    public void paperHasBeenAddedToThePrinter() {
+        this.ref.notifyPaper(true);
+    }
 
-	@Override
-	public void paperHasBeenAddedToThePrinter() {
-		this.ref.notifyPaper(true);
-	}
-
-	@Override
-	public void inkHasBeenAddedToThePrinter() {
-		this.ref.notifyInk(true);
-	}
+    @Override
+    public void inkHasBeenAddedToThePrinter() {
+        this.ref.notifyInk(true);
+    }
 
 }

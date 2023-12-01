@@ -1,6 +1,7 @@
 package managers.interfaces;
 
 import com.jjjwelectronics.Item;
+import com.jjjwelectronics.card.Card;
 import managers.enums.SessionStatus;
 
 import java.math.BigDecimal;
@@ -39,5 +40,15 @@ public interface ISystemManagerNotify {
      * @param value the value of the payment
      */
     void notifyPaymentAdded(BigDecimal value);
+
+    /**
+     * This notifies all listeners that the payment window has closed.
+     */
+    void notifyPaymentWindowClosed();
+
+    /**
+     * This notifies all listeners that there was an issue reading data from the inserted card.
+     */
+    void notifyInvalidCardRead(Card card);
 
 }

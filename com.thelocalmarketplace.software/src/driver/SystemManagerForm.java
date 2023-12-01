@@ -3,13 +3,13 @@
 package driver;
 
 import com.jjjwelectronics.Item;
-import com.jjjwelectronics.scanner.Barcode;
+import com.jjjwelectronics.bag.ReusableBag;
+import com.jjjwelectronics.card.Card;
 import com.jjjwelectronics.scanner.BarcodedItem;
 import com.jjjwelectronics.screen.ITouchScreen;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.PLUCodedItem;
 import com.thelocalmarketplace.hardware.PLUCodedProduct;
-import com.thelocalmarketplace.hardware.Product;
 import managers.SystemManager;
 import managers.enums.ScanType;
 import managers.enums.SessionStatus;
@@ -23,8 +23,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 public class SystemManagerForm implements IScreen {
 
@@ -47,13 +45,14 @@ public class SystemManagerForm implements IScreen {
     private JButton purchaseBagsButton;
     private JCheckBox doNotBagItemCheckBox;
     private JButton exitSessionButton;
-    private DebugForm debug;
+    protected JLabel priceLabel;
+    private final DebugForm debug;
+    private PaymentSimualtorGui paymentGui;
 
     // TABLE HEADERS
     private final String nameColumn = "Name";
     private final String priceColumn = "Price";
     private final String baggedColumn = "Bagged?";
-
     private final String[] defaultTableHeaders = new String[]{
             nameColumn,
             priceColumn,
@@ -74,10 +73,13 @@ public class SystemManagerForm implements IScreen {
         itemsTable.setModel(generateModelSkeleton());
 
         // setting the label
-        updateFeedbackLabel();
+        resetFeedbackLabel();
 
         // setting the state of the remove item button
-        updateRemoveItemButtonState();
+        updateButtonStates();
+
+        // setting the text of the price label
+        updatePriceLabel();
 
         // events
         scanByMainScannerButton.addActionListener(new ActionListener() {
@@ -157,6 +159,13 @@ public class SystemManagerForm implements IScreen {
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.out.println("The customer wishes to pay for their order.");
+
+                // revealing the payment window
+                paymentGui.setVisible(true);
+
+                // blocking buttons
+                blockButtons();
+                updateButtonStates();
             }
         });
         exitSessionButton.addActionListener(new ActionListener() {
@@ -171,12 +180,42 @@ public class SystemManagerForm implements IScreen {
         return new DefaultTableModel(defaultTableHeaders, 0);
     }
 
+    protected void updateButtonStates() {
+        updateRemoveItemButtonState();
+        updatePayForOrderButtonState();
+    }
+
+    protected void updatePayForOrderButtonState() {
+        payForOrderButton.setEnabled(!sm.getItems().isEmpty());
+
+        // disabling if the payment gui is not null and visible
+        if (paymentGui != null) {
+            if (paymentGui.isVisible()) {
+                payForOrderButton.setEnabled(false);
+            }
+        }
+
+        if (sm.isBlocked()) {
+            payForOrderButton.setEnabled(false);
+        }
+    }
+
     /**
      * This function updates the enabled state of the button based on the remove
      * item check boxes.
      */
     protected void updateRemoveItemButtonState() {
+        // TODO edge case where adding the first item doesn't scan properly
+
+        // enabling the buttom if there is at least one item in the order
         removeItemButton.setEnabled(!sm.getItems().isEmpty());
+
+        // disabling if the payment gui is not null and visible
+        if (paymentGui != null) {
+            if (paymentGui.isVisible()) {
+                removeItemButton.setEnabled(false);
+            }
+        }
     }
 
     @Override
@@ -195,8 +234,9 @@ public class SystemManagerForm implements IScreen {
         debugView.setLayout(new GridLayout());
         debugView.add(debug.getPanel());
 
-        // updating the touch screen
-        touchScreen.getFrame().setContentPane(root);
+        // creating the payment gui
+        this.paymentGui = new PaymentSimualtorGui(sm);
+        sm.attach(paymentGui);
     }
 
     /**
@@ -236,9 +276,13 @@ public class SystemManagerForm implements IScreen {
                 description = prod.getDescription();
                 price = prod.getPrice();
             }
+            if (item instanceof ReusableBag) {
+                description = "Reusable Bag";
+                price = DatabaseHelper.PRICE_OF_BAG.doubleValue();
+            }
 
             // adding the row
-            model.addRow(new Object[]{ description, "$ " + price, pair.getValue() });
+            model.addRow(new Object[]{description, "$ " + price, pair.getValue()});
         }
 
         // updating the label
@@ -261,7 +305,10 @@ public class SystemManagerForm implements IScreen {
         doNotBagItemCheckBox.setSelected(false);
 
         // updating the state of the remove item button
-        updateRemoveItemButtonState();
+        updateButtonStates();
+
+        // update the text of the price label
+        updatePriceLabel();
     }
 
     @Override
@@ -270,14 +317,17 @@ public class SystemManagerForm implements IScreen {
         updateTable();
 
         // updating the state of the remove item button
-        updateRemoveItemButtonState();
+        updateButtonStates();
+
+        // update the text of the price label
+        updatePriceLabel();
     }
 
     @Override
     public void notifyStateChange(SessionStatus state) {
         switch (state) {
             case NORMAL -> {
-                updateFeedbackLabel();
+                resetFeedbackLabel();
                 unblockButtons();
             }
             case BLOCKED -> {
@@ -285,7 +335,7 @@ public class SystemManagerForm implements IScreen {
                 determineCause();
             }
             case PAID -> {
-                // TODO do something different here?
+                System.out.println("The session has been paid for.");
                 blockButtons();
             }
             case DISABLED -> {
@@ -297,12 +347,28 @@ public class SystemManagerForm implements IScreen {
     @Override
     public void notifyRefresh() {
         updateTable();
-        updateRemoveItemButtonState();
+        updateButtonStates();
+        updatePriceLabel();
+    }
+
+    protected void updatePriceLabel() {
+        priceLabel.setText("Price: $" + sm.getTotalPrice().toString());
     }
 
     @Override
     public void notifyPaymentAdded(BigDecimal value) {
-        // TODO do something with this
+        // doing nothing with this event
+    }
+
+    @Override
+    public void notifyPaymentWindowClosed() {
+        unblockButtons();
+        updateButtonStates();
+    }
+
+    @Override
+    public void notifyInvalidCardRead(Card card) {
+        // do nothing here
     }
 
     protected void determineCause() {
@@ -319,7 +385,7 @@ public class SystemManagerForm implements IScreen {
      * This is to quickly set the feedback label to nothing,
      * essentially clearing the label.
      */
-    protected void updateFeedbackLabel() {
+    protected void resetFeedbackLabel() {
         updateFeedbackLabel(null);
     }
 
@@ -354,9 +420,207 @@ public class SystemManagerForm implements IScreen {
     protected void setButtonsState(boolean state) {
         scanByMainScannerButton.setEnabled(state);
         scanByHandheldScannerButton.setEnabled(state);
-        payForOrderButton.setEnabled(state);
         searchForItemButton.setEnabled(state);
         addOwnBagsButton.setEnabled(state);
         purchaseBagsButton.setEnabled(state);
+        doNotBagItemCheckBox.setEnabled(state);
     }
+
+    {
+// GUI initializer generated by IntelliJ IDEA GUI Designer
+// >>> IMPORTANT!! <<<
+// DO NOT EDIT OR ADD ANY CODE HERE!
+        $$$setupUI$$$();
+    }
+
+    /**
+     * Method generated by IntelliJ IDEA GUI Designer
+     * >>> IMPORTANT!! <<<
+     * DO NOT edit this method OR call it in your code!
+     *
+     * @noinspection ALL
+     */
+    private void $$$setupUI$$$() {
+        root = new JPanel();
+        root.setLayout(new GridBagLayout());
+        root.setMinimumSize(new Dimension(800, 600));
+        root.setOpaque(false);
+        root.setPreferredSize(new Dimension(800, 600));
+        mainPane = new JTabbedPane();
+        GridBagConstraints gbc;
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        root.add(mainPane, gbc);
+        regularView = new JPanel();
+        regularView.setLayout(new GridBagLayout());
+        mainPane.addTab("Normal", regularView);
+        tableLabel = new JLabel();
+        tableLabel.setText("Items");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        regularView.add(tableLabel, gbc);
+        buttonsLabel = new JLabel();
+        buttonsLabel.setText("Actions");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 2;
+        gbc.weightx = 1.0;
+        regularView.add(buttonsLabel, gbc);
+        final JPanel panel1 = new JPanel();
+        panel1.setLayout(new GridBagLayout());
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 2;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        regularView.add(panel1, gbc);
+        final JScrollPane scrollPane1 = new JScrollPane();
+        scrollPane1.setHorizontalScrollBarPolicy(31);
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        panel1.add(scrollPane1, gbc);
+        itemsTable = new JTable();
+        itemsTable.setAutoCreateRowSorter(false);
+        itemsTable.setAutoResizeMode(3);
+        itemsTable.setAutoscrolls(false);
+        itemsTable.setCellSelectionEnabled(true);
+        itemsTable.setColumnSelectionAllowed(true);
+        itemsTable.setName("itemsTable");
+        itemsTable.putClientProperty("Table.isFileList", Boolean.TRUE);
+        scrollPane1.setViewportView(itemsTable);
+        removeItemButton = new JButton();
+        removeItemButton.setText("Remove Item");
+        removeItemButton.setVerticalAlignment(0);
+        removeItemButton.setVerticalTextPosition(0);
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        panel1.add(removeItemButton, gbc);
+        final JPanel panel2 = new JPanel();
+        panel2.setLayout(new GridBagLayout());
+        gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 3;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        regularView.add(panel2, gbc);
+        scanByMainScannerButton = new JButton();
+        scanByMainScannerButton.setText("Scan by Main Scanner");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        panel2.add(scanByMainScannerButton, gbc);
+        signalForAttendantButton = new JButton();
+        signalForAttendantButton.setText("Signal for Attendant");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 7;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        panel2.add(signalForAttendantButton, gbc);
+        payForOrderButton = new JButton();
+        payForOrderButton.setText("Pay for Order");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        panel2.add(payForOrderButton, gbc);
+        searchForItemButton = new JButton();
+        searchForItemButton.setText("Search For Item");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        panel2.add(searchForItemButton, gbc);
+        scanByHandheldScannerButton = new JButton();
+        scanByHandheldScannerButton.setText("Scan by Handheld Scanner");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        panel2.add(scanByHandheldScannerButton, gbc);
+        addOwnBagsButton = new JButton();
+        addOwnBagsButton.setText("Add Own Bags");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        panel2.add(addOwnBagsButton, gbc);
+        purchaseBagsButton = new JButton();
+        purchaseBagsButton.setText("Purchase Bags");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        panel2.add(purchaseBagsButton, gbc);
+        doNotBagItemCheckBox = new JCheckBox();
+        doNotBagItemCheckBox.setText("Do Not Bag Item");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        panel2.add(doNotBagItemCheckBox, gbc);
+        exitSessionButton = new JButton();
+        exitSessionButton.setText("Exit Session");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 8;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        panel2.add(exitSessionButton, gbc);
+        feedbackLabel = new JLabel();
+        feedbackLabel.setText("Feedback Label");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 3;
+        regularView.add(feedbackLabel, gbc);
+        priceLabel = new JLabel();
+        priceLabel.setText("Price");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        regularView.add(priceLabel, gbc);
+        debugView = new JPanel();
+        debugView.setLayout(new GridBagLayout());
+        mainPane.addTab("Debug", debugView);
+        buttonsLabel.setLabelFor(scrollPane1);
+    }
+
+    /**
+     * @noinspection ALL
+     */
+    public JComponent $$$getRootComponent$$$() {
+        return root;
+    }
+
 }

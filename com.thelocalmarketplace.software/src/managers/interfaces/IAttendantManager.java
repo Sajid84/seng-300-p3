@@ -33,6 +33,11 @@ public interface IAttendantManager extends IManager {
     void maintainBanknoteStorage();
 
     /**
+     * Maintain bags use case.
+     */
+    void maintainBags();
+
+    /**
      * Maintain coins use case.
      */
     void maintainCoinStorage();
@@ -46,5 +51,19 @@ public interface IAttendantManager extends IManager {
      * Remotely enable a machine.
      */
     void requestEnableMachine();
+
+    /**
+     * Tests whether the machine can print or not.
+     *
+     * @return true if the machine can print, false otherwise
+     */
+    boolean canPrint();
+
+    /**
+     * Signal to the system that the customer wishes to purchase bags.
+     *
+     * @param count the amount of bags the customer wants to purchase
+     */
+    void requestPurchaseBags(int count);
 
 }
