@@ -8,6 +8,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,7 +27,7 @@ public class TestScaleObserver {
     private StubbedOrderManager om;
     private StubbedSystemManager sm;
     private ScaleObserver so;
-    private AbstractSelfCheckoutStation machine;
+    private ISelfCheckoutStation machine;
 
     @Before
     public void setup() {
@@ -49,7 +50,7 @@ public class TestScaleObserver {
 
     @Test(expected = IllegalArgumentException.class)
     public void testNullOrderManager() {
-        new ScaleObserver(null, machine.baggingArea);
+        new ScaleObserver(null, machine.getBaggingArea());
     }
 
     @Test(expected = IllegalArgumentException.class)

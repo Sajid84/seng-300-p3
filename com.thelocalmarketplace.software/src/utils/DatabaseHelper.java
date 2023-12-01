@@ -192,7 +192,7 @@ public class DatabaseHelper {
     public static BarcodedItem createCustomerBags() {
         Barcode barcode = DatabaseHelper.createRandomBarcode(10);
 
-        return new BarcodedItem(barcode, new Mass(200));
+        return new BarcodedItem(barcode, new Mass(createRandomMass()));
     }
 
     /**

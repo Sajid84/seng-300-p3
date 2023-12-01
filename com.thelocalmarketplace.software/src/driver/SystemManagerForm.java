@@ -185,6 +185,11 @@ public class SystemManagerForm implements IScreen {
     }
 
     @Override
+    public JFrame getFrame() {
+        throw new UnsupportedOperationException("This object does not have a JFrame");
+    }
+
+    @Override
     public void configure(ITouchScreen touchScreen) {
         // attaching debug window to the correct panel
         debugView.setLayout(new GridLayout());

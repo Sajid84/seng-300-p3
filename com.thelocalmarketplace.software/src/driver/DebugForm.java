@@ -100,6 +100,11 @@ public class DebugForm implements IScreen {
     }
 
     @Override
+    public JFrame getFrame() {
+        throw new UnsupportedOperationException("This object does not have a JFrame");
+    }
+
+    @Override
     public void configure(ITouchScreen touchScreen) {
         // do nothing here
     }

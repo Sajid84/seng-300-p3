@@ -94,6 +94,28 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 		bc = new BanknoteCollector(this, machine.getBanknoteValidator());
 		cro = new CardReaderObserver(this, machine.getCardReader());
 		rpls = new ReceiptPrinterObserver(this, machine.getPrinter());
+
+		// setting has papper & ink
+		getPrinterStatus();
+	}
+
+	/**
+	 * Getting the state of the printer's ink & paper.
+	 */
+	protected void getPrinterStatus() {
+		try {
+			hasInk = machine.getPrinter().inkRemaining() > 0;
+		} catch (UnsupportedOperationException e) {
+			// WHYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
+			hasInk = true;
+		}
+
+		try {
+			hasPaper = machine.getPrinter().paperRemaining() > 0;
+		} catch (UnsupportedOperationException e) {
+			// WHYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
+			hasPaper = true;
+		}
 	}
 
 	/**
@@ -473,4 +495,9 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 		return sm.isDisabled();
 	}
 
+	@Override
+	public void reset() {
+		payment = BigDecimal.ZERO;
+		getPrinterStatus();
+	}
 }
