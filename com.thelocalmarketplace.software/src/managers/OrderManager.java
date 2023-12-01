@@ -21,6 +21,7 @@ import com.thelocalmarketplace.hardware.PriceLookUpCode;
 import com.thelocalmarketplace.hardware.Product;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
 
+import database.Database;
 import managers.enums.ScanType;
 import managers.enums.SessionStatus;
 import managers.interfaces.IOrderManager;
@@ -330,42 +331,26 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 	 */
 	public Item searchItemsByText(String description) {
 	    // Iterate over the barcoded products in the database
-	    for (BarcodedProduct barcodedProduct : ProductDatabases.BARCODED_PRODUCT_DATABASE.values()) {
+	    for (BarcodedProduct barcodedProduct : Database.BARCODED_PRODUCT_DATABASE.values()) {
 	        // Check if the product's description matches the input
 	        if (barcodedProduct.getDescription().equals(description)) {
 	            // Use the barcode to get the corresponding barcoded item from the new database
-	            BarcodedItem barcodedItem = getBarcodedItemFromNewDatabase(barcodedProduct.getBarcode());
-	            return barcodedItem;
+                return Database.BARCODED_ITEM_DATABASE.get(barcodedProduct.getBarcode());
 	        }
 	    }
 
 	    // Iterate over the PLU-coded products in the database
-	    for (PLUCodedProduct pluCodedProduct : ProductDatabases.PLU_PRODUCT_DATABASE.values()) {
+	    for (PLUCodedProduct pluCodedProduct : Database.PLU_PRODUCT_DATABASE.values()) {
 	        // Check if the product's description matches the input
 	        if (pluCodedProduct.getDescription().equals(description)) {
 	            // Use the PLU to get the corresponding PLU-coded item from the new database
-	            PLUCodedItem pluCodedItem = getPLUCodedItemFromNewDatabase(pluCodedProduct.getPLUCode());
-	            return pluCodedItem;
+	            return Database.PLU_ITEM_DATABASE.get(pluCodedProduct.getPLUCode());
 	        }
 	    }
 
 	    // If no match is found, return null
 	    return null;
 	}
-
-	// Placeholder functions to get items from the new database based on barcode or PLU
-	private BarcodedItem getBarcodedItemFromNewDatabase(Barcode barcode) {
-	    // Implement this based on the structure of your new database
-	    // Return the corresponding BarcodedItem
-	    return null;
-	}
-
-	private PLUCodedItem getPLUCodedItemFromNewDatabase(PriceLookUpCode pluCode) {
-	    // Implement this based on the structure of your new database
-	    // Return the corresponding PLUCodedItem
-	    return null;
-	}
-
 	
     /**
      * This method handles a customer's request to add their own bags. The system
