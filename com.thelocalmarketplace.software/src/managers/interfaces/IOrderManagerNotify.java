@@ -37,13 +37,6 @@ public interface IOrderManagerNotify {
     void notifyMassChanged(ElectronicScaleListener scale, BigDecimal mass);
 
     /**
-     * An event announcing that an item has been removed from the OrderManager.
-     *
-     * @param item The item in question.
-     */
-    void onItemRemovedFromOrder(Item item);
-
-    /**
      * Notifies the manager of a scale overload of a scale.
      *
      * @param scale the scale that's overloaded
