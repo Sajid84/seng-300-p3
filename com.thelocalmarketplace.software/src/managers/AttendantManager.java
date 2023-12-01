@@ -95,11 +95,11 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 		}
 
 		for (BigDecimal denom : machine.getCoinDenominations()) {
-			coinMonitorMap.put(denom, new CoinMonitor(pm, new CoinDispenserGold(0)));
+			coinMonitorMap.put(denom, new CoinMonitor(pm, machine.getCoinDispensers().get(denom)));
 		}
 
 		for (BigDecimal denom : machine.getBanknoteDenominations()) {
-			bankNoteMonitorMap.put(denom, new BanknoteMonitor(pm, new BanknoteDispenserGold()));
+			bankNoteMonitorMap.put(denom, new BanknoteMonitor(pm, machine.getBanknoteDispensers().get(denom)));
 		}
 	}
 
