@@ -60,7 +60,7 @@ public interface IOrderManager extends IManager {
      * @param method the method of scanning
      */
     void addItemToOrder(Item item, ScanType method);
-
+    
     /**
      * This removes an {@link Item} from the order and the bagging area.
      *

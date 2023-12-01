@@ -1,5 +1,12 @@
 package managers.interfaces;
 
+import java.util.List;
+
+import com.jjjwelectronics.Item;
+import com.thelocalmarketplace.hardware.Product;
+
+import utils.Pair;
+
 public interface IAttendantManager extends IManager {
 
     /**

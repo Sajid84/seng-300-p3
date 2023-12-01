@@ -17,6 +17,11 @@ import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import com.thelocalmarketplace.hardware.PLUCodedItem;
 import com.thelocalmarketplace.hardware.PLUCodedProduct;
+import com.thelocalmarketplace.hardware.PriceLookUpCode;
+import com.thelocalmarketplace.hardware.Product;
+import com.thelocalmarketplace.hardware.external.ProductDatabases;
+
+import database.Database;
 import managers.enums.ScanType;
 import managers.enums.SessionStatus;
 import managers.interfaces.IOrderManager;
@@ -31,6 +36,7 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class OrderManager implements IOrderManager, IOrderManagerNotify {
 
@@ -295,6 +301,57 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
         }
     }
 
+    /**
+     * Adds an item to the order based on the provided description and scanning method.
+     *
+     * @param description the description of the item to be added.
+     * @param method      the scanning method used for adding the item.
+     * @throws IllegalArgumentException if the description is null or no matching item is found.
+     */
+    public void addItemToOrder(String description, ScanType method) {
+        // Use searchItemsByText to find the item based on the description
+        Item foundItem = searchItemsByText(description);
+
+        // Check if an item was found
+        if (foundItem != null) {
+            // Item found, add it to the order
+            addItemToOrder(foundItem, method);
+            System.out.println("Item added to the order: " + description);
+        } else {
+        	 // No matching item found
+            throw new IllegalArgumentException("Error: Item with description '" + description + "' not found.");
+        }
+    }
+    
+	/**
+	 * Searches for products based on a provided description in both PLU-coded and Barcoded product databases.
+	 *
+	 * @param description The text used for keyword search to find products.
+	 * @return A list of pairs, each containing a product (either PLU-coded or Barcoded) and a boolean value indicating whether the product is found.
+	 */
+	public Item searchItemsByText(String description) {
+	    // Iterate over the barcoded products in the database
+	    for (BarcodedProduct barcodedProduct : Database.BARCODED_PRODUCT_DATABASE.values()) {
+	        // Check if the product's description matches the input
+	        if (barcodedProduct.getDescription().equals(description)) {
+	            // Use the barcode to get the corresponding barcoded item from the new database
+                return Database.BARCODED_ITEM_DATABASE.get(barcodedProduct.getBarcode());
+	        }
+	    }
+
+	    // Iterate over the PLU-coded products in the database
+	    for (PLUCodedProduct pluCodedProduct : Database.PLU_PRODUCT_DATABASE.values()) {
+	        // Check if the product's description matches the input
+	        if (pluCodedProduct.getDescription().equals(description)) {
+	            // Use the PLU to get the corresponding PLU-coded item from the new database
+	            return Database.PLU_ITEM_DATABASE.get(pluCodedProduct.getPLUCode());
+	        }
+	    }
+
+	    // If no match is found, return null
+	    return null;
+	}
+	
     /**
      * This method handles a customer's request to add their own bags. The system
      * gets the mass of the bags and updates the system adjustment and weight

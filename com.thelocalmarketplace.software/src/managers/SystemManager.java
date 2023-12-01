@@ -17,6 +17,7 @@ import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import com.thelocalmarketplace.hardware.PLUCodedItem;
+import com.thelocalmarketplace.hardware.Product;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
 import driver.SystemManagerForm;
 import managers.enums.PaymentType;

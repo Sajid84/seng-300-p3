@@ -34,10 +34,21 @@ import com.tdc.coin.Coin;
 import com.tdc.coin.CoinStorageUnit;
 import com.tdc.coin.ICoinDispenser;
 
+import com.jjjwelectronics.Item;
+import com.jjjwelectronics.scanner.Barcode;
+import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
+import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
+import com.thelocalmarketplace.hardware.PLUCodedProduct;
+import com.thelocalmarketplace.hardware.PriceLookUpCode;
+import com.thelocalmarketplace.hardware.Product;
+import com.thelocalmarketplace.hardware.external.ProductDatabases;
+
 import managers.enums.SessionStatus;
 import managers.interfaces.IAttendantManager;
 import managers.interfaces.IAttendantManagerNotify;
+import managers.interfaces.IOrderManager;
+import utils.Pair;
 import observers.payment.CoinMonitor;
 import observers.payment.ReceiptPrinterObserver;
 
@@ -107,7 +118,7 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 //		bankNoteMonitorMap.put(new BigDecimal(50.00), new CoinMonitor());
 //		bankNoteMonitorMap.put(new BigDecimal(100.00), new CoinMonitor());
 	}
-
+	
 	@Override
 	public SessionStatus getState() {
 		return sm.getState();
