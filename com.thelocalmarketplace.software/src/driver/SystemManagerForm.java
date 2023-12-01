@@ -3,13 +3,12 @@
 package driver;
 
 import com.jjjwelectronics.Item;
-import com.jjjwelectronics.scanner.Barcode;
+import com.jjjwelectronics.card.Card;
 import com.jjjwelectronics.scanner.BarcodedItem;
 import com.jjjwelectronics.screen.ITouchScreen;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.PLUCodedItem;
 import com.thelocalmarketplace.hardware.PLUCodedProduct;
-import com.thelocalmarketplace.hardware.Product;
 import managers.SystemManager;
 import managers.enums.ScanType;
 import managers.enums.SessionStatus;
@@ -23,8 +22,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 public class SystemManagerForm implements IScreen {
 
@@ -47,13 +44,13 @@ public class SystemManagerForm implements IScreen {
     private JButton purchaseBagsButton;
     private JCheckBox doNotBagItemCheckBox;
     private JButton exitSessionButton;
-    private DebugForm debug;
+    private final DebugForm debug;
+    private PaymentSimualtorGui paymentGui;
 
     // TABLE HEADERS
     private final String nameColumn = "Name";
     private final String priceColumn = "Price";
     private final String baggedColumn = "Bagged?";
-
     private final String[] defaultTableHeaders = new String[]{
             nameColumn,
             priceColumn,
@@ -74,10 +71,10 @@ public class SystemManagerForm implements IScreen {
         itemsTable.setModel(generateModelSkeleton());
 
         // setting the label
-        updateFeedbackLabel();
+        resetFeedbackLabel();
 
         // setting the state of the remove item button
-        updateRemoveItemButtonState();
+        updateButtonStates();
 
         // events
         scanByMainScannerButton.addActionListener(new ActionListener() {
@@ -157,6 +154,13 @@ public class SystemManagerForm implements IScreen {
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.out.println("The customer wishes to pay for their order.");
+
+                // revealing the payment window
+                paymentGui.setVisible(true);
+
+                // blocking buttons
+                blockButtons();
+                updateButtonStates();
             }
         });
         exitSessionButton.addActionListener(new ActionListener() {
@@ -171,12 +175,40 @@ public class SystemManagerForm implements IScreen {
         return new DefaultTableModel(defaultTableHeaders, 0);
     }
 
+    protected void updateButtonStates() {
+        updateRemoveItemButtonState();
+        updatePayForOrderButtonState();
+    }
+
+    protected void updatePayForOrderButtonState() {
+        payForOrderButton.setEnabled(!sm.getItems().isEmpty());
+
+        // disabling if the payment gui is not null and visible
+        if (paymentGui != null) {
+            if (paymentGui.isVisible()) {
+                payForOrderButton.setEnabled(false);
+            }
+        }
+
+        if (sm.isBlocked()) {
+            payForOrderButton.setEnabled(false);
+        }
+    }
+
     /**
      * This function updates the enabled state of the button based on the remove
      * item check boxes.
      */
     protected void updateRemoveItemButtonState() {
+        // enabling the buttom if there is at least one item in the order
         removeItemButton.setEnabled(!sm.getItems().isEmpty());
+
+        // disabling if the payment gui is not null and visible
+        if (paymentGui != null) {
+            if (paymentGui.isVisible()) {
+                removeItemButton.setEnabled(false);
+            }
+        }
     }
 
     @Override
@@ -197,6 +229,10 @@ public class SystemManagerForm implements IScreen {
 
         // updating the touch screen
         touchScreen.getFrame().setContentPane(root);
+
+        // creating the payment gui
+        this.paymentGui = new PaymentSimualtorGui(sm);
+        sm.attach(paymentGui);
     }
 
     /**
@@ -261,7 +297,7 @@ public class SystemManagerForm implements IScreen {
         doNotBagItemCheckBox.setSelected(false);
 
         // updating the state of the remove item button
-        updateRemoveItemButtonState();
+        updateButtonStates();
     }
 
     @Override
@@ -270,14 +306,14 @@ public class SystemManagerForm implements IScreen {
         updateTable();
 
         // updating the state of the remove item button
-        updateRemoveItemButtonState();
+        updateButtonStates();
     }
 
     @Override
     public void notifyStateChange(SessionStatus state) {
         switch (state) {
             case NORMAL -> {
-                updateFeedbackLabel();
+                resetFeedbackLabel();
                 unblockButtons();
             }
             case BLOCKED -> {
@@ -285,7 +321,7 @@ public class SystemManagerForm implements IScreen {
                 determineCause();
             }
             case PAID -> {
-                // TODO do something different here?
+                System.out.println("The session has been paid for.");
                 blockButtons();
             }
             case DISABLED -> {
@@ -297,12 +333,23 @@ public class SystemManagerForm implements IScreen {
     @Override
     public void notifyRefresh() {
         updateTable();
-        updateRemoveItemButtonState();
+        updateButtonStates();
     }
 
     @Override
     public void notifyPaymentAdded(BigDecimal value) {
-        // TODO do something with this
+        // doing nothing with this event
+    }
+
+    @Override
+    public void notifyPaymentWindowClosed() {
+        unblockButtons();
+        updateButtonStates();
+    }
+
+    @Override
+    public void notifyInvalidCardRead(Card card) {
+        // do nothing here
     }
 
     protected void determineCause() {
@@ -319,7 +366,7 @@ public class SystemManagerForm implements IScreen {
      * This is to quickly set the feedback label to nothing,
      * essentially clearing the label.
      */
-    protected void updateFeedbackLabel() {
+    protected void resetFeedbackLabel() {
         updateFeedbackLabel(null);
     }
 
@@ -354,9 +401,9 @@ public class SystemManagerForm implements IScreen {
     protected void setButtonsState(boolean state) {
         scanByMainScannerButton.setEnabled(state);
         scanByHandheldScannerButton.setEnabled(state);
-        payForOrderButton.setEnabled(state);
         searchForItemButton.setEnabled(state);
         addOwnBagsButton.setEnabled(state);
         purchaseBagsButton.setEnabled(state);
+        doNotBagItemCheckBox.setEnabled(state);
     }
 }
