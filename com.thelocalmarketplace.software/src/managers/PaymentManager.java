@@ -131,12 +131,9 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 		long holdNumber = issuer.authorizeHold(cardData.getNumber(), amountDouble);
 
 		// testing the hold number
-		if (holdNumber == -1) {
-			return;
-		} else {
+		if (holdNumber != -1) {
 			payment = sm.getTotalPrice();
 			recordTransaction(cardData, holdNumber, amountDouble);
-			sm.notifyPaid();
 		}
 	}
 
@@ -201,8 +198,6 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 		// machine does not have enough cash
 		// to give change
 		if (!canTenderChange(change)) {
-			this.sm.blockSession();
-			this.sm.notifyAttendant("Not enough cash in machine to return change");
 			throw new NoCashAvailableException();
 		}
 
