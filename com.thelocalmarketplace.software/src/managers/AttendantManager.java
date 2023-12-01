@@ -25,9 +25,13 @@ package managers;
 import com.jjjwelectronics.OverloadedDevice;
 import com.tdc.CashOverloadException;
 import com.tdc.banknote.Banknote;
+import com.tdc.banknote.BanknoteDispensationSlotObserver;
+import com.tdc.banknote.BanknoteDispenserGold;
 import com.tdc.banknote.BanknoteStorageUnit;
+import com.tdc.banknote.BanknoteValidator;
 import com.tdc.banknote.IBanknoteDispenser;
 import com.tdc.coin.Coin;
+import com.tdc.coin.CoinDispenserGold;
 import com.tdc.coin.CoinStorageUnit;
 import com.tdc.coin.ICoinDispenser;
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
@@ -39,6 +43,7 @@ import observers.payment.ReceiptPrinterObserver;
 
 import java.math.BigDecimal;
 import java.util.*;
+import observers.payment.BanknoteMonitor;
 
 public class AttendantManager implements IAttendantManager, IAttendantManagerNotify {
 
@@ -47,6 +52,7 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 	// object references
 	protected SystemManager sm;
+	protected PaymentManager pm;
 
 	// object ownership
 	protected Map<BigDecimal, CoinMonitor> coinMonitorMap = new HashMap<BigDecimal, CoinMonitor>();
@@ -63,8 +69,7 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	protected Map<BigDecimal, Boolean> coinDispenserLow = new HashMap<>();
 	protected Map<BigDecimal, Boolean> banknoteDispenserLow = new HashMap<>();
 
-
-	public AttendantManager(SystemManager sm) {
+	public AttendantManager(SystemManager sm, PaymentManager pm) {
 
 		// checking arguments
 		if (sm == null) {
@@ -73,6 +78,7 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 		// copying the system manager
 		this.sm = sm;
+		this.pm = pm;
 	}
 
 	@Override
@@ -80,33 +86,23 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 		// saving reference
 		this.machine = machine;
 
-        // initializing the maps
-        for (BigDecimal denom : machine.getCoinDenominations()) {
-            coinDispenserLow.put(denom, false);
-        }
-        for (BigDecimal denom : machine.getBanknoteDenominations()) {
-            banknoteDispenserLow.put(denom, false);
-        }
+		// initializing the maps
+		for (BigDecimal denom : machine.getCoinDenominations()) {
+			coinDispenserLow.put(denom, false);
+		}
+		for (BigDecimal denom : machine.getBanknoteDenominations()) {
+			banknoteDispenserLow.put(denom, false);
+		}
 
-		// creating the printer observer
-		rpls = new ReceiptPrinterObserver(this, machine.getPrinter());
+		for (BigDecimal denom : machine.getCoinDenominations()) {
+			coinMonitorMap.put(denom, new CoinMonitor(pm, new CoinDispenserGold(0)));
+		}
 
-		// creating coin dispenser observers
-//		coinMonitorMap.put(new BigDecimal(0.01), new CoinMonitor());
-//		coinMonitorMap.put(new BigDecimal(0.05), new CoinMonitor());
-//		coinMonitorMap.put(new BigDecimal(0.10), new CoinMonitor());
-//		coinMonitorMap.put(new BigDecimal(0.25), new CoinMonitor());
-//		coinMonitorMap.put(new BigDecimal(1.00), new CoinMonitor());
-//		coinMonitorMap.put(new BigDecimal(2.00), new CoinMonitor());
-//
-//		// banknote dispenser observers
-//		bankNoteMonitorMap.put(new BigDecimal(5.00), new CoinMonitor());
-//		bankNoteMonitorMap.put(new BigDecimal(10.00), new CoinMonitor());
-//		bankNoteMonitorMap.put(new BigDecimal(20.00), new CoinMonitor());
-//		bankNoteMonitorMap.put(new BigDecimal(50.00), new CoinMonitor());
-//		bankNoteMonitorMap.put(new BigDecimal(100.00), new CoinMonitor());
+		for (BigDecimal denom : machine.getBanknoteDenominations()) {
+			bankNoteMonitorMap.put(denom, new BanknoteMonitor(pm, new BanknoteDispenserGold()));
+		}
 	}
-	
+
 	@Override
 	public SessionStatus getState() {
 		return sm.getState();
@@ -220,31 +216,31 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 	@Override
 	public void maintainBanknoteDispensers() {
-        // loading the dispensers if they're low
+		// loading the dispensers if they're low
 		for (BigDecimal denom : machine.getBanknoteDenominations()) {
-            Boolean low = banknoteDispenserLow.get(denom);
+			Boolean low = banknoteDispenserLow.get(denom);
 
-            // filling the dispenser if it's low
-            if (low) {
-                // getting the dispenser object
-                IBanknoteDispenser dispenser = machine.getBanknoteDispensers().get(denom);
+			// filling the dispenser if it's low
+			if (low) {
+				// getting the dispenser object
+				IBanknoteDispenser dispenser = machine.getBanknoteDispensers().get(denom);
 
-                // creating an array of banknotes
-                int amount = (int) (dispenser.getCapacity() * 0.5);
-                Banknote[] notes = new Banknote[amount];
+				// creating an array of banknotes
+				int amount = (int) (dispenser.getCapacity() * 0.5);
+				Banknote[] notes = new Banknote[amount];
 
-                for (int i = 0; i < amount; ++i) {
-                    notes[i] = new Banknote(Currency.getInstance(Locale.CANADA), denom);
-                }
+				for (int i = 0; i < amount; ++i) {
+					notes[i] = new Banknote(Currency.getInstance(Locale.CANADA), denom);
+				}
 
-                // loading the machine
-                try {
-                    dispenser.load(notes);
-                } catch (CashOverloadException e) {
-                    notifyAttendant("Loading banknotes into the machine caused an overload.");
-                }
-            }
-        }
+				// loading the machine
+				try {
+					dispenser.load(notes);
+				} catch (CashOverloadException e) {
+					notifyAttendant("Loading banknotes into the machine caused an overload.");
+				}
+			}
+		}
 	}
 
 	@Override
@@ -260,31 +256,31 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 	@Override
 	public void maintainCoinDispensers() {
-        // loading the dispensers if they're low
-        for (BigDecimal denom : machine.getCoinDenominations()) {
-            Boolean low = coinDispenserLow.get(denom);
+		// loading the dispensers if they're low
+		for (BigDecimal denom : machine.getCoinDenominations()) {
+			Boolean low = coinDispenserLow.get(denom);
 
-            // filling the dispenser if it's low
-            if (low) {
-                // getting the dispenser object
-                ICoinDispenser dispenser = machine.getCoinDispensers().get(denom);
+			// filling the dispenser if it's low
+			if (low) {
+				// getting the dispenser object
+				ICoinDispenser dispenser = machine.getCoinDispensers().get(denom);
 
-                // creating an array of banknotes
-                int amount = (int) (dispenser.getCapacity() * 0.5);
-                Coin[] coins = new Coin[amount];
+				// creating an array of banknotes
+				int amount = (int) (dispenser.getCapacity() * 0.5);
+				Coin[] coins = new Coin[amount];
 
-                for (int i = 0; i < amount; ++i) {
-                    coins[i] = new Coin(Currency.getInstance(Locale.CANADA), denom);
-                }
+				for (int i = 0; i < amount; ++i) {
+					coins[i] = new Coin(Currency.getInstance(Locale.CANADA), denom);
+				}
 
-                // loading the machine
-                try {
-                    dispenser.load(coins);
-                } catch (CashOverloadException e) {
-                    notifyAttendant("Loading banknotes into the machine caused an overload.");
-                }
-            }
-        }
+				// loading the machine
+				try {
+					dispenser.load(coins);
+				} catch (CashOverloadException e) {
+					notifyAttendant("Loading banknotes into the machine caused an overload.");
+				}
+			}
+		}
 	}
 
 	@Override

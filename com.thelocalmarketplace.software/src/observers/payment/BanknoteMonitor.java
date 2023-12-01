@@ -33,12 +33,12 @@ public class BanknoteMonitor extends AbstractComponentObserver implements Bankno
 
     @Override
     public void banknoteAdded(IBanknoteDispenser dispenser, Banknote banknote) {
-
+        banknote.getDenomination();
     }
 
     @Override
     public void banknoteRemoved(IBanknoteDispenser dispenser, Banknote banknote) {
-
+        
     }
 
     @Override
