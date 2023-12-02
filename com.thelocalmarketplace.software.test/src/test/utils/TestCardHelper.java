@@ -16,14 +16,16 @@ import com.thelocalmarketplace.hardware.external.CardIssuer;
 import utils.CardHelper;
 
 public class TestCardHelper {
-
+	//Instance variable is create to use CardIssuer in test cases
 	private CardIssuer issuer;
 
+	//setup method is used to initialize CardIssuer before test cases
 	@Before
 	public void setup() {
 		this.issuer = CardHelper.createCardIssuer();
 	}
 
+	//test case for if the CardIssuer created is not null
 	@Test
 	public void testCreateCardIssuerNotNull() {
 		CardIssuer i = CardHelper.createCardIssuer();
@@ -31,16 +33,19 @@ public class TestCardHelper {
 		assertNotNull(i);
 	}
 
+	//test case to give an IllegalArgumentException if creating card with null issuer
 	@Test(expected = IllegalArgumentException.class)
 	public void testCreateCardNullIssuer() {
 		CardHelper.createCard(null);
 	}
 
+	//test case to give an IllegalArgumentException if creating a card with invalid amount
 	@Test(expected = IllegalArgumentException.class)
 	public void testCreateCardInvalidAmount() {
 		CardHelper.createCard(issuer, 0);
 	}
 
+	//test case to ensure multiple cards can be created and blocked
 	@Test(timeout = 7000)
 	public void testCreateCardEnsureMultipleUnique() {
 		Card[] cards = new Card[10];
