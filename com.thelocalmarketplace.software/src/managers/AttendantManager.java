@@ -55,7 +55,7 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 	// object ownership
 	protected Map<BigDecimal, CoinMonitor> coinMonitorMap = new HashMap<BigDecimal, CoinMonitor>();
-	protected Map<BigDecimal, CoinMonitor> bankNoteMonitorMap = new HashMap<BigDecimal, CoinMonitor>();
+	protected Map<BigDecimal, BanknoteMonitor> bankNoteMonitorMap = new HashMap<BigDecimal, BanknoteMonitor>();
 	protected ReceiptPrinterObserver rpls;
 
 	// vars
@@ -199,6 +199,11 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 		if (unit.getCapacity() <= unit.getCoinCount()) {
 			notifyCoinsFull(unit);
 		}
+
+		// if coins almost full
+		if (unit.getCapacity() * 0.90 <= unit.getCoinCount()) {
+			notifyAttendant("The " + unit + " is over 90% full!");
+		}
 	}
 
 	@Override
@@ -208,6 +213,11 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 		// if banknotes full
 		if (unit.getCapacity() <= unit.getBanknoteCount()) {
 			notifyBanknotesFull(unit);
+		}
+
+		// if banknotes almost full
+		if (unit.getCapacity() * 0.90 <= unit.getBanknoteCount()) {
+			notifyAttendant("The " + unit + " is over 90% full!");
 		}
 	}
 
