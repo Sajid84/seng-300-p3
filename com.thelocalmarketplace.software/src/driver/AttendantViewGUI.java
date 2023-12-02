@@ -23,6 +23,13 @@ import javax.swing.JFrame;
 
 import java.awt.Component;
 import java.awt.Color;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.JTextPane;
+import javax.swing.JTextArea;
+import javax.swing.DropMode;
+import java.awt.Font;
+import javax.swing.UIManager;
 
 public class AttendantViewGUI extends JPanel implements IScreen{
 
@@ -38,25 +45,38 @@ public class AttendantViewGUI extends JPanel implements IScreen{
 	private JButton UnloadBanknotesButton;
 	private JButton UnblockSessionButton;
 	private JButton ExtraActionButton;
-	private JPanel EventViewerPanel;
+	private JPanel EventTextHolder;
 
 	/**
 	 * Create the panel.
 	 */
 	public AttendantViewGUI(SystemManager sm) {
-		this.sm = sm;
+		//this.sm = sm;
 		
 		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		
-		EventViewerPanel = new JPanel();
-		EventViewerPanel.setBackground(new Color(192, 192, 192));
+		JPanel EventViewerPanel = new JPanel();
+		EventViewerPanel.setBackground(new Color(240, 240, 240));
 		EventViewerPanel.setPreferredSize(new Dimension(200, 600));
 		EventViewerPanel.setMinimumSize(new Dimension(70, 10));
 		EventViewerPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		add(EventViewerPanel);
 		EventViewerPanel.setLayout(new BoxLayout(EventViewerPanel, BoxLayout.Y_AXIS));
 		
+		JScrollPane SysEventsScrollPane = new JScrollPane();
+		SysEventsScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		EventViewerPanel.add(SysEventsScrollPane);
+		
+		EventTextHolder = new JPanel();
+		EventTextHolder.setBackground(new Color(192, 192, 192));
+		EventTextHolder.setBorder(null);
+		SysEventsScrollPane.setViewportView(EventTextHolder);
+		EventTextHolder.setLayout(new BoxLayout(EventTextHolder, BoxLayout.Y_AXIS));
+		
+		
+		
 		JPanel ButtonPanel = new JPanel();
+		ButtonPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		add(ButtonPanel);
 		ButtonPanel.setLayout(new GridLayout(5, 2, 5, 5));
 		
@@ -66,6 +86,7 @@ public class AttendantViewGUI extends JPanel implements IScreen{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				sm.maintainInk();
+				// why is there even in in the first place? aren't receipts typically heat based?
 				
 			}
 			
@@ -78,7 +99,6 @@ public class AttendantViewGUI extends JPanel implements IScreen{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				sm.requestEnableMachine();
-				// TODO Auto-generated method stub
 				
 			}
 			
@@ -91,7 +111,6 @@ public class AttendantViewGUI extends JPanel implements IScreen{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				sm.maintainPaper();
-				// TODO Auto-generated method stub
 				
 			}
 			
@@ -104,7 +123,6 @@ public class AttendantViewGUI extends JPanel implements IScreen{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				sm.requestDisableMachine();
-				// TODO Auto-generated method stub
 				
 			}
 			
@@ -117,7 +135,6 @@ public class AttendantViewGUI extends JPanel implements IScreen{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				sm.maintainCoinDispensers();
-				// TODO Auto-generated method stub
 				
 			}
 			
@@ -130,7 +147,6 @@ public class AttendantViewGUI extends JPanel implements IScreen{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				sm.maintainCoinStorage();
-				// TODO Auto-generated method stub
 				
 			}
 			
@@ -143,7 +159,6 @@ public class AttendantViewGUI extends JPanel implements IScreen{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				sm.maintainBanknoteDispensers();
-				// TODO Auto-generated method stub
 				
 			}
 			
@@ -156,7 +171,6 @@ public class AttendantViewGUI extends JPanel implements IScreen{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				sm.maintainBanknoteStorage();
-				// TODO Auto-generated method stub
 				
 			}
 			
@@ -169,7 +183,6 @@ public class AttendantViewGUI extends JPanel implements IScreen{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				sm.unblockSession();
-				// TODO Auto-generated method stub
 				
 			}
 			
@@ -191,6 +204,14 @@ public class AttendantViewGUI extends JPanel implements IScreen{
 	}
 	
 	public void AddEvent(String eventName) {
+		EventPanel newEvent = new EventPanel(this, eventName);
+		
+		EventTextHolder.add(newEvent);
+		
+	}
+	
+	public void removeEvent(EventPanel event) {
+		EventTextHolder.remove(event);
 		
 	}
 
@@ -252,5 +273,4 @@ public class AttendantViewGUI extends JPanel implements IScreen{
 		// TODO Auto-generated method stub
 		
 	}
-
 }
