@@ -173,22 +173,22 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 	@Override
 	public void notifyCoinEmitted(BigDecimal denom) {
-		checkCoinDispenserState(denom, false);
+		checkCoinDispenserState(denom);
 	}
 
 	@Override
 	public void notifyBanknoteEmitted(BigDecimal denom) {
-		checkBanknoteDispenserState(denom, false);
+		checkBanknoteDispenserState(denom);
 	}
 
 	@Override
 	public void notifyCoinAdded(BigDecimal denom) {
-		checkCoinDispenserState(denom, true);
+		checkCoinDispenserState(denom);
 	}
 
 	@Override
 	public void notifyBanknoteAdded(BigDecimal denom) {
-		checkBanknoteDispenserState(denom, true);
+		checkBanknoteDispenserState(denom);
 	}
 
 	@Override
@@ -197,7 +197,7 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 		// if coins full
 		if (unit.getCapacity() <= unit.getCoinCount()) {
-			notifyCoinsFull(unit);
+			notifyAttendant("The " + unit + " is full!");
 		}
 
 		// if coins almost full
@@ -212,7 +212,7 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 		// if banknotes full
 		if (unit.getCapacity() <= unit.getBanknoteCount()) {
-			notifyBanknotesFull(unit);
+			notifyAttendant("The " + unit + " is full!");
 		}
 
 		// if banknotes almost full
@@ -221,29 +221,17 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 		}
 	}
 
-	protected void checkCoinDispenserState(BigDecimal denom, boolean added) {
-		// coin added
-		if (added) {
-			coinMonitorMap.get(denom).coinAdded(machine.getCoinDispensers().get(denom), new Coin(denom));
-		}
-		// coin removed
-		else {
-			coinMonitorMap.get(denom).coinRemoved(machine.getCoinDispensers().get(denom), new Coin(denom));
-		}
+	protected void checkCoinDispenserState(BigDecimal denom) {
+		// check if they are below 10%
 
+		// if below 10% then
+		// coinDispenserLow.put(denom, true);
 	}
 
-	protected void checkBanknoteDispenserState(BigDecimal denom, boolean added) {
+	protected void checkBanknoteDispenserState(BigDecimal denom) {
 		// banknote added
-		if (added) {
-			bankNoteMonitorMap.get(denom).banknoteAdded(machine.getBanknoteDispensers().get(denom),
-					new Banknote(Currency.getInstance(Locale.CANADA), denom));
-		}
-		// banknote removed
-		else {
-			bankNoteMonitorMap.get(denom).banknoteRemoved(machine.getBanknoteDispensers().get(denom),
-					new Banknote(Currency.getInstance(Locale.CANADA), denom));
-		}
+		// if below 10% then
+		// banknoteDispenserLow.put(denom, true);
 	}
 
 	@Override

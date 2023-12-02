@@ -34,16 +34,18 @@ public class BanknoteMonitor extends AbstractComponentObserver implements Bankno
 
     @Override
     public void banknoteAdded(IBanknoteDispenser dispenser, Banknote banknote) {
-        banknote.getDenomination();
-        dispenser.getCapacity();
         // if dispenser.getCapacity * 0.90 <= amount of banknotes
-        // if 90% of the capacity is less then the amount of banknotes then notify attendent
+        // if 90% of the capacity is less then the amount of banknotes then notify
+        // attendent
+        am.notifyBanknoteAdded(banknote.getDenomination());
     }
 
     @Override
     public void banknoteRemoved(IBanknoteDispenser dispenser, Banknote banknote) {
         // if dispenser.getCapacity * 0.10 >= amount of banknotes
-        // if the amount of banknotes is less than 10% the capacity then notify the attendant
+        // if the amount of banknotes is less than 10% the capacity then notify the
+        // attendant
+        am.notifyBanknoteEmitted(banknote.getDenomination());
     }
 
     @Override

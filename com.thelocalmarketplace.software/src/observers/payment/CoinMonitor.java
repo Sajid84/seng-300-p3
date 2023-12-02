@@ -35,14 +35,13 @@ public class CoinMonitor extends AbstractComponentObserver implements CoinDispen
 
     @Override
     public void coinAdded(ICoinDispenser dispenser, Coin coin) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'coinAdded'");
+        am.notifyCoinAdded(coin.getValue());
     }
 
     @Override
     public void coinRemoved(ICoinDispenser dispenser, Coin coin) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'coinRemoved'");
+        am.notifyCoinEmitted(coin.getValue());
     }
 
     @Override
