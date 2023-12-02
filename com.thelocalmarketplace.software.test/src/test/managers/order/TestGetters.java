@@ -34,6 +34,7 @@ public class TestGetters {
 		om = sm.omStub;
 	}
 
+	//Testing that getItems includes all added products.
 	@Test
 	public void testGetProductsContainsAllAdded() {
 		Item item = DatabaseHelper.createRandomBarcodedItem();
@@ -53,11 +54,14 @@ public class TestGetters {
 
 	@Test
 	public void testGetProductsHasNonOnCreation() {
+		//setup
 		List<Pair<Item, Boolean>> prods = om.getItems();
 
+		//asserting
 		assertEquals(prods.size(), 0);
 	}
 
+	//Add a null item. Expect that getTotalPrice throws an expection.
 	@Test(expected = IllegalArgumentException.class)
 	public void testTotalPriceThrowsOnNull() {
 		om.addItem(null);
@@ -65,6 +69,7 @@ public class TestGetters {
 		om.getTotalPrice();
 	}
 
+	//Add a null item. Expect that getExpectedMass throws an expection.
 	@Test(expected = IllegalArgumentException.class)
 	public void testExpectedMassThrowsOnNull() {
 		om.addItem(null);
@@ -72,8 +77,10 @@ public class TestGetters {
 		om.getExpectedMass();
 	}
 
+	//Testing that getMass and getExpectedMass are equal 
 	@Test
 	public void testExpectedMassEqualsProductMasses() {
+		//add item
 		Item item = DatabaseHelper.createRandomBarcodedItem();
 		om.addItem(item);
 
@@ -83,22 +90,28 @@ public class TestGetters {
 		assertEquals(item.getMass().inGrams(), mass);
 	}
 
+	//Testing ExpectedMass to not be null
 	@Test
 	public void testExpectedMassNotNull() {
 		assertNotNull(om.getExpectedMass());
 	}
 
+	//No items added. Expect to getExpectedMass is equal to zero.
 	@Test
 	public void testExpectedMassZeroWithNoItems() {
 		assertEquals(om.getItems().size(), 0);
 		assertEquals(om.getExpectedMass(), BigDecimal.ZERO);
 	}
 
+	
+	//Test adjustment.
 	@Test
 	public void testNoAdjustmentOnCreation() {
 		assertEquals(om.getWeightAdjustment(), BigDecimal.ZERO);
 	}
 	
+	
+	//No items added. Expect to getTotalPrice is equal to zero.
 	@Test
 	public void testGetTotalPriceReturnsZeroWithNoProducts() {
 		assertEquals(om.getTotalPrice(), BigDecimal.ZERO);
