@@ -4,7 +4,6 @@ import com.tdc.banknote.Banknote;
 import com.tdc.banknote.BanknoteDispenserObserver;
 import com.tdc.banknote.IBanknoteDispenser;
 import managers.AttendantManager;
-import managers.PaymentManager;
 import observers.AbstractComponentObserver;
 
 public class BanknoteMonitor extends AbstractComponentObserver implements BanknoteDispenserObserver {
@@ -20,6 +19,7 @@ public class BanknoteMonitor extends AbstractComponentObserver implements Bankno
 
         // saving the reference
         this.am = am;
+        disp.attach(this);
     }
 
     @Override

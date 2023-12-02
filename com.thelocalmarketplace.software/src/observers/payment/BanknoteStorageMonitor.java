@@ -14,12 +14,14 @@ public class BanknoteStorageMonitor extends AbstractComponentObserver implements
 
     public BanknoteStorageMonitor(AttendantManager am, IComponent<? extends IComponentObserver> d) {
         super(d);
+
         // TODO Auto-generated constructor stub
         if (am == null) {
             throw new IllegalArgumentException("The attendant manager cannot be null.");
         }
 
         this.am = am;
+        d.attach(this);
     }
 
     @Override

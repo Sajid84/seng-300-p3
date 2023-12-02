@@ -20,6 +20,7 @@ public class CoinStorageMonitor extends AbstractComponentObserver implements Coi
         }
 
         this.am = am;
+        d.attach(this);
     }
 
     @Override

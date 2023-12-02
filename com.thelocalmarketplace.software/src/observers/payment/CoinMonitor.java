@@ -19,6 +19,7 @@ public class CoinMonitor extends AbstractComponentObserver implements CoinDispen
 
         // saving the reference
         this.am = am;
+        disp.attach(this);
     }
 
     @Override
