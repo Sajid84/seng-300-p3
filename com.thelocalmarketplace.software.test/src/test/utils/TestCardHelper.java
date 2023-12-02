@@ -61,6 +61,7 @@ public class TestCardHelper {
 		}
 	}
 
+	//test case to make sure the card created is not null
 	@Test
 	public void testCreateCardNotNull() {
 		Card card = CardHelper.createCard(issuer);
@@ -68,6 +69,7 @@ public class TestCardHelper {
 		assertNotNull(card);
 	}
 
+	//test case to make sure invalid card is not null
 	@Test
 	public void testCreateInvalidCardNotNull() {
 		Card card = CardHelper.createCard(issuer);
@@ -75,12 +77,14 @@ public class TestCardHelper {
 		assertNotNull(card);
 	}
 
+	//test case to make sure that a non-issued card is able to be created without being blocked
 	@Test
 	public void testCreateNullCard() {
 		Card card = CardHelper.createNonIssuedCard();
 		assertFalse(issuer.block(card.number));
 	}
 
+	//test case to make sure a card that is created is added to the issuer
 	@Test
 	public void testCreateCardInIssuer() {
 		Card card = CardHelper.createCard(issuer);
@@ -89,6 +93,7 @@ public class TestCardHelper {
 		assertTrue(issuer.block(card.number));
 	}
 
+	//test case to make sure card has a valid number
 	@Test
 	public void testCardHasValidNumber() {
 		Card card = CardHelper.createCard(issuer);
@@ -102,6 +107,7 @@ public class TestCardHelper {
 		}
 	}
 
+	//test case to make sure the card has a valid CCV
 	@Test
 	public void testCardHasValidCCV() {
 		Card card = CardHelper.createCard(issuer);
@@ -116,6 +122,7 @@ public class TestCardHelper {
 		}
 	}
 
+	//test case to make sure card has a valid kind
 	@Test
 	public void testCardHasValidKind() {
 		Card card = CardHelper.createCard(issuer);
@@ -124,6 +131,7 @@ public class TestCardHelper {
 		assertTrue(card.kind.length() > 0);
 	}
 
+	//test case to make sure card has a valid holder
 	@Test
 	public void testCardHasValidHolder() {
 		Card card = CardHelper.createCard(issuer);
