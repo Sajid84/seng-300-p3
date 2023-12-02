@@ -48,9 +48,8 @@ public class EventPanel extends JPanel {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				avgui.removeEvent(self);
 				// kinda wish I could explicitly tell the system to destroy this, but i just gotta trust java's garbage collector
-				
+				avgui.removeEvent(self);
 			}});
 		add(ResolveIssueButton);
 

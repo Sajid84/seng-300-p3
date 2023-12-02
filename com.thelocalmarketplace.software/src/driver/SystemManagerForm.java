@@ -48,6 +48,7 @@ public class SystemManagerForm implements IScreen {
     protected JLabel priceLabel;
     private final DebugForm debug;
     private PaymentSimualtorGui paymentGui;
+    private AddItemGui addItemGui;
 
     // TABLE HEADERS
     private final String nameColumn = "Name";
@@ -174,6 +175,19 @@ public class SystemManagerForm implements IScreen {
                 System.out.println("Exiting the session.");
             }
         });
+        searchForItemButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("The customer wishes to pay for their order.");
+
+                // revealing the payment window
+                addItemGui.setVisible(true);
+
+                // blocking buttons
+                blockButtons();
+                updateButtonStates();
+            }
+        });
     }
 
     protected DefaultTableModel generateModelSkeleton() {
@@ -237,6 +251,11 @@ public class SystemManagerForm implements IScreen {
         // creating the payment gui
         this.paymentGui = new PaymentSimualtorGui(sm);
         sm.attach(paymentGui);
+
+        // creating the add item gui
+        // TODO this will crash because the program cannot find the jgoodies jar.
+//        this.addItemGui = new AddItemGui(sm);
+        sm.attach(sm);
     }
 
     /**
@@ -335,6 +354,9 @@ public class SystemManagerForm implements IScreen {
                 determineCause();
             }
             case PAID -> {
+                /**
+                 * For reasons that I cannot comprehend, this doesn't actually work.
+                 */
                 System.out.println("The session has been paid for.");
                 blockButtons();
             }
