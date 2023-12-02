@@ -48,6 +48,7 @@ public class SystemManagerForm implements IScreen {
     protected JLabel priceLabel;
     private final DebugForm debug;
     private PaymentSimualtorGui paymentGui;
+    private SearchItemGui searchGui;
 
     // TABLE HEADERS
     private final String nameColumn = "Name";
@@ -125,6 +126,14 @@ public class SystemManagerForm implements IScreen {
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Searching for item was initiated");
+                
+
+                // revealing the payment window
+                searchGui.setVisible(true);
+
+                // blocking buttons
+                blockButtons();
+                updateButtonStates();     
             }
         });
         doNotBagItemCheckBox.addActionListener(new ActionListener() {
@@ -237,6 +246,10 @@ public class SystemManagerForm implements IScreen {
         // creating the payment gui
         this.paymentGui = new PaymentSimualtorGui(sm);
         sm.attach(paymentGui);
+        
+        // creating the search gui
+        this.searchGui = new SearchItemGui(sm);
+        sm.attach(searchGui);
     }
 
     /**
