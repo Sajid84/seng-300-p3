@@ -385,7 +385,7 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	public void notifyBagDispensed() {
 		// TODO implement this method
 		BarcodedItem bagProduct = createCustomerBags();
-		sm.addItemToOrder(bagProduct);
+		sm.addItemToOrder(bagProduct, ScanType.MAIN)
 	}
 
 	@Override
