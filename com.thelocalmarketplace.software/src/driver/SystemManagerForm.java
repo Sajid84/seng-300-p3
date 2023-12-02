@@ -249,13 +249,13 @@ public class SystemManagerForm implements IScreen {
         debugView.add(debug.getPanel());
 
         // creating the payment gui
-        this.paymentGui = new PaymentSimualtorGui(sm);
+        paymentGui = new PaymentSimualtorGui(sm);
         sm.attach(paymentGui);
 
         // creating the add item gui
         // TODO this will crash because the program cannot find the jgoodies jar.
-//        this.addItemGui = new AddItemGui(sm);
-        sm.attach(sm);
+        addItemGui = new AddItemGui(sm);
+        sm.attach(addItemGui);
     }
 
     /**
