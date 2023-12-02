@@ -222,16 +222,23 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	}
 
 	protected void checkCoinDispenserState(BigDecimal denom) {
-		// check if they are below 10%
-
-		// if below 10% then
-		// coinDispenserLow.put(denom, true);
+		if (machine.getBanknoteDispensers().get(denom).getCapacity() * 0.10 <= machine.getBanknoteStorage()
+				.getBanknoteCount()) {
+			coinDispenserLow.put(denom, true);
+		} else if (machine.getBanknoteDispensers().get(denom).getCapacity() * 0.10 >= machine.getBanknoteStorage()
+				.getBanknoteCount()) {
+			coinDispenserLow.put(denom, false);
+		}
 	}
 
 	protected void checkBanknoteDispenserState(BigDecimal denom) {
-		// banknote added
-		// if below 10% then
-		// banknoteDispenserLow.put(denom, true);
+		if (machine.getBanknoteDispensers().get(denom).getCapacity() * 0.10 <= machine.getBanknoteStorage()
+				.getBanknoteCount()) {
+			banknoteDispenserLow.put(denom, true);
+		} else if (machine.getBanknoteDispensers().get(denom).getCapacity() * 0.10 >= machine.getBanknoteStorage()
+				.getBanknoteCount()) {
+			banknoteDispenserLow.put(denom, false);
+		}
 	}
 
 	@Override
