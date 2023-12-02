@@ -12,7 +12,7 @@ public class BanknoteStorageMonitor extends AbstractComponentObserver implements
     // object references
     AttendantManager am;
 
-    public BanknoteStorageMonitor(AttendantManager am, IComponent<? extends IComponentObserver> d) {
+    public BanknoteStorageMonitor(AttendantManager am, BanknoteStorageUnit d) {
         super(d);
 
         // TODO Auto-generated constructor stub
@@ -26,26 +26,22 @@ public class BanknoteStorageMonitor extends AbstractComponentObserver implements
 
     @Override
     public void banknotesFull(BanknoteStorageUnit unit) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'banknotesFull'");
+        am.notifyBanknoteStorageUnitStateChange(unit);
     }
 
     @Override
     public void banknoteAdded(BanknoteStorageUnit unit) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'banknoteAdded'");
+        am.notifyBanknoteStorageUnitStateChange(unit);
     }
 
     @Override
     public void banknotesLoaded(BanknoteStorageUnit unit) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'banknotesLoaded'");
+        am.notifyBanknoteStorageUnitStateChange(unit);
     }
 
     @Override
     public void banknotesUnloaded(BanknoteStorageUnit unit) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'banknotesUnloaded'");
+        am.notifyBanknoteStorageUnitStateChange(unit);
     }
 
 }

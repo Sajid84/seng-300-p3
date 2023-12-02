@@ -24,31 +24,31 @@ public class BanknoteMonitor extends AbstractComponentObserver implements Bankno
 
     @Override
     public void moneyFull(IBanknoteDispenser dispenser) {
-
+        am.notifyBanknoteDispenserStateChange(dispenser);
     }
 
     @Override
     public void banknotesEmpty(IBanknoteDispenser dispenser) {
-
+        am.notifyBanknoteDispenserStateChange(dispenser);
     }
 
     @Override
     public void banknoteAdded(IBanknoteDispenser dispenser, Banknote banknote) {
-        am.notifyBanknoteAdded(banknote.getDenomination());
+        am.notifyBanknoteDispenserStateChange(dispenser);
     }
 
     @Override
     public void banknoteRemoved(IBanknoteDispenser dispenser, Banknote banknote) {
-        am.notifyBanknoteEmitted(banknote.getDenomination());
+        am.notifyBanknoteDispenserStateChange(dispenser);
     }
 
     @Override
     public void banknotesLoaded(IBanknoteDispenser dispenser, Banknote... banknotes) {
-
+        am.notifyBanknoteDispenserStateChange(dispenser);
     }
 
     @Override
     public void banknotesUnloaded(IBanknoteDispenser dispenser, Banknote... banknotes) {
-
+        am.notifyBanknoteDispenserStateChange(dispenser);
     }
 }

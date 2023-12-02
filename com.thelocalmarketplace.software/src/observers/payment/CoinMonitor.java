@@ -24,37 +24,32 @@ public class CoinMonitor extends AbstractComponentObserver implements CoinDispen
 
     @Override
     public void coinsFull(ICoinDispenser dispenser) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'coinsFull'");
+        am.notifyCoinDispenserStateChange(dispenser);
     }
 
     @Override
     public void coinsEmpty(ICoinDispenser dispenser) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'coinsEmpty'");
+        am.notifyCoinDispenserStateChange(dispenser);
     }
 
     @Override
     public void coinAdded(ICoinDispenser dispenser, Coin coin) {
-        am.notifyCoinAdded(coin.getValue());
+        am.notifyCoinDispenserStateChange(dispenser);
     }
 
     @Override
     public void coinRemoved(ICoinDispenser dispenser, Coin coin) {
-        // TODO Auto-generated method stub
-        am.notifyCoinEmitted(coin.getValue());
+        am.notifyCoinDispenserStateChange(dispenser);
     }
 
     @Override
     public void coinsLoaded(ICoinDispenser dispenser, Coin... coins) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'coinsLoaded'");
+        am.notifyCoinDispenserStateChange(dispenser);
     }
 
     @Override
     public void coinsUnloaded(ICoinDispenser dispenser, Coin... coins) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'coinsUnloaded'");
+        am.notifyCoinDispenserStateChange(dispenser);
     }
 
 }

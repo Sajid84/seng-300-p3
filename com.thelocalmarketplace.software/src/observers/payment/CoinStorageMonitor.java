@@ -12,7 +12,7 @@ public class CoinStorageMonitor extends AbstractComponentObserver implements Coi
     // object references
     AttendantManager am;
 
-    public CoinStorageMonitor(AttendantManager am, IComponent<? extends IComponentObserver> d) {
+    public CoinStorageMonitor(AttendantManager am, CoinStorageUnit d) {
         super(d);
 
         if (am == null) {
@@ -25,26 +25,22 @@ public class CoinStorageMonitor extends AbstractComponentObserver implements Coi
 
     @Override
     public void coinsFull(CoinStorageUnit unit) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'coinsFull'");
+        am.notifyCoinStorageUnitStateChange(unit);
     }
 
     @Override
     public void coinAdded(CoinStorageUnit unit) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'coinAdded'");
+        am.notifyCoinStorageUnitStateChange(unit);
     }
 
     @Override
     public void coinsLoaded(CoinStorageUnit unit) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'coinsLoaded'");
+        am.notifyCoinStorageUnitStateChange(unit);
     }
 
     @Override
     public void coinsUnloaded(CoinStorageUnit unit) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'coinsUnloaded'");
+        am.notifyCoinStorageUnitStateChange(unit);
     }
 
 }
