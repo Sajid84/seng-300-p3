@@ -38,6 +38,11 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
     private JButton InsertCoinButton;
     private JComboBox CashValueDropdown;
     private JButton InsertBanknoteButton;
+    private JLabel AmountInsertedLabel;
+    private JLabel RemainingDueLabel;
+    
+    private String AmountInPre = "Amount Inserted: $";
+    private String AmountDuePre = "Remaining Due: $";
 
     @Override
     public JPanel getPanel() {
@@ -47,6 +52,11 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
     @Override
     public JFrame getFrame() {
         return this;
+    }
+    
+    private void updateMoneyLabels() {
+    	AmountInsertedLabel.setText(AmountInPre + sm.getCustomerPayment().toString());
+    	RemainingDueLabel.setText(AmountDuePre + sm.getRemainingBalance().toString());
     }
 
     protected void createDenominationMapping() {
@@ -97,6 +107,7 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Swiping a card.");
                 sm.swipeCard(simulatedCard);
+                updateMoneyLabels();
             }
         });
         CardPanel.add(SwipeCardButton);
@@ -108,6 +119,8 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //sm.tapCard(SimulatedCard); TODO: get actual implementation
+                updateMoneyLabels();
+
             }
         });
         CardPanel.add(TapCardButton);
@@ -119,6 +132,7 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //sm.insertCard(SimulatedCard); TODO: get actual implementation
+            	updateMoneyLabels();
 
             }
         });
@@ -151,6 +165,8 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
                 BigDecimal denom = stringToCoinDenom.get(CoinValueDropdown.getSelectedItem());
                 sm.insertCoin(new Coin(Currency.getInstance("CAD"), denom));
                 System.out.println("Inserted a coin of value: " + denom.toString());
+                updateMoneyLabels();
+
             }
         });
         CoinPanel.add(InsertCoinButton);
@@ -177,19 +193,23 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
                 BigDecimal denom = stringToBanknoteDenom.get(CashValueDropdown.getSelectedItem());
                 sm.insertBanknote(new Banknote(Currency.getInstance("CAD"), denom));
                 System.out.println("Inserted a banknote of value: " + denom.toString());
+                updateMoneyLabels();
+
             }
         });
         CashPanel.add(InsertBanknoteButton);
         
-        JPanel panel = new JPanel();
-        contentPane.add(panel, BorderLayout.SOUTH);
-        panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+        JPanel MoneyTrackerPanel = new JPanel();
+        contentPane.add(MoneyTrackerPanel, BorderLayout.SOUTH);
+        MoneyTrackerPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
         
-        JLabel AmountInsertedLabel = new JLabel("Amount Inserted:");
-        panel.add(AmountInsertedLabel);
+        AmountInsertedLabel = new JLabel("Amount Inserted: $");
+        MoneyTrackerPanel.add(AmountInsertedLabel);
         
-        JLabel RemainingDueLabel = new JLabel("Remaining Due:");
-        panel.add(RemainingDueLabel);
+        RemainingDueLabel = new JLabel("Remaining Due: $");
+        MoneyTrackerPanel.add(RemainingDueLabel);
+        updateMoneyLabels();
+
 
         this.addWindowListener(new WindowAdapter() {
             @Override
