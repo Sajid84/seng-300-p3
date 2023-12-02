@@ -224,6 +224,21 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 
 		this.pm.tapCard(card);
 	}
+	
+	@Override
+	public void insertCard(Card card, String pin) throws IOException {
+		if (getState() != SessionStatus.NORMAL)
+			throw new IllegalStateException("cannot insert card when PAID");
+		this.pm.insertCard(card, pin);
+	}
+	
+	@Override
+	public boolean isMembership(Card card) throws IOException {
+		if (card.kind.toLowerCase() == "membership") {
+			return true;
+		}
+		return false;
+	}
 
 	public boolean tenderChange() {
 		if (!isPaid())

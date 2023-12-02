@@ -35,17 +35,37 @@ public interface IPaymentManager extends IManager {
 	 */
 	void swipeCard(Card card) throws IOException;
 
+
 	/**
-	 * Allows the customer to tap a credit card
+	 * Allows the customer to insert their card
+	 * 
+	 * @param card 
 	 * @throws IOException
 	 */
 	void tapCard(Card card) throws IOException;
 
 	/**
+	 * Allows the customer to insert their credit card
+	 *
+	 * @param card
+	 * @throws IOException
+	 */
+	void insertCard(Card card, String pin) throws IOException;
+	
+	/**
+	 * Checks to see if card is a membership card
+	 * 
+	 * @param card a card
+	 * @throws IOException
+	 */
+	boolean isMembership(Card card) throws IOException;
+	
+	/**
 	 * Allows the customer to insert a coin into the system.
 	 * 
 	 * @param coin a coin
 	 */
+	
 	void insertCoin(Coin coin) throws DisabledException, CashOverloadException;
 
 	/**
