@@ -3,22 +3,23 @@ package observers.payment;
 import com.tdc.banknote.Banknote;
 import com.tdc.banknote.BanknoteDispenserObserver;
 import com.tdc.banknote.IBanknoteDispenser;
+import managers.AttendantManager;
 import managers.PaymentManager;
 import observers.AbstractComponentObserver;
 
 public class BanknoteMonitor extends AbstractComponentObserver implements BanknoteDispenserObserver {
     // object references
-    PaymentManager pm;
+    AttendantManager am;
 
-    public BanknoteMonitor(PaymentManager pm, IBanknoteDispenser disp) {
+    public BanknoteMonitor(AttendantManager am, IBanknoteDispenser disp) {
         super(disp);
 
-        if (pm == null) {
-            throw new IllegalArgumentException("The PaymentManager cannot be null.");
+        if (am == null) {
+            throw new IllegalArgumentException("The attendant manager cannot be null.");
         }
 
         // saving the reference
-        this.pm = pm;
+        this.am = am;
     }
 
     @Override

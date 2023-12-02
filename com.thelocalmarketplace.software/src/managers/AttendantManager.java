@@ -52,7 +52,6 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 	// object references
 	protected SystemManager sm;
-	protected PaymentManager pm;
 
 	// object ownership
 	protected Map<BigDecimal, CoinMonitor> coinMonitorMap = new HashMap<BigDecimal, CoinMonitor>();
@@ -69,7 +68,7 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	protected Map<BigDecimal, Boolean> coinDispenserLow = new HashMap<>();
 	protected Map<BigDecimal, Boolean> banknoteDispenserLow = new HashMap<>();
 
-	public AttendantManager(SystemManager sm, PaymentManager pm) {
+	public AttendantManager(SystemManager sm) {
 
 		// checking arguments
 		if (sm == null) {
@@ -78,7 +77,6 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 		// copying the system manager
 		this.sm = sm;
-		this.pm = pm;
 	}
 
 	@Override
@@ -95,12 +93,15 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 		}
 
 		for (BigDecimal denom : machine.getCoinDenominations()) {
-			coinMonitorMap.put(denom, new CoinMonitor(pm, machine.getCoinDispensers().get(denom)));
+			coinMonitorMap.put(denom, new CoinMonitor(this, machine.getCoinDispensers().get(denom)));
 		}
 
 		for (BigDecimal denom : machine.getBanknoteDenominations()) {
-			bankNoteMonitorMap.put(denom, new BanknoteMonitor(pm, machine.getBanknoteDispensers().get(denom)));
+			bankNoteMonitorMap.put(denom, new BanknoteMonitor(this, machine.getBanknoteDispensers().get(denom)));
 		}
+
+		// creating the printer observer
+		rpls = new ReceiptPrinterObserver(this, machine.getPrinter());
 	}
 
 	@Override
@@ -195,7 +196,7 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 		// TODO check state of the coin storage unit
 
 		// if coins full
-		if (unit.getCapacity() <= unit.getCoinCount()){
+		if (unit.getCapacity() <= unit.getCoinCount()) {
 			notifyCoinsFull(unit);
 		}
 	}
@@ -205,16 +206,16 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 		// TODO check state of the banknote storage unit
 
 		// if banknotes full
-		if (unit.getCapacity() <= unit.getBanknoteCount()){
+		if (unit.getCapacity() <= unit.getBanknoteCount()) {
 			notifyBanknotesFull(unit);
 		}
 	}
 
 	protected void checkCoinDispenserState(BigDecimal denom, boolean added) {
 		// coin added
-		if (added){
+		if (added) {
 			coinMonitorMap.get(denom).coinAdded(machine.getCoinDispensers().get(denom), new Coin(denom));
-		} 
+		}
 		// coin removed
 		else {
 			coinMonitorMap.get(denom).coinRemoved(machine.getCoinDispensers().get(denom), new Coin(denom));
@@ -224,14 +225,14 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 	protected void checkBanknoteDispenserState(BigDecimal denom, boolean added) {
 		// banknote added
-		if (added){
+		if (added) {
 			bankNoteMonitorMap.get(denom).banknoteAdded(machine.getBanknoteDispensers().get(denom),
-			new Banknote(Currency.getInstance(Locale.CANADA), denom));
-		} 
+					new Banknote(Currency.getInstance(Locale.CANADA), denom));
+		}
 		// banknote removed
 		else {
 			bankNoteMonitorMap.get(denom).banknoteRemoved(machine.getBanknoteDispensers().get(denom),
-			new Banknote(Currency.getInstance(Locale.CANADA), denom));
+					new Banknote(Currency.getInstance(Locale.CANADA), denom));
 		}
 	}
 
