@@ -30,16 +30,19 @@ public class TestNotifyBarcodeScanned {
 		om = sm.omStub;
 	}
 
+	//Testing the null barcode scanned.
 	@Test(expected = IllegalArgumentException.class)
 	public void testNullBarcodeScanned() {
 		om.notifyBarcodeScanned(null, null);
 	}
 
+	//Testing if a null item is detected. 
 	@Test(expected = IllegalArgumentException.class)
 	public void testNullItemDetected() {
 		om.notifyBarcodeScanned(null, null);
 	}
 
+	//Testing the barcode.
 	@Test
 	public void testValidUsage() {
 		BarcodedItem stub = DatabaseHelper.createRandomBarcodedItem();
