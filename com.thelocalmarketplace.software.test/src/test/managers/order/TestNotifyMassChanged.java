@@ -29,11 +29,12 @@ public class TestNotifyMassChanged {
 		om = sm.omStub;
 	}
 
+	//Test if the notifyMassChanged throws an expection if null.
 	@Test(expected = IllegalArgumentException.class)
 	public void testNotifyMassChangeThrowsOnNull() {
 		om.notifyMassChanged(null, null);
 	}
-
+ 
 	@Test
 	public void testNotifyMassChangeThrowsBlocks() {
 		om.notifyMassChanged(null, BigDecimal.ONE);
@@ -63,6 +64,7 @@ public class TestNotifyMassChanged {
 
 	@Test
 	public void testCheckWeightDifferenceTriggersOnNormal() {
+		//setup
 		om.setState(SessionStatus.NORMAL);
 
 		om.checkWeightDifference(BigDecimal.ONE);
@@ -73,6 +75,7 @@ public class TestNotifyMassChanged {
 
 	@Test
 	public void testCheckWeightDifferenceDoesntTriggerOnNormal() {
+		//setup
 		om.setState(SessionStatus.NORMAL);
 
 		om.checkWeightDifference(BigDecimal.ZERO);
@@ -83,6 +86,7 @@ public class TestNotifyMassChanged {
 
 	@Test
 	public void testCheckWeightDifferenceUnblocks() {
+		//setup
 		om.setState(SessionStatus.BLOCKED);
 
 		om.checkWeightDifference(BigDecimal.ZERO);
@@ -93,6 +97,7 @@ public class TestNotifyMassChanged {
 
 	@Test
 	public void testCheckWeightDifferenceDoesntUnblock() {
+		//setup
 		om.setState(SessionStatus.BLOCKED);
 
 		om.checkWeightDifference(BigDecimal.ONE);
@@ -103,11 +108,14 @@ public class TestNotifyMassChanged {
 	
 	@Test(expected = IllegalStateException.class)
 	public void testNotifyMassChangedThrowsWhenPaid() {
+		//setup
 		om.setState(SessionStatus.PAID);
 		
+		//expect to throw an exception
 		om.notifyMassChanged(null, BigDecimal.ONE);
 	}
 	
+	//Testing expecting to throw an exception
 	@Test(expected = IllegalStateException.class)
 	public void testCheckWeightDifferenceThrowsWhenPaid() {
 		om.setState(SessionStatus.PAID);
