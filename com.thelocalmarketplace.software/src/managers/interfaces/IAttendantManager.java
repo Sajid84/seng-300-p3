@@ -65,5 +65,9 @@ public interface IAttendantManager extends IManager {
      * @param count the amount of bags the customer wants to purchase
      */
     void requestPurchaseBags(int count);
+        private int bagCount = count;
+        for (int i = 0; i <= bagCount; i++) {
+            dispense();
+        }
 
 }
