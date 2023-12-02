@@ -86,11 +86,12 @@ public class AttendantViewGUI extends JPanel implements IScreen{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				sm.maintainInk();
-				// why is there even in in the first place? aren't receipts typically heat based?
-				
+				FillInkButton.setEnabled(false);
+				// why is there even in in the first place? aren't receipts typically heat based?	
 			}
 			
 		});
+		FillInkButton.setEnabled(false);
 		ButtonPanel.add(FillInkButton);
 		
 		EnableMachineButton = new JButton("Enable Machine");
@@ -111,10 +112,11 @@ public class AttendantViewGUI extends JPanel implements IScreen{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				sm.maintainPaper();
-				
+				FillPaperButton.setEnabled(false);
 			}
 			
 		});
+		FillPaperButton.setEnabled(false);
 		ButtonPanel.add(FillPaperButton);
 		
 		DisableMachineButton = new JButton("Disable Machine");
@@ -135,10 +137,12 @@ public class AttendantViewGUI extends JPanel implements IScreen{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				sm.maintainCoinDispensers();
+				FillCoinsButton.setEnabled(false);
 				
 			}
 			
 		});
+		FillCoinsButton.setEnabled(false);
 		ButtonPanel.add(FillCoinsButton);
 		
 		UnloadCoinsButton = new JButton("Unload Coins");
@@ -159,10 +163,12 @@ public class AttendantViewGUI extends JPanel implements IScreen{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				sm.maintainBanknoteDispensers();
+				FillBanknotesButton.setEnabled(false);
 				
 			}
 			
 		});
+		FillBanknotesButton.setEnabled(false);
 		ButtonPanel.add(FillBanknotesButton);
 		
 		UnloadBanknotesButton = new JButton("Unload Banknotes");
@@ -213,6 +219,20 @@ public class AttendantViewGUI extends JPanel implements IScreen{
 	public void removeEvent(EventPanel event) {
 		EventTextHolder.remove(event);
 		
+	}
+	
+	
+	public void enableFillInk() {
+		FillInkButton.setEnabled(true);
+	}
+	public void enableFillPaper() {
+		FillPaperButton.setEnabled(true);
+	}
+	public void enableFillCoins() {
+		FillCoinsButton.setEnabled(true);
+	}
+	public void enableFillBanknotes() {
+		FillBanknotesButton.setEnabled(true);
 	}
 
 	@Override
