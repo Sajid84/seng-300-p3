@@ -119,6 +119,6 @@ public interface IAttendantManagerNotify {
      * Notifies the manager that a bag was dispensed.
      */
     void notifyBagDispensed();
-
-
+        BarcodedItem bagProduct = createCustomerBags();
+		sm.addItemToOrder(bagProduct, ScanType.MAIN)
 }
