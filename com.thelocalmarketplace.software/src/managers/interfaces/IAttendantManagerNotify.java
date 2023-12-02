@@ -115,5 +115,10 @@ public interface IAttendantManagerNotify {
      */
     void notifyInk(boolean hasInk);
 
+    /**
+     * Notifies the manager that a bag was dispensed.
+     */
+    void notifyBagDispensed();
+
 
 }

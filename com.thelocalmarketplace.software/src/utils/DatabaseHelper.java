@@ -6,11 +6,13 @@ import ca.ucalgary.seng300.simulation.InvalidArgumentSimulationException;
 import com.jjjwelectronics.Item;
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Numeral;
+import com.jjjwelectronics.bag.ReusableBag;
 import com.jjjwelectronics.scanner.Barcode;
 import com.jjjwelectronics.scanner.BarcodedItem;
 import com.thelocalmarketplace.hardware.*;
 import database.Database;
 
+import java.math.BigDecimal;
 import java.util.Random;
 
 /**
@@ -18,6 +20,7 @@ import java.util.Random;
  */
 public class DatabaseHelper {
 
+    public static final BigDecimal PRICE_OF_BAG = BigDecimal.ONE;
     private static final String[] names = {"Milk", "Bread", "Eggs", "Cheese", "Sugar", "Cereal", "Beef", "Abacus", "Butter"};
 
     private static final String[] adjectives = {"Inedible", "Tasty", "Pasty", "Wooden", "Super", "Proud", "Big", "Small",
