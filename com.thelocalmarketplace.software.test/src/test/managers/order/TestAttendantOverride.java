@@ -44,10 +44,13 @@ public class TestAttendantOverride {
 
 	@Test
 	public void testMethodUnblocks() {
+		// setup
 		om.setState(SessionStatus.BLOCKED);
 
+		// calling
 		om.onAttendantOverride();
 
+		//asserting
 		assertEquals(om.getState(), SessionStatus.NORMAL);
 	}
 
