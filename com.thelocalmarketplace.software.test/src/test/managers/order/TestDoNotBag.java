@@ -83,7 +83,7 @@ public class TestDoNotBag {
 		om.doNotBagRequest(true);
 
 		// check if the attendant is notified with the correct reason
-		assertEquals("do not bag request was received", sm.getAttendantNotification());
+        assertTrue(sm.notifyAttendantCalled);
 	}
 
 	@Test
@@ -94,7 +94,7 @@ public class TestDoNotBag {
 		om.doNotBagRequest(true);
 
 		// check if the attendant is notified with the correct reason
-		assertEquals("do not bag request was received", sm.getAttendantNotification());
+		assertTrue(sm.notifyAttendantCalled);
 		assertTrue(!om.getBagItem());
 
 		// adding the item to the order

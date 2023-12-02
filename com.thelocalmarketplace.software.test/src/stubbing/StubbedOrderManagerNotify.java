@@ -31,12 +31,6 @@ public class StubbedOrderManagerNotify implements IOrderManagerNotify {
 	}
 
 	@Override
-	public void onItemRemovedFromOrder(Item item) {
-		gotOnItemRemovedFromOrderMessage = true;
-		itemRemovedFromOrder = item;
-	}
-
-	@Override
 	public void notifyScaleOverload(IElectronicScale scale, boolean state) {
 		// TODO Auto-generated method stub
 		

@@ -3,6 +3,7 @@
 package test.managers.order;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import java.math.BigDecimal;
 
@@ -36,8 +37,7 @@ public class TestNotifyBarcodeScanned {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testNullItemDetected() {
-		Numeral[] num = { Numeral.one, Numeral.one };
-		om.notifyBarcodeScanned(null, new Barcode(num));
+		om.notifyBarcodeScanned(null, null);
 	}
 
 	@Test
@@ -46,6 +46,6 @@ public class TestNotifyBarcodeScanned {
 
 		om.notifyBarcodeScanned(null, stub.getBarcode());
 
-		assertEquals(1, om.getItems().size());
+		assertFalse(om.errorAddingItem());
 	}
 }

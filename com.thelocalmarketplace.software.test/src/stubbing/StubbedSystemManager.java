@@ -23,6 +23,7 @@ public class StubbedSystemManager extends SystemManager {
 
 	public StubbedPaymentManager pmStub;
 	public StubbedOrderManager omStub;
+	public StubbedAttendantManager amStub;
 	private String attendantNotification;
 
 	public boolean notifyAttendantCalled;
@@ -49,10 +50,12 @@ public class StubbedSystemManager extends SystemManager {
 		// creating stubbed managers
 		omStub = new StubbedOrderManager(this, l);
 		pmStub = new StubbedPaymentManager(this, i);
+		amStub = new StubbedAttendantManager(this);
 
 		// injecting stubbed managers for testing purposes
 		this.om = omStub;
 		this.pm = pmStub;
+		this.am = amStub;
 
 		// variables to track if a function was called or not
 		notifyAttendantCalled = false;
@@ -67,11 +70,7 @@ public class StubbedSystemManager extends SystemManager {
 		pmStub.setIssuer(i);
 	}
 
-	public CardIssuer getIssuer() {
-		return super.issuer;
-	}
-
-	public ISelfCheckoutStation getMachine() {
+    public ISelfCheckoutStation getMachine() {
 		return machine;
 	}
 

@@ -51,7 +51,7 @@ public class TestFunctionDelegation {
 
 	@Test
 	public void testTenderChangeCallsPaymentManager() {
-		sm.setState(SessionStatus.NORMAL);
+		sm.setState(SessionStatus.PAID);
 
 		try {
 			sm.tenderChange();

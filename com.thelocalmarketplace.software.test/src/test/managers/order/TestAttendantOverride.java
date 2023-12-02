@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.math.BigDecimal;
 
+import com.jjjwelectronics.scanner.BarcodedItem;
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,6 +14,7 @@ import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 
 import managers.enums.SessionStatus;
 import stubbing.*;
+import utils.DatabaseHelper;
 
 public class TestAttendantOverride {
 	// machine
@@ -52,14 +54,17 @@ public class TestAttendantOverride {
 	@Test
 	public void testAttendantOverrideSetsAdjustment() {
 		// setup
-		StubbedBarcodedItem p = new StubbedBarcodedItem();
-		om.addItem(p, true);
-		om.setActualWeight(BigDecimal.ONE);
+		BarcodedItem item = DatabaseHelper.createRandomBarcodedItem();
+		om.addItem(item, true);
+		om.setActualWeight(BigDecimal.TEN);
 
 		// calling
 		om.onAttendantOverride();
 
+		// weight but decimal
+		BigDecimal weight = item.getMass().inGrams();
+
 		// asserting
-		assertEquals(om.getWeightAdjustment(), new BigDecimal(StubbedBarcodedItem.WEIGHT).subtract(BigDecimal.ONE));
+		assertEquals(om.getWeightAdjustment(), BigDecimal.TEN.subtract(weight));
 	}
 }

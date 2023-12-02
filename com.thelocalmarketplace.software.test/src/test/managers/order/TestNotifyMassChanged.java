@@ -6,6 +6,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.math.BigDecimal;
 
+import com.jjjwelectronics.scanner.BarcodedItem;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -14,6 +15,7 @@ import stubbing.StubbedBarcodedItem;
 import stubbing.StubbedBarcodedProduct;
 import stubbing.StubbedOrderManager;
 import stubbing.StubbedSystemManager;
+import utils.DatabaseHelper;
 
 public class TestNotifyMassChanged {
 	// vars
@@ -37,18 +39,26 @@ public class TestNotifyMassChanged {
 		om.notifyMassChanged(null, BigDecimal.ONE);
 
 		// station should be blocked now
-		assertEquals(om.getState(), SessionStatus.BLOCKED);
+		assertEquals(SessionStatus.BLOCKED, om.getState());
 	}
 
 	@Test
-	public void testNotifyMassChangeThrowsWithAdjustmentDoesntBlock() {
-		om.addItem(new StubbedBarcodedItem());
-		om.setWeightAdjustment(new BigDecimal(StubbedBarcodedProduct.WEIGHT));
+	public void testNotifyMassChangeWithAdjustmentDoesntBlock() {
+		BarcodedItem item = DatabaseHelper.createWeightDiscrepancy();
 
+		// adding the item and setting the adjustment
+		om.addItem(item);
+		om.setWeightAdjustment(BigDecimal.valueOf(DatabaseHelper.get(item).getExpectedWeight()).negate());
+
+		// testing the adjustment
 		om.notifyMassChanged(null, BigDecimal.ZERO);
 
+		System.out.println("Expected Weight: " + om.getExpectedMass());
+		System.out.println("Actual Weight: " + om.getActualWeight());
+		System.out.println("Adjustment: " + om.getWeightAdjustment());
+
 		// station should still be normal
-		assertEquals(om.getState(), SessionStatus.NORMAL);
+		assertEquals(SessionStatus.NORMAL, om.getState());
 	}
 
 	@Test
@@ -58,7 +68,7 @@ public class TestNotifyMassChanged {
 		om.checkWeightDifference(BigDecimal.ONE);
 
 		// the OrderManager should be blocked now
-		assertEquals(om.getState(), SessionStatus.BLOCKED);
+		assertEquals(SessionStatus.BLOCKED, om.getState());
 	}
 
 	@Test
@@ -88,7 +98,7 @@ public class TestNotifyMassChanged {
 		om.checkWeightDifference(BigDecimal.ONE);
 
 		// the OrderManager should still be blocked
-		assertEquals(om.getState(), SessionStatus.BLOCKED);
+		assertEquals(SessionStatus.BLOCKED, om.getState());
 	}
 	
 	@Test(expected = IllegalStateException.class)

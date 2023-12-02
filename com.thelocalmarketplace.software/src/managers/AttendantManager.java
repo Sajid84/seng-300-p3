@@ -51,6 +51,10 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	protected Map<BigDecimal, CoinMonitor> coinMonitorMap = new HashMap<BigDecimal, CoinMonitor>();
 	protected Map<BigDecimal, BanknoteMonitor> bankNoteMonitorMap = new HashMap<BigDecimal, BanknoteMonitor>();
 	protected ReceiptPrinterObserver rpls;
+	protected Map<BigDecimal, Boolean> coinDispenserLow = new HashMap<>();
+	protected Map<BigDecimal, Boolean> banknoteDispenserLow = new HashMap<>();
+	protected CoinStorageMonitor csu;
+	protected BanknoteStorageMonitor bsu;
 
 	// vars
 	protected boolean hasPaper = false;
@@ -59,10 +63,6 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	protected boolean inkLow = false;
 	protected boolean coinStorageUnitFull = false;
 	protected boolean banknoteStorageUnitFull = false;
-	protected Map<BigDecimal, Boolean> coinDispenserLow = new HashMap<>();
-	protected Map<BigDecimal, Boolean> banknoteDispenserLow = new HashMap<>();
-	protected CoinStorageMonitor csu;
-	protected BanknoteStorageMonitor bsu;
 
 	public AttendantManager(SystemManager sm) {
 

@@ -8,17 +8,12 @@ import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
-
 import observers.payment.ReceiptPrinterObserver;
-import stubbing.StubbedGrid;
-import stubbing.StubbedPaymentManager;
-import stubbing.StubbedStation;
-import stubbing.StubbedSystemManager;
+import stubbing.*;
 
 public class TestReceiptPrinterObserver {
     // vars
-    private StubbedPaymentManager pm;
+    private StubbedAttendantManager am;
     private StubbedSystemManager sm;
     private ReceiptPrinterObserver rpls;
     private ISelfCheckoutStation machine;
@@ -27,7 +22,7 @@ public class TestReceiptPrinterObserver {
     public void setup() {
         // creating the stubs
         sm = new StubbedSystemManager();
-        pm = sm.pmStub;
+        am = sm.amStub;
 
         // configuring the hardware
         StubbedStation.configure();
@@ -39,7 +34,7 @@ public class TestReceiptPrinterObserver {
         // configuring the machine
         sm.configure(machine);
 
-        rpls = pm.getReceiptPrinterObserver();
+        rpls = am.getReceiptPrinterObserver();
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -49,7 +44,7 @@ public class TestReceiptPrinterObserver {
 
     @Test(expected = IllegalArgumentException.class)
     public void testNullDevice() {
-        new ReceiptPrinterObserver(pm, null);
+        new ReceiptPrinterObserver(am, null);
     }
 
     @Test
@@ -57,7 +52,7 @@ public class TestReceiptPrinterObserver {
         rpls.thePrinterIsOutOfPaper();
 
         // asserting
-        assertFalse(pm.getHasPaper());
+        assertFalse(am.getHasPaper());
     }
 
     @Test
@@ -65,7 +60,7 @@ public class TestReceiptPrinterObserver {
         rpls.paperHasBeenAddedToThePrinter();
 
         // asserting
-        assertTrue(pm.getHasPaper());
+        assertTrue(am.getHasPaper());
     }
 
     @Test
@@ -73,7 +68,7 @@ public class TestReceiptPrinterObserver {
         rpls.thePrinterIsOutOfInk();
 
         // asserting
-        assertFalse(pm.getHasInk());
+        assertFalse(am.getHasInk());
     }
 
     @Test
@@ -81,6 +76,6 @@ public class TestReceiptPrinterObserver {
         rpls.inkHasBeenAddedToThePrinter();
 
         // asserting
-        assertTrue(pm.getHasInk());
+        assertTrue(am.getHasInk());
     }
 }

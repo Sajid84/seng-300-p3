@@ -131,7 +131,7 @@ public class SystemManagerForm implements IScreen {
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Do not bag item was triggered: " + e.getActionCommand());
-                sm.doNotBagRequest(!doNotBagItemCheckBox.isSelected());
+                sm.doNotBagRequest(doNotBagItemCheckBox.isSelected());
             }
         });
         removeItemButton.addActionListener(new ActionListener() {
@@ -396,16 +396,19 @@ public class SystemManagerForm implements IScreen {
      * @param message the message to be displayed
      */
     protected void updateFeedbackLabel(String message) {
-        System.out.println("Cause: " + message);
+        // setting the color of the text
         feedbackLabel.setForeground(Color.RED);
 
-        // switching based on message
+        // breaking early there is no cause
         if ((message == null) || (message.isEmpty())) {
             feedbackLabel.setText("");
             return;
         }
 
-        // updating label
+        // logging
+        System.out.println("Cause: " + message);
+
+        // updating label with the cause
         feedbackLabel.setText("BLOCKED: " + message);
     }
 

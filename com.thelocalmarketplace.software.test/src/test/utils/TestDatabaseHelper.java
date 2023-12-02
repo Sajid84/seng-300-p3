@@ -8,12 +8,12 @@ import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 
+import database.Database;
 import org.junit.Test;
 
 import com.jjjwelectronics.scanner.Barcode;
 import com.jjjwelectronics.scanner.BarcodedItem;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
-import com.thelocalmarketplace.hardware.external.ProductDatabases;
 
 import ca.ucalgary.seng300.simulation.InvalidArgumentSimulationException;
 import utils.DatabaseHelper;
@@ -115,14 +115,14 @@ public class TestDatabaseHelper {
 	public void testRandomBarcodedItemHasProductInDatabase() {
 		BarcodedItem item = DatabaseHelper.createRandomBarcodedItem();
 
-		assertTrue(ProductDatabases.BARCODED_PRODUCT_DATABASE.containsKey(item.getBarcode()));
-		assertNotNull(ProductDatabases.BARCODED_PRODUCT_DATABASE.keySet().size() > 0);
+		assertTrue(Database.BARCODED_PRODUCT_DATABASE.containsKey(item.getBarcode()));
+		assertNotNull(Database.BARCODED_PRODUCT_DATABASE.keySet().size() > 0);
 	}
 
 	@Test
 	public void testRandomBarcodedItemAndProductHaveSameBarcode() {
 		BarcodedItem item = DatabaseHelper.createRandomBarcodedItem();
-		BarcodedProduct prod = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(item.getBarcode());
+		BarcodedProduct prod = Database.BARCODED_PRODUCT_DATABASE.get(item.getBarcode());
 
 		assertEquals(item.getBarcode(), prod.getBarcode());
 	}
@@ -130,7 +130,7 @@ public class TestDatabaseHelper {
 	@Test
 	public void testCreateWeightDiscrepancy() {
 		BarcodedItem item = DatabaseHelper.createWeightDiscrepancy();
-		BarcodedProduct prod = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(item.getBarcode());
+		BarcodedProduct prod = Database.BARCODED_PRODUCT_DATABASE.get(item.getBarcode());
 
 		// getting masses
 		double item_mass = item.getMass().inGrams().doubleValue();

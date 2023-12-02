@@ -205,7 +205,7 @@ public class DatabaseHelper {
      * </p>
      * <p>
      * This function also guarantess that the product's expected mass is bigger than
-     * the item's by at least 10 units.
+     * the item's by at 1,000 units.
      *
      * @return the generated barcoded item
      */

@@ -18,7 +18,7 @@ import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 
 import managers.enums.ScanType;
 import powerutility.PowerGrid;
-import stubbing.StubbedItem;
+import stubbing.StubbedBarcodedItem;
 import stubbing.StubbedOrderManager;
 import stubbing.StubbedStation;
 import stubbing.StubbedSystemManager;
@@ -64,27 +64,27 @@ public class TestBagsTooHeavy {
 	}
 
 	@Test
-	public void testBagsNotTooHeavy() throws OperationNotSupportedException {
+	public void testBagsNotTooHeavy() {
 		// Test to ensure that adding a light item does not trigger the scale overload
-		StubbedItem item = new StubbedItem(massBelow);
+		StubbedBarcodedItem item = new StubbedBarcodedItem(massBelow);
 		om.addItemToOrder(item, ScanType.MAIN);
 		assertFalse("Scale should not be overloaded with a light item", om.isScaleOverloaded());
 	}
 
 	@Test
-	public void testBagsTooHeavy() throws OperationNotSupportedException {
+	public void testBagsTooHeavy() {
 		// Test to check if adding a single heavy item correctly triggers the scale
 		// overload
-		StubbedItem heavyItem = new StubbedItem(massAbove);
+		StubbedBarcodedItem heavyItem = new StubbedBarcodedItem(massAbove);
 		om.addItemToOrder(heavyItem, ScanType.MAIN);
 		assertTrue("Scale should be overloaded with a heavy item", om.isScaleOverloaded());
 	}
 
 	@Test
-	public void testRemovingItemReducesWeight() throws OperationNotSupportedException {
+	public void testRemovingItemReducesWeight() {
 		// Test to confirm that removing an item reduces the total weight and can
 		// resolve an overload
-		StubbedItem heavyItem = new StubbedItem(massAbove);
+		StubbedBarcodedItem heavyItem = new StubbedBarcodedItem(massAbove);
 		om.addItemToOrder(heavyItem, ScanType.MAIN);
 		assertTrue("Scale should be overloaded after adding a heavy item", om.isScaleOverloaded());
 
@@ -93,11 +93,11 @@ public class TestBagsTooHeavy {
 	}
 
 	@Test
-	public void testCumulativeWeightCausesOverload() throws OperationNotSupportedException {
+	public void testCumulativeWeightCausesOverload() {
 		// Test to check if the cumulative weight of multiple items leads to an overload
 
-		StubbedItem item1 = new StubbedItem(massHalf);
-		StubbedItem item2 = new StubbedItem(massAbove);
+		StubbedBarcodedItem item1 = new StubbedBarcodedItem(massHalf);
+		StubbedBarcodedItem item2 = new StubbedBarcodedItem(massAbove);
 		om.addItemToOrder(item1, ScanType.MAIN);
 		om.addItemToOrder(item2, ScanType.MAIN);
 

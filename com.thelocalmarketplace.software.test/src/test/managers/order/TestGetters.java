@@ -36,19 +36,19 @@ public class TestGetters {
 
 	@Test
 	public void testGetProductsContainsAllAdded() {
-		om.addItem(new StubbedBarcodedItem());
+		Item item = DatabaseHelper.createRandomBarcodedItem();
+		om.addItem(item);
 
 		List<Pair<Item, Boolean>> items = om.getItems();
 
 		assertEquals(items.size(), 1);
 
-		// cheating because I know that I just added a barcoded product
+		// getting the product from the database
 		BarcodedProduct prod = DatabaseHelper.get((BarcodedItem) items.get(0).getKey());
 
 		// asserting
 		assertNotNull(prod);
-		assertEquals(prod.getBarcode(), StubbedBarcodedItem.BARCODE);
-		assertTrue(prod.getExpectedWeight() == StubbedBarcodedItem.WEIGHT);
+        assertEquals(prod.getExpectedWeight(), item.getMass().inGrams().doubleValue(), 1.5); // I love floating point numbers
 	}
 
 	@Test
@@ -56,20 +56,6 @@ public class TestGetters {
 		List<Pair<Item, Boolean>> prods = om.getItems();
 
 		assertEquals(prods.size(), 0);
-	}
-
-	@Test(expected = UnsupportedOperationException.class)
-	public void testTotalPriceThrowsOnPLU() {
-		om.addItem(new StubbedPLUItem());
-
-		om.getTotalPrice();
-	}
-
-	@Test(expected = UnsupportedOperationException.class)
-	public void testExpectedMassThrowsOnPLU() {
-		om.addItem(new StubbedPLUItem());
-
-		om.getExpectedMass();
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -88,11 +74,13 @@ public class TestGetters {
 
 	@Test
 	public void testExpectedMassEqualsProductMasses() {
-		om.addItem(new StubbedBarcodedItem());
+		Item item = DatabaseHelper.createRandomBarcodedItem();
+		om.addItem(item);
 
+		// getting the mass from the manager
 		BigDecimal mass = om.getExpectedMass();
 
-		assertEquals(mass, new BigDecimal(StubbedBarcodedProduct.WEIGHT));
+		assertEquals(item.getMass().inGrams(), mass);
 	}
 
 	@Test

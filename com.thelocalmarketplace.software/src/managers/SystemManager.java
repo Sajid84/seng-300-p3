@@ -118,6 +118,7 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 		// configuring the managers
 		this.pm.configure(this.machine);
 		this.om.configure(this.machine);
+		this.am.configure(this.machine);
 	}
 
 	/**
@@ -478,7 +479,7 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 
 	@Override
 	public boolean isUnblocked() {
-		return getState() != SessionStatus.BLOCKED;
+		return getState() == SessionStatus.NORMAL;
 	}
 
 	@Override
