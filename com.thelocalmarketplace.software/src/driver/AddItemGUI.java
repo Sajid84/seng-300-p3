@@ -23,9 +23,7 @@ import java.text.NumberFormat;
 public class AddItemGUI extends JPanel implements IScreen {
 
     private static NumberFormat PLUFormat = NumberFormat.getInstance();
-
     private SystemManager sm;
-
     JLabel searchByTextLabel = new JLabel("Search by text");
     JTextField searchByTextField = new JTextField();
     JButton textSearchButton = new JButton("search");
@@ -36,18 +34,17 @@ public class AddItemGUI extends JPanel implements IScreen {
     JLabel searchByPLUStatusLabel = new JLabel("");
     JLabel searchByListTextLabel = new JLabel("Search in List");
     List list = new List();
-    JPanel keyboardPanel = new JPanel();
-
-    protected JPanel getKeyboardPanel() {
-        // TODO Auto-generated method stub
-        return keyboardPanel;
-    }
+    PopupKeyboard keyboard;
 
     /**
      * Create the frame.
      */
     public AddItemGUI(SystemManager sm) {
         this.sm = sm;
+
+        // creating a keyboard
+        keyboard = new PopupKeyboard();
+        keyboard.setVisible(false);
 
         GridLayout gridLayout = new GridLayout();
         gridLayout.setVgap(2);
@@ -68,7 +65,7 @@ public class AddItemGUI extends JPanel implements IScreen {
 
         // add item by PLU
         PLUCodeFormattedTextField.setToolTipText("Enter PLU Code");
-        PLUCodeFormattedTextField.setValue(PLUFormat);
+//        PLUCodeFormattedTextField.setValue(PLUFormat);
         searchByPLUCodeTextLabel.setHorizontalAlignment(SwingConstants.CENTER);
         searchByPLUCodeTextLabel.setVerticalAlignment(SwingConstants.BOTTOM);
 
@@ -101,23 +98,33 @@ public class AddItemGUI extends JPanel implements IScreen {
         searchByTextField.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
-                PopupKeyboard keyboard = new PopupKeyboard(searchByTextField);
+                // setting the keyboard to visible
+                if (!keyboard.isVisible()) {
+                    keyboard.setVisible(true);
+                }
 
+                // changing the focused element
+                keyboard.setTextboxFocus(searchByTextField);
             }
         });
 
         PLUCodeFormattedTextField.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
-                PopupKeyboard keyboard = new PopupKeyboard(searchByTextField);
+                // setting the keyboard to visible
+                if (!keyboard.isVisible()) {
+                    keyboard.setVisible(true);
+                }
+
+                // changing the focused element
+                keyboard.setTextboxFocus(PLUCodeFormattedTextField);
             }
         });
 
         PLUSearchButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Object PLUcode = PLUCodeFormattedTextField.getValue();
-                //if PLU code exists, continue with order
-
+                // if PLU code exists, continue with order
 
                 // if PLU code does not exist
                 searchByTextStatusLabel.setText("Could not find PLU code: " + "'" + PLUcode + "'" + " in the database");
