@@ -22,7 +22,9 @@
 
 package managers;
 
+import com.jjjwelectronics.EmptyDevice;
 import com.jjjwelectronics.OverloadedDevice;
+import com.jjjwelectronics.bag.ReusableBag;
 import com.tdc.CashOverloadException;
 import com.tdc.banknote.Banknote;
 import com.tdc.banknote.BanknoteStorageUnit;
@@ -31,10 +33,11 @@ import com.tdc.coin.Coin;
 import com.tdc.coin.CoinStorageUnit;
 import com.tdc.coin.ICoinDispenser;
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
+import managers.enums.ScanType;
 import managers.enums.SessionStatus;
 import managers.interfaces.IAttendantManager;
 import managers.interfaces.IAttendantManagerNotify;
-import observers.payment.*;
+import observers.attendant.*;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -55,12 +58,16 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	protected Map<BigDecimal, Boolean> banknoteDispenserLow = new HashMap<>();
 	protected CoinStorageMonitor csu;
 	protected BanknoteStorageMonitor bsu;
+	protected BagMonitor bm;
 
 	// vars
 	protected boolean hasPaper = false;
 	protected boolean hasInk = false;
 	protected boolean paperLow = false;
 	protected boolean inkLow = false;
+	protected boolean bagsEmpty = false;
+	protected boolean bagsLow = false;
+	protected int bagCount = 0;
 	protected boolean coinStorageUnitFull = false;
 	protected boolean banknoteStorageUnitFull = false;
 
@@ -100,6 +107,9 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 		// creating the printer observer
 		rpls = new ReceiptPrinterObserver(this, machine.getPrinter());
+
+		// creating the bag dispenser observer
+		bm = new BagMonitor(this, machine.getReusableBagDispenser());
 	}
 
 	@Override
@@ -150,9 +160,17 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 			}
 		}
 
+		// checking the state of the dispenser
+		checkCoinDispenserState(denom, dispenser);
+	}
+
+	protected void checkCoinDispenserState(BigDecimal denom, ICoinDispenser dispenser) {
 		// checking if we actually found the denomination of the dispenser
 		if (denom == null) {
 			throw new IllegalArgumentException("An invalid dispenser was passed into the function");
+		}
+		if (dispenser == null) {
+			throw new IllegalArgumentException("A null coin dispenser was passed into the function.");
 		}
 
 		// updating the state of the coin dispenser in the map
@@ -180,9 +198,17 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 			}
 		}
 
+		// checking the state of the dispenser
+		checkBanknoteDispenserState(denom, dispenser);
+	}
+
+	protected void checkBanknoteDispenserState(BigDecimal denom, IBanknoteDispenser dispenser) {
 		// checking if we actually found the denomination of the dispenser
 		if (denom == null) {
 			throw new IllegalArgumentException("An invalid dispenser was passed into the function");
+		}
+		if (dispenser == null) {
+			throw new IllegalArgumentException("A null banknote dispenser was passed into the function.");
 		}
 
 		// updating the state of the coin dispenser in the map
@@ -201,23 +227,37 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 	@Override
 	public void notifyCoinStorageUnitStateChange(CoinStorageUnit unit) {
+		checkCoinStorageUnitState(unit);
+	}
+
+	protected void checkCoinStorageUnitState(CoinStorageUnit unit) {
 		// if coins almost full
 		if (unit.getCoinCount() == unit.getCapacity()) {
 			coinStorageUnitFull = true;
 			notifyAttendant("The coin storage unit is full.");
-		} else if (unit.getCoinCount() >= (unit.getCapacity() * 0.90)) {
-			notifyAttendant("The coin storage unit is over 90% full.");
+		} else if (unit.getCoinCount() >= (unit.getCapacity() * 0.70)) {
+			coinStorageUnitFull = true;
+			notifyAttendant("The coin storage unit is over 70% full.");
+		} else {
+			coinStorageUnitFull = false;
 		}
 	}
 
 	@Override
 	public void notifyBanknoteStorageUnitStateChange(BanknoteStorageUnit unit) {
+		checkBanknoteStorageUnitState(unit);
+	}
+
+	protected void checkBanknoteStorageUnitState(BanknoteStorageUnit unit) {
 		// if coins almost full
 		if (unit.getBanknoteCount() == unit.getCapacity()) {
 			banknoteStorageUnitFull = true;
 			notifyAttendant("The banknote storage unit is full.");
-		} else if (unit.getBanknoteCount() >= (unit.getCapacity() * 0.90)) {
-			notifyAttendant("The banknote storage unit is over 90% full.");
+		} else if (unit.getBanknoteCount() >= (unit.getCapacity() * 0.70)) {
+			banknoteStorageUnitFull = true;
+			notifyAttendant("The banknote storage unit is over 70% full.");
+		} else {
+			banknoteStorageUnitFull = false;
 		}
 	}
 
@@ -321,7 +361,23 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 	@Override
 	public void maintainBags() {
-		// TODO implement this method
+		if (bagsEmpty || bagsLow) {
+			// forming the array
+			int len = (int) (machine.getReusableBagDispenser().getCapacity() * 0.5);
+			ReusableBag[] bags = new ReusableBag[len];
+
+			// populating it
+			for (int i = 0; i < len; ++i) {
+				bags[i] = new ReusableBag();
+			}
+
+			// filling the bag dispenser
+			try {
+				machine.getReusableBagDispenser().load(bags);
+			} catch (OverloadedDevice e) {
+				// this should never happen from this state
+			}
+		}
 	}
 
 	@Override
@@ -373,7 +429,26 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	@Override
 	public void reset() {
 		// setting has papper & ink
-		getPrinterStatus();
+		checkPrinterState();
+
+		/// checking the status of the devices
+
+		// bag dispenser
+		checkBagDispenserState();
+
+		// storage units
+		checkCoinStorageUnitState(machine.getCoinStorage());
+		checkBanknoteStorageUnitState(machine.getBanknoteStorage());
+
+		// coin dispensers
+		for (BigDecimal denom : machine.getCoinDenominations()) {
+			checkCoinDispenserState(denom, machine.getCoinDispensers().get(denom));
+		}
+
+		// banknote dispensers
+		for (BigDecimal denom : machine.getBanknoteDenominations()) {
+			checkBanknoteDispenserState(denom, machine.getBanknoteDispensers().get(denom));
+		}
 	}
 
 	@Override
@@ -388,7 +463,54 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 	@Override
 	public void notifyBagDispensed() {
-		// TODO implement this method
+		// decrementing the bag count
+		--bagCount;
+
+		// checking the state of the dispenser
+		checkBagDispenserState();
+	}
+
+	@Override
+	public void notifyBagsLoaded(int count) {
+		if (count > 0) {
+			bagCount = count; // treating this as the maximum capacity if there's an exception
+
+			// resetting the count of the bags
+			bagsEmpty = false;
+
+			// checking the state of the bag dispenser
+			checkBagDispenserState();
+		}
+	}
+
+	@Override
+	public void notifyBagsEmpty() {
+		bagsEmpty = true;
+	}
+
+	protected void checkBagDispenserState() {
+		// getting the capacity of the machine, this will never cause an error
+		int capacity = machine.getReusableBagDispenser().getCapacity();
+		int remaining;
+
+		try {
+			// trying to access the amount of bags remaining
+			remaining = machine.getReusableBagDispenser().getQuantityRemaining();
+
+			// updating the internal variable from this
+			bagCount = remaining;
+		} catch (UnsupportedOperationException e) {
+			// setting the remaining to the bag count
+			remaining = bagCount;
+		}
+
+		// checking if low
+		if (remaining <= (capacity * 0.1)) {
+			bagsLow = true;
+			notifyAttendant("The bag dispenser has less than 10% capacity.");
+		} else {
+			bagsLow = false;
+		}
 	}
 
 	@Override
@@ -398,25 +520,69 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 	@Override
 	public void requestPurchaseBags(int count) {
-		// TODO implement this method
+		// checking if empty
+		if (!hasBags()) {
+			notifyAttendant("The customer tried to purchase bags but there are none available.");
+			return;
+		}
+
+		int bound = count;
+
+		// getting the upper bound
+		if (count > bagCount) {
+			bound = bagCount;
+			notifyAttendant("Cannot dispense the requested amount of bags for the customer, dispensing" + bagCount + " bags.");
+		}
+
+		// dispensing bags
+		for (int i = 0; i < bound; ++i) {
+			try {
+				// dispensing a bag
+				ReusableBag bag = machine.getReusableBagDispenser().dispense();
+
+				// adding the item to the order
+				sm.addItemToOrder(bag, ScanType.MAIN);
+			} catch (EmptyDevice e) {
+				notifyAttendant("Not enough bags could be dispensed for the customer.");
+				break;
+			}
+		}
+	}
+
+	@Override
+	public boolean hasBags() {
+		return !bagsEmpty;
+	}
+
+	@Override
+	public boolean isBagsLow() {
+		return bagsLow;
 	}
 
 	/**
 	 * Getting the state of the printer's ink & paper.
 	 */
-	protected void getPrinterStatus() {
+	protected void checkPrinterState() {
 		try {
 			hasInk = machine.getPrinter().inkRemaining() > 0;
 		} catch (UnsupportedOperationException e) {
-			// WHYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
-			hasInk = true;
+			/**
+			 * Because I cannot actually obtain the amount of ink remaining, I need to
+			 * rely on the events given to me by my observer.
+			 *
+			 * Why does this error exist.
+			 */
 		}
 
 		try {
 			hasPaper = machine.getPrinter().paperRemaining() > 0;
 		} catch (UnsupportedOperationException e) {
-			// WHYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
-			hasPaper = true;
+			/**
+			 * Because I cannot actually obtain the amount of ink remaining, I need to
+			 * rely on the events given to me by my observer.
+			 *
+			 * Why does this error exist.
+			 */
 		}
 	}
 

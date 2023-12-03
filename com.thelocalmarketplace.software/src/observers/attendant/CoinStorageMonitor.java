@@ -1,4 +1,4 @@
-package observers.payment;
+package observers.attendant;
 
 import com.tdc.IComponent;
 import com.tdc.IComponentObserver;

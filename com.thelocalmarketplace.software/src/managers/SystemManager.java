@@ -575,6 +575,16 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	}
 
 	@Override
+	public boolean hasBags() {
+		return am.hasBags();
+	}
+
+	@Override
+	public boolean isBagsLow() {
+		return am.isBagsLow();
+	}
+
+	@Override
 	public boolean isDisabled() {
 		return getState() == SessionStatus.DISABLED;
 	}
