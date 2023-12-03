@@ -1,3 +1,5 @@
+package test.managers.attendent;
+
 //Sheikh Falah Sheikh Hasan - 30175335
 
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
