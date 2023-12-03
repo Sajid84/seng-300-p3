@@ -116,7 +116,10 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 		if (card == null) {
 			throw new IllegalArgumentException("cannot tap a null card");
 		}
-		this.machine.cardReader.tap(card);
+		if (isMembership(card)) {
+			throw new IllegalArgumentException("cannot tap a membership card as payment");
+		}
+		this.machine.getCardReader().tap(card);
 
 	}
 
@@ -141,9 +144,40 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 	}
 
 	@Override
+	public void insertCard(Card card, String pin) throws IOException {
+		if (card == null ) {
+			throw new IllegalArgumentException("Cannot insert a null card");
+		}
+		if (isMembership(card)) {
+			throw new IllegalArgumentException("cannot insert a membership card as payment");
+		}
+		this.machine.getCardReader().insert(card, pin);
+	}
+
+	@Override
+	public void notifyInsertCard(CardData cardData){
+		if (cardData == null){
+			throw new IllegalArgumentException("received null card data from the observer");
+		}
+		double amountDouble = sm.getTotalPrice().doubleValue();
+		long holdNumber = issuer.authorizeHold(cardData.getNumber(), amountDouble);
+
+		if (holdNumber == -1){
+			return;
+		} else {
+			payment = sm.getTotalPrice();
+			recordTransaction(cardData, holdNumber, amountDouble);
+			sm.notifyPaid();
+		}
+	}
+
+	@Override
 	public void swipeCard(Card card) throws IOException {
 		if (card == null) {
 			throw new IllegalArgumentException("cannot swipe a null card");
+		}
+		if (isMembership(card)) {
+			throw new IllegalArgumentException("cannot swipe a membership card as payment");
 		}
 
 		this.machine.getCardReader().swipe(card);
@@ -165,28 +199,13 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 			recordTransaction(cardData, holdNumber, amountDouble);
 		}
 	}
-	@Override
-	public void insertCard(Card card, String pin) throws IOException {
-		if (card == null ) {
-			throw new IllegalArgumentException("Cannot insert a null card");
-		}
-		this.machine.getCardReader().insert(card, pin);
-	}
 
 	@Override
-	public void notifyInsertCard(CardData cardData){
-		if (cardData == null){
-			throw new IllegalArgumentException("received null card data from the observer");
+	public boolean isMembership(Card card) throws IOException {
+		if (card.kind.toLowerCase() == "membership") {
+			return true;
 		}
-		double amountDouble = sm.getTotalPrice().doubleValue();
-		long holdNumber = issuer.authorizeHold(cardData.getNumber(), amountDouble);
-
-		if (holdNumber == -1){
-			return;
-		} else {
-			recordTransaction(cardData, holdNumber, amountDouble);
-			sm.notifyPaid();
-		}
+		return false;
 	}
 
 	@Override

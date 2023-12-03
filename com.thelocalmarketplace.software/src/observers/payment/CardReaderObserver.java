@@ -41,11 +41,15 @@ public class CardReaderObserver extends AbstractDeviceObserver implements CardRe
 			this.ref.notifyCardSwipe(data);
 			cardSwiped = false;
 		}
-		else if (cardTapped){
+		else if (cardTapped) {
 			this.ref.notifyCardTap(data);
 			cardTapped = false;
 		} else if (cardInserted) {
 			this.red.notifyInsertCard(data);
+			cardInserted = false;
+		}
+		else if (cardInserted) {
+			this.ref.notifyInsertCard(data);
 			cardInserted = false;
 		}
 	}
@@ -64,7 +68,7 @@ public class CardReaderObserver extends AbstractDeviceObserver implements CardRe
 
 	@Override
 	public void aCardHasBeenTapped() {
-		cardTapped = false;
+		cardTapped = true;
 	}
 
 }

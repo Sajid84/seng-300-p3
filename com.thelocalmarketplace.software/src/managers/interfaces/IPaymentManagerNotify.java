@@ -32,7 +32,14 @@ public interface IPaymentManagerNotify {
 	 * @return
 	 */
 	void notifyCardTap(CardData cardData);
-
+	
+	/**
+	 * This method notifies that a card has been inserted
+	 *
+	 * @param cardData the data of the inserted card
+	 */
+	
+	void notifyInsertCard(CardData cardData);
 	/**
 	 * This method notifies that a card has been inserted
 	 *
