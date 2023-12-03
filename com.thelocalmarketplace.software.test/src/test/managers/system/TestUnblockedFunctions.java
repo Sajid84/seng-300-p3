@@ -27,6 +27,7 @@ public class TestUnblockedFunctions {
 		sm = new StubbedSystemManager();
 	}
 	
+	//test case for when getRemainingBalance function can be used without issues within the state
 	@Test
 	public void testGetRemainingBalanceFunctionsWithoutState() {
 		for (SessionStatus status : SessionStatus.values()) {
@@ -35,6 +36,7 @@ public class TestUnblockedFunctions {
 		}
 	}
 	
+	//test case for when getTotalPrice function can be used without issues within the state
 	@Test
 	public void testGetTotalPriceFunctionsWithoutState() {
 		for (SessionStatus status : SessionStatus.values()) {
@@ -43,6 +45,7 @@ public class TestUnblockedFunctions {
 		}
 	}
 	
+	//test case for when getCustomerPayment function can be used without issues within the state
 	@Test
 	public void testGetCustomerPaymentFunctionsWithoutState() {
 		for (SessionStatus status : SessionStatus.values()) {
@@ -51,6 +54,7 @@ public class TestUnblockedFunctions {
 		}
 	}
 	
+	//test case for when getExceptionMass function can be used without issues within the state
 	@Test
 	public void testGetExpectedMassFunctionsWithoutState() {
 		for (SessionStatus status : SessionStatus.values()) {
@@ -58,7 +62,8 @@ public class TestUnblockedFunctions {
 			assertNotNull(sm.getExpectedMass());
 		}
 	}
-	
+
+	//test case for when getProducts function can be used without issues within the state
 	@Test
 	public void testGetProductsFunctionsWithoutState() {
 		for (SessionStatus status : SessionStatus.values()) {
@@ -67,6 +72,7 @@ public class TestUnblockedFunctions {
 		}
 	}
 	
+	//test case for when getState function can be used without issues within the state
 	@Test
 	public void testGetStateFunctionsWithoutState() {
 		for (SessionStatus status : SessionStatus.values()) {
@@ -75,6 +81,7 @@ public class TestUnblockedFunctions {
 		}
 	}
 	
+	//test case for when isScaleOverloaded function can be used without issues within the state
 	@Test
 	public void testIsScaleOverloadedWithoutState() {
 		for (SessionStatus status : SessionStatus.values()) {
@@ -83,6 +90,7 @@ public class TestUnblockedFunctions {
 		}
 	}
 	
+	//test case for when post transaction function can be used without issues within the state
 	@Test
 	public void testPostTransactionsWithoutState() {
 		for (SessionStatus status : SessionStatus.values()) {
