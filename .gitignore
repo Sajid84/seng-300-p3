@@ -1,8 +1,7 @@
 *.zip
 old*
-bin/
-*.class
 .idea/
 qodana.yml
 *.iml
 *.eml
+bin/

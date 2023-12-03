@@ -22,7 +22,9 @@
 
 package managers;
 
+import com.jjjwelectronics.EmptyDevice;
 import com.jjjwelectronics.OverloadedDevice;
+import com.jjjwelectronics.bag.ReusableBag;
 import com.tdc.CashOverloadException;
 import com.tdc.banknote.Banknote;
 import com.tdc.banknote.BanknoteStorageUnit;
@@ -31,11 +33,11 @@ import com.tdc.coin.Coin;
 import com.tdc.coin.CoinStorageUnit;
 import com.tdc.coin.ICoinDispenser;
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
+import managers.enums.ScanType;
 import managers.enums.SessionStatus;
 import managers.interfaces.IAttendantManager;
 import managers.interfaces.IAttendantManagerNotify;
-import observers.payment.CoinMonitor;
-import observers.payment.ReceiptPrinterObserver;
+import observers.attendant.*;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -50,19 +52,24 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 	// object ownership
 	protected Map<BigDecimal, CoinMonitor> coinMonitorMap = new HashMap<BigDecimal, CoinMonitor>();
-	protected Map<BigDecimal, CoinMonitor> bankNoteMonitorMap = new HashMap<BigDecimal, CoinMonitor>();
+	protected Map<BigDecimal, BanknoteMonitor> bankNoteMonitorMap = new HashMap<BigDecimal, BanknoteMonitor>();
 	protected ReceiptPrinterObserver rpls;
+	protected Map<BigDecimal, Boolean> coinDispenserLow = new HashMap<>();
+	protected Map<BigDecimal, Boolean> banknoteDispenserLow = new HashMap<>();
+	protected CoinStorageMonitor csu;
+	protected BanknoteStorageMonitor bsu;
+	protected BagMonitor bm;
 
 	// vars
 	protected boolean hasPaper = false;
 	protected boolean hasInk = false;
 	protected boolean paperLow = false;
 	protected boolean inkLow = false;
-	protected boolean coinsFull = false;
-	protected boolean banknotesFull = false;
-	protected Map<BigDecimal, Boolean> coinDispenserLow = new HashMap<>();
-	protected Map<BigDecimal, Boolean> banknoteDispenserLow = new HashMap<>();
-
+	protected boolean bagsEmpty = false;
+	protected boolean bagsLow = false;
+	protected int bagCount = 0;
+	protected boolean coinStorageUnitFull = false;
+	protected boolean banknoteStorageUnitFull = false;
 
 	public AttendantManager(SystemManager sm) {
 
@@ -80,33 +87,31 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 		// saving reference
 		this.machine = machine;
 
-        // initializing the maps
-        for (BigDecimal denom : machine.getCoinDenominations()) {
+		/// initializing the maps
+
+		// creating the coin monitors for each of the dispensers
+		for (BigDecimal denom : machine.getCoinDenominations()) {
+            coinMonitorMap.put(denom, new CoinMonitor(this, machine.getCoinDispensers().get(denom)));
             coinDispenserLow.put(denom, false);
-        }
-        for (BigDecimal denom : machine.getBanknoteDenominations()) {
+		}
+
+		// creating the banknote monitors for each of the dispensers
+		for (BigDecimal denom : machine.getBanknoteDenominations()) {
+            bankNoteMonitorMap.put(denom, new BanknoteMonitor(this, machine.getBanknoteDispensers().get(denom)));
             banknoteDispenserLow.put(denom, false);
-        }
+		}
+
+		// creating the observers for the storage units
+		bsu = new BanknoteStorageMonitor(this, machine.getBanknoteStorage());
+		csu = new CoinStorageMonitor(this, machine.getCoinStorage());
 
 		// creating the printer observer
 		rpls = new ReceiptPrinterObserver(this, machine.getPrinter());
 
-		// creating coin dispenser observers
-//		coinMonitorMap.put(new BigDecimal(0.01), new CoinMonitor());
-//		coinMonitorMap.put(new BigDecimal(0.05), new CoinMonitor());
-//		coinMonitorMap.put(new BigDecimal(0.10), new CoinMonitor());
-//		coinMonitorMap.put(new BigDecimal(0.25), new CoinMonitor());
-//		coinMonitorMap.put(new BigDecimal(1.00), new CoinMonitor());
-//		coinMonitorMap.put(new BigDecimal(2.00), new CoinMonitor());
-//
-//		// banknote dispenser observers
-//		bankNoteMonitorMap.put(new BigDecimal(5.00), new CoinMonitor());
-//		bankNoteMonitorMap.put(new BigDecimal(10.00), new CoinMonitor());
-//		bankNoteMonitorMap.put(new BigDecimal(20.00), new CoinMonitor());
-//		bankNoteMonitorMap.put(new BigDecimal(50.00), new CoinMonitor());
-//		bankNoteMonitorMap.put(new BigDecimal(100.00), new CoinMonitor());
+		// creating the bag dispenser observer
+		bm = new BagMonitor(this, machine.getReusableBagDispenser());
 	}
-	
+
 	@Override
 	public SessionStatus getState() {
 		return sm.getState();
@@ -145,106 +150,145 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	}
 
 	@Override
-	public void notifyCoinsFull(BigDecimal denom) {
+	public void notifyCoinDispenserStateChange(ICoinDispenser dispenser) {
+		// getting the denomination
+		BigDecimal denom = null;
+		for (BigDecimal d : machine.getCoinDenominations()) {
+			if (machine.getCoinDispensers().get(d) == dispenser) {
+				denom = d;
+				break;
+			}
+		}
 
+		// checking the state of the dispenser
+		checkCoinDispenserState(denom, dispenser);
+	}
+
+	protected void checkCoinDispenserState(BigDecimal denom, ICoinDispenser dispenser) {
+		// checking if we actually found the denomination of the dispenser
+		if (denom == null) {
+			throw new IllegalArgumentException("An invalid dispenser was passed into the function");
+		}
+		if (dispenser == null) {
+			throw new IllegalArgumentException("A null coin dispenser was passed into the function.");
+		}
+
+		// updating the state of the coin dispenser in the map
+		coinDispenserLow.put(denom, dispenser.size() <= (dispenser.getCapacity() * 0.10));
+
+		// checking if the dispenser is empty
+		if (dispenser.size() == 0) {
+			notifyAttendant("The " + denom + " coin dispenser is empty.");
+		}
+
+		// checking if the dispenser is almost empty
+		if (coinDispenserLow.get(denom)) {
+			notifyAttendant("The " + denom + " coin dispenser is less than 10% full.");
+		}
 	}
 
 	@Override
-	public void notifyCoinsFull(CoinStorageUnit unit) {
+	public void notifyBanknoteDispenserStateChange(IBanknoteDispenser dispenser) {
+		// getting the denomination
+		BigDecimal denom = null;
+		for (BigDecimal d : machine.getBanknoteDenominations()) {
+			if (machine.getBanknoteDispensers().get(d) == dispenser) {
+				denom = d;
+				break;
+			}
+		}
 
+		// checking the state of the dispenser
+		checkBanknoteDispenserState(denom, dispenser);
+	}
+
+	protected void checkBanknoteDispenserState(BigDecimal denom, IBanknoteDispenser dispenser) {
+		// checking if we actually found the denomination of the dispenser
+		if (denom == null) {
+			throw new IllegalArgumentException("An invalid dispenser was passed into the function");
+		}
+		if (dispenser == null) {
+			throw new IllegalArgumentException("A null banknote dispenser was passed into the function.");
+		}
+
+		// updating the state of the coin dispenser in the map
+		banknoteDispenserLow.put(denom, dispenser.size() <= (dispenser.getCapacity() * 0.10));
+
+		// checking if the dispenser is empty
+		if (dispenser.size() == 0) {
+			notifyAttendant("The " + dispenser + " banknote dispenser is empty.");
+		}
+
+		// checking if the dispenser is almost empty
+		if (banknoteDispenserLow.get(denom)) {
+			notifyAttendant("The " + dispenser + " banknote dispenser is less than 10% full.");
+		}
 	}
 
 	@Override
-	public void notifyCoinsEmpty(BigDecimal denom) {
+	public void notifyCoinStorageUnitStateChange(CoinStorageUnit unit) {
+		checkCoinStorageUnitState(unit);
+	}
 
+	protected void checkCoinStorageUnitState(CoinStorageUnit unit) {
+		// if coins almost full
+		if (unit.getCoinCount() == unit.getCapacity()) {
+			coinStorageUnitFull = true;
+			notifyAttendant("The coin storage unit is full.");
+		} else if (unit.getCoinCount() >= (unit.getCapacity() * 0.70)) {
+			coinStorageUnitFull = true;
+			notifyAttendant("The coin storage unit is over 70% full.");
+		} else {
+			coinStorageUnitFull = false;
+		}
 	}
 
 	@Override
-	public void notifyBanknotesFull(BigDecimal denom) {
-
+	public void notifyBanknoteStorageUnitStateChange(BanknoteStorageUnit unit) {
+		checkBanknoteStorageUnitState(unit);
 	}
 
-	@Override
-	public void notifyBanknotesFull(BanknoteStorageUnit unit) {
-
-	}
-
-	@Override
-	public void notifyBanknotesEmpty(BigDecimal denom) {
-
-	}
-
-	@Override
-	public void notifyCoinEmitted(BigDecimal denom) {
-		checkCoinDispenserState(denom);
-	}
-
-	@Override
-	public void notifyBanknoteEmitted(BigDecimal denom) {
-		checkBanknoteDispenserState(denom);
-	}
-
-	@Override
-	public void notifyCoinAdded(BigDecimal denom) {
-		checkCoinDispenserState(denom);
-	}
-
-	@Override
-	public void notifyBanknoteAdded(BigDecimal denom) {
-		checkBanknoteDispenserState(denom);
-	}
-
-	@Override
-	public void notifyCoinAdded(CoinStorageUnit unit) {
-		// TODO check state of the coin storage unit
-
-		// if coins full
-		notifyCoinsFull(unit);
-	}
-
-	@Override
-	public void notifyBanknoteAdded(BanknoteStorageUnit unit) {
-		// TODO check state of the banknote storage unit
-
-		// if banknotes full
-		notifyBanknotesFull(unit);
-	}
-
-	protected void checkCoinDispenserState(BigDecimal denom) {
-
-	}
-
-	protected void checkBanknoteDispenserState(BigDecimal denom) {
-
+	protected void checkBanknoteStorageUnitState(BanknoteStorageUnit unit) {
+		// if coins almost full
+		if (unit.getBanknoteCount() == unit.getCapacity()) {
+			banknoteStorageUnitFull = true;
+			notifyAttendant("The banknote storage unit is full.");
+		} else if (unit.getBanknoteCount() >= (unit.getCapacity() * 0.70)) {
+			banknoteStorageUnitFull = true;
+			notifyAttendant("The banknote storage unit is over 70% full.");
+		} else {
+			banknoteStorageUnitFull = false;
+		}
 	}
 
 	@Override
 	public void maintainBanknoteDispensers() {
-        // loading the dispensers if they're low
+		// loading the dispensers if they're low
 		for (BigDecimal denom : machine.getBanknoteDenominations()) {
-            Boolean low = banknoteDispenserLow.get(denom);
+			Boolean low = banknoteDispenserLow.get(denom);
 
-            // filling the dispenser if it's low
-            if (low) {
-                // getting the dispenser object
-                IBanknoteDispenser dispenser = machine.getBanknoteDispensers().get(denom);
+			// filling the dispenser if it's low
+			if (low) {
+				// getting the dispenser object
+				IBanknoteDispenser dispenser = machine.getBanknoteDispensers().get(denom);
 
-                // creating an array of banknotes
-                int amount = (int) (dispenser.getCapacity() * 0.5);
-                Banknote[] notes = new Banknote[amount];
+				// creating an array of banknotes
+				int amount = (int) (dispenser.getCapacity() * 0.5);
+				Banknote[] notes = new Banknote[amount];
 
-                for (int i = 0; i < amount; ++i) {
-                    notes[i] = new Banknote(Currency.getInstance(Locale.CANADA), denom);
-                }
+				for (int i = 0; i < amount; ++i) {
+					notes[i] = new Banknote(Currency.getInstance(Locale.CANADA), denom);
+				}
 
-                // loading the machine
-                try {
-                    dispenser.load(notes);
-                } catch (CashOverloadException e) {
-                    notifyAttendant("Loading banknotes into the machine caused an overload.");
-                }
-            }
-        }
+				// loading the machine
+				try {
+					dispenser.load(notes);
+				} catch (CashOverloadException e) {
+					// from this state, this should never happen
+					notifyAttendant("Loading banknotes into the machine caused an overload.");
+				}
+			}
+		}
 	}
 
 	@Override
@@ -260,31 +304,32 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 	@Override
 	public void maintainCoinDispensers() {
-        // loading the dispensers if they're low
-        for (BigDecimal denom : machine.getCoinDenominations()) {
-            Boolean low = coinDispenserLow.get(denom);
+		// loading the dispensers if they're low
+		for (BigDecimal denom : machine.getCoinDenominations()) {
+			Boolean low = coinDispenserLow.get(denom);
 
-            // filling the dispenser if it's low
-            if (low) {
-                // getting the dispenser object
-                ICoinDispenser dispenser = machine.getCoinDispensers().get(denom);
+			// filling the dispenser if it's low
+			if (low) {
+				// getting the dispenser object
+				ICoinDispenser dispenser = machine.getCoinDispensers().get(denom);
 
-                // creating an array of banknotes
-                int amount = (int) (dispenser.getCapacity() * 0.5);
-                Coin[] coins = new Coin[amount];
+				// creating an array of banknotes
+				int amount = (int) (dispenser.getCapacity() * 0.5);
+				Coin[] coins = new Coin[amount];
 
-                for (int i = 0; i < amount; ++i) {
-                    coins[i] = new Coin(Currency.getInstance(Locale.CANADA), denom);
-                }
+				for (int i = 0; i < amount; ++i) {
+					coins[i] = new Coin(Currency.getInstance(Locale.CANADA), denom);
+				}
 
-                // loading the machine
-                try {
-                    dispenser.load(coins);
-                } catch (CashOverloadException e) {
-                    notifyAttendant("Loading banknotes into the machine caused an overload.");
-                }
-            }
-        }
+				// loading the machine
+				try {
+					dispenser.load(coins);
+				} catch (CashOverloadException e) {
+					// from this state, this should never happen
+					notifyAttendant("Loading banknotes into the machine caused an overload.");
+				}
+			}
+		}
 	}
 
 	@Override
@@ -300,7 +345,7 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 	@Override
 	public void maintainBanknoteStorage() {
-		if (banknotesFull) {
+		if (banknoteStorageUnitFull) {
 			List<Banknote> notes = machine.getBanknoteStorage().unload();
 
 			// summation
@@ -310,13 +355,34 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 			}
 
 			// notifying the station
-			notifyAttendant("Unloaded $" + total.toString() + " from the banknote storage unit.");
+			notifyAttendant("Unloaded $" + total + " from the banknote storage unit.");
+		}
+	}
+
+	@Override
+	public void maintainBags() {
+		if (bagsEmpty || bagsLow) {
+			// forming the array
+			int len = (int) (machine.getReusableBagDispenser().getCapacity() * 0.5);
+			ReusableBag[] bags = new ReusableBag[len];
+
+			// populating it
+			for (int i = 0; i < len; ++i) {
+				bags[i] = new ReusableBag();
+			}
+
+			// filling the bag dispenser
+			try {
+				machine.getReusableBagDispenser().load(bags);
+			} catch (OverloadedDevice e) {
+				// this should never happen from this state
+			}
 		}
 	}
 
 	@Override
 	public void maintainCoinStorage() {
-		if (coinsFull) {
+		if (coinStorageUnitFull) {
 			List<Coin> coins = machine.getCoinStorage().unload();
 
 			// summation
@@ -326,7 +392,7 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 			}
 
 			// notifying the station
-			notifyAttendant("Unloaded $" + total.toString() + " from the coin storage unit.");
+			notifyAttendant("Unloaded $" + total + " from the coin storage unit.");
 		}
 	}
 
@@ -363,7 +429,26 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	@Override
 	public void reset() {
 		// setting has papper & ink
-		getPrinterStatus();
+		checkPrinterState();
+
+		/// checking the status of the devices
+
+		// bag dispenser
+		checkBagDispenserState();
+
+		// storage units
+		checkCoinStorageUnitState(machine.getCoinStorage());
+		checkBanknoteStorageUnitState(machine.getBanknoteStorage());
+
+		// coin dispensers
+		for (BigDecimal denom : machine.getCoinDenominations()) {
+			checkCoinDispenserState(denom, machine.getCoinDispensers().get(denom));
+		}
+
+		// banknote dispensers
+		for (BigDecimal denom : machine.getBanknoteDenominations()) {
+			checkBanknoteDispenserState(denom, machine.getBanknoteDispensers().get(denom));
+		}
 	}
 
 	@Override
@@ -377,26 +462,127 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	}
 
 	@Override
+	public void notifyBagDispensed() {
+		// decrementing the bag count
+		--bagCount;
+
+		// checking the state of the dispenser
+		checkBagDispenserState();
+	}
+
+	@Override
+	public void notifyBagsLoaded(int count) {
+		if (count > 0) {
+			bagCount = count; // treating this as the maximum capacity if there's an exception
+
+			// resetting the count of the bags
+			bagsEmpty = false;
+
+			// checking the state of the bag dispenser
+			checkBagDispenserState();
+		}
+	}
+
+	@Override
+	public void notifyBagsEmpty() {
+		bagsEmpty = true;
+	}
+
+	protected void checkBagDispenserState() {
+		// getting the capacity of the machine, this will never cause an error
+		int capacity = machine.getReusableBagDispenser().getCapacity();
+		int remaining;
+
+		try {
+			// trying to access the amount of bags remaining
+			remaining = machine.getReusableBagDispenser().getQuantityRemaining();
+
+			// updating the internal variable from this
+			bagCount = remaining;
+		} catch (UnsupportedOperationException e) {
+			// setting the remaining to the bag count
+			remaining = bagCount;
+		}
+
+		// checking if low
+		if (remaining <= (capacity * 0.1)) {
+			bagsLow = true;
+			notifyAttendant("The bag dispenser has less than 10% capacity.");
+		} else {
+			bagsLow = false;
+		}
+	}
+
+	@Override
 	public boolean canPrint() {
 		return hasInk && hasPaper;
+	}
+
+	@Override
+	public void requestPurchaseBags(int count) {
+		// checking if empty
+		if (!hasBags()) {
+			notifyAttendant("The customer tried to purchase bags but there are none available.");
+			return;
+		}
+
+		int bound = count;
+
+		// getting the upper bound
+		if (count > bagCount) {
+			bound = bagCount;
+			notifyAttendant("Cannot dispense the requested amount of bags for the customer, dispensing" + bagCount + " bags.");
+		}
+
+		// dispensing bags
+		for (int i = 0; i < bound; ++i) {
+			try {
+				// dispensing a bag
+				ReusableBag bag = machine.getReusableBagDispenser().dispense();
+
+				// adding the item to the order
+				sm.addItemToOrder(bag, ScanType.MAIN);
+			} catch (EmptyDevice e) {
+				notifyAttendant("Not enough bags could be dispensed for the customer.");
+				break;
+			}
+		}
+	}
+
+	@Override
+	public boolean hasBags() {
+		return !bagsEmpty;
+	}
+
+	@Override
+	public boolean isBagsLow() {
+		return bagsLow;
 	}
 
 	/**
 	 * Getting the state of the printer's ink & paper.
 	 */
-	protected void getPrinterStatus() {
+	protected void checkPrinterState() {
 		try {
 			hasInk = machine.getPrinter().inkRemaining() > 0;
 		} catch (UnsupportedOperationException e) {
-			// WHYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
-			hasInk = true;
+			/**
+			 * Because I cannot actually obtain the amount of ink remaining, I need to
+			 * rely on the events given to me by my observer.
+			 *
+			 * Why does this error exist.
+			 */
 		}
 
 		try {
 			hasPaper = machine.getPrinter().paperRemaining() > 0;
 		} catch (UnsupportedOperationException e) {
-			// WHYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
-			hasPaper = true;
+			/**
+			 * Because I cannot actually obtain the amount of ink remaining, I need to
+			 * rely on the events given to me by my observer.
+			 *
+			 * Why does this error exist.
+			 */
 		}
 	}
 

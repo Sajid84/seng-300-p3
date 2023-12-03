@@ -56,7 +56,6 @@ public class TestConfigures {
 		
 		assertNotNull(sm.pmStub.getBanknoteCollector());
 		assertNotNull(sm.pmStub.getCardReaderObserver());
-		assertNotNull(sm.pmStub.getReceiptPrinterObserver());
 		assertNotNull(sm.pmStub.getCoinCollector());
 	}
 	

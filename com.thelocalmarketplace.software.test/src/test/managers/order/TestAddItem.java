@@ -59,16 +59,19 @@ public class TestAddItem {
 		sm.configure(machine);
 	}
 
+	// Adds null item. Expect to throw exception 
 	@Test(expected = IllegalArgumentException.class)
 	public void testAddingNullItem() throws OperationNotSupportedException {
 		om.addItemToOrder(null, ScanType.MAIN);
 	}
 
+	//Adds item with a null scanner. Expect to throw exception.
 	@Test(expected = IllegalArgumentException.class)
 	public void testAddingItemWithNullScanner() throws OperationNotSupportedException {
 		om.addItemToOrder(new StubbedItem(1), null);
 	}
 
+	//Add a barcoded product. Get barcode and expected weight for the item. Add item to the order with ScanType.MAIN. Expect to Items size equal 1.
 	@Test
 	public void addingInstanceOfBarcodedItemViaMainScanner() throws OperationNotSupportedException {
 		BarcodedProduct prod = new StubbedBarcodedProduct();
@@ -80,6 +83,7 @@ public class TestAddItem {
 		assertEquals(om.getItems().size(), 1);
 	}
 
+	//Add a barcoded product. Get barcode and expected weight for the item. Add item to the order with ScanType.HANDHELD. Expect to Items size equal 1.
 	@Test
 	public void addingInstanceOfBarcodedItemViaHandheldScanner() throws OperationNotSupportedException {
 		BarcodedProduct prod = new StubbedBarcodedProduct();
@@ -91,12 +95,14 @@ public class TestAddItem {
 		assertEquals(om.getItems().size(), 1);
 	}
 
+	//Add a pluCodedItem with main scanner and expect to throw an exception.
 	@Test(expected = OperationNotSupportedException.class)
 	public void addingInstanceOfPLUViaMainScanner() throws OperationNotSupportedException {
 		PLUCodedItem pluCodedItem = new StubbedPLUItem();
 		om.addItemToOrder(pluCodedItem, ScanType.MAIN);
 	}
 
+	//Add a pluCodedItem with handheld scanner and expect to throw an exception.
 	@Test(expected = OperationNotSupportedException.class)
 	public void addingInstanceOfPLUViaHandheldScanner() throws OperationNotSupportedException {
 		PLUCodedItem pluCodedItem = new StubbedPLUItem();

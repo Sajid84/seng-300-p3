@@ -1,9 +1,9 @@
 package managers.interfaces;
 
 import com.tdc.banknote.BanknoteStorageUnit;
+import com.tdc.banknote.IBanknoteDispenser;
 import com.tdc.coin.CoinStorageUnit;
-
-import java.math.BigDecimal;
+import com.tdc.coin.ICoinDispenser;
 
 public interface IAttendantManagerNotify {
 
@@ -18,88 +18,32 @@ public interface IAttendantManagerNotify {
     void notifyInkLow();
 
     /**
-     * This notifies the manager that the observed coin dispenser has full coins.
+     * Notifies the manager that the coin dispenser had a change in its state.
      *
-     * @param denom the dispenser that triggered this event
+     * @param dispenser the denomination of the dispenser
      */
-    void notifyCoinsFull(BigDecimal denom);
+    void notifyCoinDispenserStateChange(ICoinDispenser dispenser);
 
     /**
-     * This notifies the manager that the observed coin storage unit has full coins.
+     * Notifies the manager that the banknote dispenser had a change in its state.
      *
-     * @param unit the storage unit that triggered this event
+     * @param dispenser the denomination of the dispenser
      */
-    void notifyCoinsFull(CoinStorageUnit unit);
+    void notifyBanknoteDispenserStateChange(IBanknoteDispenser dispenser);
 
     /**
-     * This notifies the manager that the observed coin dispenser has no coins.
+     * Notifies the manager that the coin dispenser had a change in its state.
      *
-     * @param denom the denomination of coin dispenser that triggered this event
+     * @param unit the storage unit that emitted this event
      */
-    void notifyCoinsEmpty(BigDecimal denom);
+    void notifyCoinStorageUnitStateChange(CoinStorageUnit unit);
 
     /**
-     * This notifies the manager that the observed banknote dispenser has full banknotes.
+     * Notifies the manager that the coin dispenser had a change in its state.
      *
-     * @param denom the denomination of dispenser that triggered this event
+     * @param unit the storage unit that emitted this event
      */
-    void notifyBanknotesFull(BigDecimal denom);
-
-    /**
-     * This notifies the manager that the observed banknote storage unit has full banknotes.
-     *
-     * @param unit the storage unit that triggered this event
-     */
-    void notifyBanknotesFull(BanknoteStorageUnit unit);
-
-    /**
-     * This notifies the manager that the observed banknote dispenser has no banknotes.
-     *
-     * @param denom the denomination of coin dispenser that triggered this event
-     */
-    void notifyBanknotesEmpty(BigDecimal denom);
-
-    /**
-     * This tells the manager that a coin was emitted and to check the state of the coin dispensers.
-     *
-     * @param denom the denomination of the coin
-     */
-    void notifyCoinEmitted(BigDecimal denom);
-
-    /**
-     * This tells the manager that a banknote was emitted and to check the state of the banknote dispensers.
-     *
-     * @param denom the denomination of the coin
-     */
-    void notifyBanknoteEmitted(BigDecimal denom);
-
-    /**
-     * This tells the manager that a coin was added and to check the state of the coin dispensers.
-     *
-     * @param denom the denomination of the coin
-     */
-    void notifyCoinAdded(BigDecimal denom);
-
-    /**
-     * This tells the manager that a banknote was added and to check the state of the banknote dispensers.
-     *
-     * @param denom the denomination of the coin
-     */
-    void notifyBanknoteAdded(BigDecimal denom);
-
-    /**
-     * This tells the manager that a coin was emitted and to check the state of the coin storage unit.
-     *
-     * @param unit the storage unit that called this event
-     */
-    void notifyCoinAdded(CoinStorageUnit unit);
-
-    /**
-     * This tells the manager that a banknote was emitted and to check the state of the banknote storage unit.
-     *
-     * @param unit the storage unit that called this event
-     */
-    void notifyBanknoteAdded(BanknoteStorageUnit unit);
+    void notifyBanknoteStorageUnitStateChange(BanknoteStorageUnit unit);
 
     /**
      * Notifies the system about the paper status.
@@ -115,5 +59,19 @@ public interface IAttendantManagerNotify {
      */
     void notifyInk(boolean hasInk);
 
+    /**
+     * Notifies the manager that a bag was dispensed.
+     */
+    void notifyBagDispensed();
 
+    /**
+     * Notifies that bags have been loaded into the machine.
+     * @param count the number of bags loaded
+     */
+    void notifyBagsLoaded(int count);
+
+    /**
+     * Notifies that there are no more bags left in the machine.
+     */
+    void notifyBagsEmpty();
 }
