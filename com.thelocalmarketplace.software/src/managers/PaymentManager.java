@@ -38,7 +38,6 @@ import managers.interfaces.IPaymentManagerNotify;
 import observers.payment.BanknoteCollector;
 import observers.payment.CardReaderObserver;
 import observers.payment.CoinCollector;
-import observers.payment.ReceiptPrinterObserver;
 import utils.DatabaseHelper;
 import utils.Pair;
 

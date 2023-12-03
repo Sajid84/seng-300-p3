@@ -11,6 +11,7 @@ import com.jjjwelectronics.scanner.BarcodedItem;
 import com.thelocalmarketplace.hardware.*;
 import database.Database;
 
+import java.math.BigDecimal;
 import java.util.Random;
 
 /**
@@ -18,6 +19,7 @@ import java.util.Random;
  */
 public class DatabaseHelper {
 
+    public static final BigDecimal PRICE_OF_BAG = BigDecimal.ONE;
     private static final String[] names = {"Milk", "Bread", "Eggs", "Cheese", "Sugar", "Cereal", "Beef", "Abacus", "Butter"};
 
     private static final String[] adjectives = {"Inedible", "Tasty", "Pasty", "Wooden", "Super", "Proud", "Big", "Small",
@@ -202,7 +204,7 @@ public class DatabaseHelper {
      * </p>
      * <p>
      * This function also guarantess that the product's expected mass is bigger than
-     * the item's by at least 10 units.
+     * the item's by at 1,000 units.
      *
      * @return the generated barcoded item
      */

@@ -31,6 +31,18 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
 
     private Map<String, BigDecimal> stringToCoinDenom = new HashMap<>();
     private Map<String, BigDecimal> stringToBanknoteDenom = new HashMap<>();
+    private JButton SwipeCardButton;
+    private JButton TapCardButton;
+    private JButton InsertCardButton;
+    private JComboBox CoinValueDropdown;
+    private JButton InsertCoinButton;
+    private JComboBox CashValueDropdown;
+    private JButton InsertBanknoteButton;
+    private JLabel AmountInsertedLabel;
+    private JLabel RemainingDueLabel;
+    
+    private String AmountInPre = "Amount Inserted: $";
+    private String AmountDuePre = "Remaining Due: $";
 
     @Override
     public JPanel getPanel() {
@@ -40,6 +52,11 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
     @Override
     public JFrame getFrame() {
         return this;
+    }
+    
+    private void updateMoneyLabels() {
+    	AmountInsertedLabel.setText(AmountInPre + sm.getCustomerPayment().toString());
+    	RemainingDueLabel.setText(AmountDuePre + sm.getRemainingBalance().toString());
     }
 
     protected void createDenominationMapping() {
@@ -71,11 +88,11 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
         setContentPane(contentPane);
-        contentPane.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+        contentPane.setLayout(new BorderLayout(0, 0));
 
         JPanel CardPanel = new JPanel();
         CardPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-        contentPane.add(CardPanel);
+        contentPane.add(CardPanel, BorderLayout.WEST);
         CardPanel.setLayout(new BoxLayout(CardPanel, BoxLayout.Y_AXIS));
 
         JLabel CardLabel = new JLabel("Pay With Card");
@@ -83,35 +100,39 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
         CardLabel.setHorizontalAlignment(SwingConstants.CENTER);
         CardPanel.add(CardLabel);
 
-        JButton SwipeCardButton = new JButton("Swipe Card");
+        SwipeCardButton = new JButton("Swipe Card");
         SwipeCardButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         SwipeCardButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Swiping a card.");
                 sm.swipeCard(simulatedCard);
+                updateMoneyLabels();
             }
         });
         CardPanel.add(SwipeCardButton);
 
-        JButton TapCardButton = new JButton("Tap Card");
+        TapCardButton = new JButton("Tap Card");
         TapCardButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         TapCardButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 //sm.tapCard(SimulatedCard); TODO: get actual implementation
+                updateMoneyLabels();
+
             }
         });
         CardPanel.add(TapCardButton);
 
-        JButton InsertCardButton = new JButton("Insert Card");
+        InsertCardButton = new JButton("Insert Card");
         InsertCardButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         InsertCardButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 //sm.insertCard(SimulatedCard); TODO: get actual implementation
+            	updateMoneyLabels();
 
             }
         });
@@ -119,7 +140,7 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
 
         JPanel CashCoinPanel = new JPanel();
         CashCoinPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-        contentPane.add(CashCoinPanel);
+        contentPane.add(CashCoinPanel, BorderLayout.EAST);
         CashCoinPanel.setLayout(new BoxLayout(CashCoinPanel, BoxLayout.X_AXIS));
 
         JPanel CoinPanel = new JPanel();
@@ -131,11 +152,11 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
         CoinLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         CoinPanel.add(CoinLabel);
 
-        JComboBox CoinValueDropdown = new JComboBox();
+        CoinValueDropdown = new JComboBox();
         CoinValueDropdown.setModel(new DefaultComboBoxModel(stringToCoinDenom.keySet().toArray()));
         CoinPanel.add(CoinValueDropdown);
 
-        JButton InsertCoinButton = new JButton("Insert Coin");
+        InsertCoinButton = new JButton("Insert Coin");
         InsertCoinButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         InsertCoinButton.addActionListener(new ActionListener() {
 
@@ -144,6 +165,8 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
                 BigDecimal denom = stringToCoinDenom.get(CoinValueDropdown.getSelectedItem());
                 sm.insertCoin(new Coin(Currency.getInstance("CAD"), denom));
                 System.out.println("Inserted a coin of value: " + denom.toString());
+                updateMoneyLabels();
+
             }
         });
         CoinPanel.add(InsertCoinButton);
@@ -157,11 +180,11 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
         CashLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         CashPanel.add(CashLabel);
 
-        JComboBox CashValueDropdown = new JComboBox();
+        CashValueDropdown = new JComboBox();
         CashValueDropdown.setModel(new DefaultComboBoxModel(stringToBanknoteDenom.keySet().toArray()));
         CashPanel.add(CashValueDropdown);
 
-        JButton InsertBanknoteButton = new JButton("Insert Banknote");
+        InsertBanknoteButton = new JButton("Insert Banknote");
         InsertBanknoteButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         InsertBanknoteButton.addActionListener(new ActionListener() {
 
@@ -170,9 +193,23 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
                 BigDecimal denom = stringToBanknoteDenom.get(CashValueDropdown.getSelectedItem());
                 sm.insertBanknote(new Banknote(Currency.getInstance("CAD"), denom));
                 System.out.println("Inserted a banknote of value: " + denom.toString());
+                updateMoneyLabels();
+
             }
         });
         CashPanel.add(InsertBanknoteButton);
+        
+        JPanel MoneyTrackerPanel = new JPanel();
+        contentPane.add(MoneyTrackerPanel, BorderLayout.SOUTH);
+        MoneyTrackerPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+        
+        AmountInsertedLabel = new JLabel("Amount Inserted: $");
+        MoneyTrackerPanel.add(AmountInsertedLabel);
+        
+        RemainingDueLabel = new JLabel("Remaining Due: $");
+        MoneyTrackerPanel.add(RemainingDueLabel);
+        updateMoneyLabels();
+
 
         this.addWindowListener(new WindowAdapter() {
             @Override
