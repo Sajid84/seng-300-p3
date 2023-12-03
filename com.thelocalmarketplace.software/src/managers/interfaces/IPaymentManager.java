@@ -107,4 +107,9 @@ public interface IPaymentManager extends IManager {
      * @return true if a card was inserted, false otherwise
      */
     boolean isCardInserted();
+
+    /**
+     * Removes the card from the hardware.
+     */
+    void removeCard();
 }

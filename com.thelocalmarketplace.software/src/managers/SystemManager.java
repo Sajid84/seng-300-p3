@@ -230,6 +230,9 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 			if (!card.hasChip) {
 				throw new RuntimeException("Cannot insert a card without a chip.");
 			}
+			if (isCardInserted()) {
+				throw new RuntimeException("Cannot insert a card when there's already another card inserted.");
+			}
 
 			// inserting the card
 			this.pm.insertCard(card, pin);
@@ -446,6 +449,11 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	@Override
 	public boolean isCardInserted() {
 		return pm.isCardInserted();
+	}
+
+	@Override
+	public void removeCard() {
+		pm.removeCard();
 	}
 
 	public void addCustomerBags(Item bags) {

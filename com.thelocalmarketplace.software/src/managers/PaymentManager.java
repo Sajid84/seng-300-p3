@@ -454,6 +454,11 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 		return cardInserted;
 	}
 
+	@Override
+	public void removeCard() {
+		machine.getCardReader().remove();
+	}
+
 	protected void printLine(String s) throws EmptyDevice {
 		for (int i = 0; i < s.length(); i++) {
 			try {
