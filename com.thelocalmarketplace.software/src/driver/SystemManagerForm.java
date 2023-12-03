@@ -254,8 +254,8 @@ public class SystemManagerForm implements IScreen {
 
         // creating the add item gui
         // TODO this will crash because the program cannot find the jgoodies jar.
-        addItemGui = new AddItemGui(sm);
-        sm.attach(addItemGui);
+//        addItemGui = new AddItemGui(sm);
+//        sm.attach(addItemGui);
     }
 
     /**
