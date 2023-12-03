@@ -43,7 +43,7 @@ public class TestBagMonitor {
         sm.configure(machine);
 
         // creating the observer
-        bmo = am.getBagMonitor();
+        bm = am.getBagMonitor();
     }
 
     @Test
