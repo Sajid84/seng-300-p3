@@ -7,13 +7,6 @@
 
 package managers;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import com.jjjwelectronics.EmptyDevice;
 import com.jjjwelectronics.Item;
 import com.jjjwelectronics.OverloadedDevice;
@@ -27,18 +20,28 @@ import com.tdc.banknote.Banknote;
 import com.tdc.banknote.IBanknoteDispenser;
 import com.tdc.coin.Coin;
 import com.tdc.coin.ICoinDispenser;
-import com.thelocalmarketplace.hardware.*;
+import com.thelocalmarketplace.hardware.BarcodedProduct;
+import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
+import com.thelocalmarketplace.hardware.PLUCodedItem;
+import com.thelocalmarketplace.hardware.PLUCodedProduct;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
-
-import managers.enums.PaymentType;
-import managers.enums.SessionStatus;
+import enums.PaymentType;
+import enums.SessionStatus;
 import managers.interfaces.IPaymentManager;
 import managers.interfaces.IPaymentManagerNotify;
 import observers.payment.BanknoteCollector;
 import observers.payment.CardReaderObserver;
 import observers.payment.CoinCollector;
+import utils.CardHelper;
 import utils.DatabaseHelper;
 import utils.Pair;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 
@@ -56,6 +59,8 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 
 	// vars
 	protected BigDecimal payment = BigDecimal.ZERO;
+	protected CardData membershipData;
+	protected boolean cardInserted = false;
 
 	/**
 	 * This controls everything relating to customer payment.
@@ -106,9 +111,40 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 	}
 
 	@Override
+	public void notifyCardInserted(boolean inserted) {
+		cardInserted = inserted;
+	}
+
+	@Override
 	public BigDecimal getCustomerPayment() {
 		return this.payment;
 	}
+
+	@Override
+	public CardData getMembershipData() {
+		return this.membershipData;
+	}
+
+	@Override
+	public void tapCard(Card card) throws IOException{
+		if (card == null) {
+			throw new IllegalArgumentException("cannot tap a null card");
+		}
+
+		this.machine.getCardReader().tap(card);
+
+	}
+
+
+	@Override
+	public void insertCard(Card card, String pin) throws IOException {
+		if (card == null ) {
+			throw new IllegalArgumentException("Cannot insert a null card");
+		}
+
+		this.machine.getCardReader().insert(card, pin);
+	}
+
 
 	@Override
 	public void swipeCard(Card card) throws IOException {
@@ -119,12 +155,17 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 		this.machine.getCardReader().swipe(card);
 	}
 
+
 	@Override
-	public void notifyCardSwipe(CardData cardData) {
+	public void notifyCardDataRead(CardData cardData) {
 		if (cardData == null) {
 			throw new IllegalArgumentException("received null card data from the observer");
 		}
 
+		if (CardHelper.isMembership(cardData)){
+			membershipData = cardData;
+			return;
+		}
 		// vars
 		double amountDouble = sm.getTotalPrice().doubleValue();
 		long holdNumber = issuer.authorizeHold(cardData.getNumber(), amountDouble);
@@ -135,6 +176,7 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 			recordTransaction(cardData, holdNumber, amountDouble);
 		}
 	}
+
 
 	@Override
 	public void insertCoin(Coin coin) throws DisabledException, CashOverloadException {
@@ -299,13 +341,11 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 		case 0:
 			// Dispensed enough change
 			this.machine.getBanknoteOutput().dispense();
-			this.sm.notifyPaid();
 			yield true;
 		case -1:
 			// this should never actually happen
 			this.sm.notifyAttendant("To much change was dispensed");
 			this.machine.getBanknoteOutput().dispense();
-			this.sm.notifyPaid();
 			yield false;
 		default:
 			// I can't imagine this ever happening, I don't know why Java forces you to
@@ -407,6 +447,16 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 
 		// cutting the paper
 		this.machine.getPrinter().cutPaper();
+	}
+
+	@Override
+	public boolean isCardInserted() {
+		return cardInserted;
+	}
+
+	@Override
+	public void removeCard() {
+		machine.getCardReader().remove();
 	}
 
 	protected void printLine(String s) throws EmptyDevice {

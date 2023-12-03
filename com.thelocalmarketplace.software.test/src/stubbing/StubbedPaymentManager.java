@@ -15,7 +15,7 @@ import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
 
 import managers.PaymentManager;
-import managers.enums.PaymentType;
+import enums.PaymentType;
 import observers.payment.BanknoteCollector;
 import observers.payment.CardReaderObserver;
 import observers.payment.CoinCollector;

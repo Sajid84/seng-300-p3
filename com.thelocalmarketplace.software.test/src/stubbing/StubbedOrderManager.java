@@ -12,8 +12,8 @@ import com.jjjwelectronics.scale.IElectronicScale;
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 
 import managers.OrderManager;
-import managers.enums.ScanType;
-import managers.enums.SessionStatus;
+import enums.ScanType;
+import enums.SessionStatus;
 import managers.interfaces.IOrderManagerNotify;
 import observers.order.BarcodeScannerObserver;
 import observers.order.ScaleObserver;

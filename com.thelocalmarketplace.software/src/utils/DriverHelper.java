@@ -15,7 +15,7 @@ import com.thelocalmarketplace.hardware.SelfCheckoutStationGold;
 import com.thelocalmarketplace.hardware.SelfCheckoutStationSilver;
 
 import ca.ucalgary.seng300.simulation.InvalidArgumentSimulationException;
-import managers.enums.SelfCheckoutTypes;
+import enums.SelfCheckoutTypes;
 
 // this moves most of the setup from Driver into another class
 public class DriverHelper {

@@ -6,7 +6,7 @@ package managers.interfaces;
 import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
-import managers.enums.SessionStatus;
+import enums.SessionStatus;
 
 public interface IManager extends IManagerNotify {
 	/**

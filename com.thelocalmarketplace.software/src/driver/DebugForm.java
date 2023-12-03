@@ -5,8 +5,8 @@ import com.jjjwelectronics.card.Card;
 import com.jjjwelectronics.scanner.BarcodedItem;
 import com.jjjwelectronics.screen.ITouchScreen;
 import managers.SystemManager;
-import managers.enums.ScanType;
-import managers.enums.SessionStatus;
+import enums.ScanType;
+import enums.SessionStatus;
 import managers.interfaces.IScreen;
 import utils.DatabaseHelper;
 

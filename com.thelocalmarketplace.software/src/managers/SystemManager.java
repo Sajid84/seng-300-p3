@@ -19,9 +19,9 @@ import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import com.thelocalmarketplace.hardware.PLUCodedItem;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
 import driver.MainScreenForm;
-import managers.enums.PaymentType;
-import managers.enums.ScanType;
-import managers.enums.SessionStatus;
+import enums.PaymentType;
+import enums.ScanType;
+import enums.SessionStatus;
 import managers.interfaces.*;
 import utils.Pair;
 
@@ -203,6 +203,11 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	}
 
 	@Override
+	public CardData getMembershipData() {
+		return pm.getMembershipData();
+	}
+
+	@Override
 	public void swipeCard(Card card) {
 		// not performing action if session is blocked
 		if (!isUnblocked())
@@ -216,7 +221,50 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 			checkPaid();
 		}
 	}
+	@Override
+	public void insertCard(Card card, String pin) {
+		if (!isUnblocked()) {throw new IllegalStateException("cannot insert card when PAID");}
 
+		try{
+			// checking if the card can actually be inserted
+			if (!card.hasChip) {
+				throw new RuntimeException("Cannot insert a card without a chip.");
+			}
+			if (isCardInserted()) {
+				throw new RuntimeException("Cannot insert a card when there's already another card inserted.");
+			}
+
+			// inserting the card
+			this.pm.insertCard(card, pin);
+		} catch (IOException e) {
+			notifyInvalidCardRead(card);
+		} finally {
+			checkPaid();
+		}
+	}
+
+	@Override
+	public void tapCard(Card card) {
+		// not performing action if session is blocked
+		if (!isUnblocked()) {throw new IllegalStateException("cannot tap card when PAID");}
+
+		try{
+			// checking if the card can actually be inserted
+			if (!card.isTapEnabled) {
+				throw new RuntimeException("Cannot tap a card that isn't tap enabled.");
+			}
+
+			// inserting the card
+			this.pm.tapCard(card);
+		} catch (IOException e) {
+			notifyInvalidCardRead(card);
+		} finally {
+			checkPaid();
+		}
+
+	}
+	
+	@Override
 	public boolean tenderChange() {
 		if (!isPaid())
 			throw new IllegalStateException("cannot tender change when not in a PAID state");
@@ -396,6 +444,16 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 		}
 
 		this.pm.printReceipt(type, card);
+	}
+
+	@Override
+	public boolean isCardInserted() {
+		return pm.isCardInserted();
+	}
+
+	@Override
+	public void removeCard() {
+		pm.removeCard();
 	}
 
 	public void addCustomerBags(Item bags) {
@@ -597,6 +655,7 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 		om.reset();
 
 		// resetting self
+		setState(SessionStatus.NORMAL);
 	}
 
 	@Override
