@@ -5,11 +5,18 @@ import observers.payment.ReceiptPrinterObserver;
 
 public class StubbedAttendantManager extends AttendantManager {
     public StubbedSystemManager smStub;
+    
+    public boolean notifyAttendantCalled;
+	private String attendantNotification;
+
 
     public StubbedAttendantManager(StubbedSystemManager sm) {
         super(sm);
 
         smStub = sm;
+        
+        //variables to check if predict is called, copied from StubbedSystemManager
+        notifyAttendantCalled = false;
     }
 
     public ReceiptPrinterObserver getReceiptPrinterObserver() {
@@ -31,4 +38,26 @@ public class StubbedAttendantManager extends AttendantManager {
     public void setHasInk(boolean has) {
         super.hasInk = has;
     }
+    
+    //getter for checking paperLow, inkLow variables
+    public boolean isPaperLow() {
+    	return paperLow;
+    }
+    
+    public boolean isInkLow() {
+    	return inkLow;
+    }
+    
+    //needed to check predict notifications
+	@Override
+	public void notifyAttendant(String reason) {
+		notifyAttendantCalled = true;
+		this.attendantNotification = reason;
+		super.notifyAttendant(reason);
+	}
+	
+	public String getAttendantNotification() {
+		return attendantNotification;
+	}
+ 
 }

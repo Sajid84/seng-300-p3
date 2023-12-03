@@ -164,7 +164,7 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 		}
 
 		// checking if the dispenser is almost empty
-		if (coinDispenserLow.get(denom)) {
+		else if (coinDispenserLow.get(denom)) {
 			notifyAttendant("The " + denom + " coin dispenser is less than 10% full.");
 		}
 	}
@@ -194,7 +194,7 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 		}
 
 		// checking if the dispenser is almost empty
-		if (banknoteDispenserLow.get(denom)) {
+		else if (banknoteDispenserLow.get(denom)) {
 			notifyAttendant("The " + dispenser + " banknote dispenser is less than 10% full.");
 		}
 	}
