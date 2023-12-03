@@ -31,7 +31,7 @@ import org.junit.Test;
 
 import com.tdc.NoCashAvailableException;
 
-import managers.enums.SessionStatus;
+import enums.SessionStatus;
 import stubbing.StubbedSystemManager;
 
 /**

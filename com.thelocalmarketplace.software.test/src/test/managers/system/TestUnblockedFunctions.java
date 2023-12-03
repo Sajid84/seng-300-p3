@@ -28,7 +28,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
-import managers.enums.SessionStatus;
+import enums.SessionStatus;
 import stubbing.StubbedSystemManager;
 
 /**
