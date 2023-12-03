@@ -1,7 +1,7 @@
 package stubbing;
 
 import managers.AttendantManager;
-import observers.payment.ReceiptPrinterObserver;
+import observers.attendant.ReceiptPrinterObserver;
 
 public class StubbedAttendantManager extends AttendantManager {
     public StubbedSystemManager smStub;

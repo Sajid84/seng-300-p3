@@ -187,18 +187,6 @@ public class DatabaseHelper {
     }
 
     /**
-     * Since {@link Item} is abstract, the only real way to arbitrarily add mass to the
-     * scale is by generating some dummy item.
-     *
-     * @return a {@link BarcodedItem} with a mass of 200 and a randomly generated barcode.
-     */
-    public static BarcodedItem createCustomerBags() {
-        Barcode barcode = DatabaseHelper.createRandomBarcode(10);
-
-        return new BarcodedItem(barcode, new Mass(createRandomMass()));
-    }
-
-    /**
      * This method creates a weight discrepancy by generating a barcoded item and
      * product pair where the product is expected to weight more than the item
      * itself.

@@ -20,7 +20,7 @@
 // Kevlam Chundawat 30180662
 // Anmol Bansal 30159559
 
-package observers.payment;
+package observers.attendant;
 
 import com.jjjwelectronics.printer.IReceiptPrinter;
 import com.jjjwelectronics.printer.ReceiptPrinterListener;
@@ -55,7 +55,7 @@ public class ReceiptPrinterObserver extends AbstractDeviceObserver implements Re
 
     @Override
     public void thePrinterHasLowInk() {
-        this.ref.notifyPaperLow();
+        this.ref.notifyInkLow();
     }
 
     @Override

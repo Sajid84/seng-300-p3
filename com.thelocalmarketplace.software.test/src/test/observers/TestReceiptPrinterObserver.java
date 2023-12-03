@@ -8,7 +8,7 @@ import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import org.junit.Before;
 import org.junit.Test;
 
-import observers.payment.ReceiptPrinterObserver;
+import observers.attendant.ReceiptPrinterObserver;
 import stubbing.*;
 
 public class TestReceiptPrinterObserver {

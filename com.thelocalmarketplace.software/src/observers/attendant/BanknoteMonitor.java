@@ -1,4 +1,4 @@
-package observers.payment;
+package observers.attendant;
 
 import com.tdc.banknote.Banknote;
 import com.tdc.banknote.BanknoteDispenserObserver;

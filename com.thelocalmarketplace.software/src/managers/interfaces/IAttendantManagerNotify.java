@@ -63,6 +63,15 @@ public interface IAttendantManagerNotify {
      * Notifies the manager that a bag was dispensed.
      */
     void notifyBagDispensed();
-        BarcodedItem bagProduct = createCustomerBags();
-		sm.addItemToOrder(bagProduct, ScanType.MAIN)
+
+    /**
+     * Notifies that bags have been loaded into the machine.
+     * @param count the number of bags loaded
+     */
+    void notifyBagsLoaded(int count);
+
+    /**
+     * Notifies that there are no more bags left in the machine.
+     */
+    void notifyBagsEmpty();
 }

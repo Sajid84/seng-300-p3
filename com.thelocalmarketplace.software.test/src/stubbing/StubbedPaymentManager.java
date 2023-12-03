@@ -11,7 +11,6 @@ import com.tdc.DisabledException;
 import com.tdc.NoCashAvailableException;
 import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
-import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
 
@@ -20,7 +19,6 @@ import managers.enums.PaymentType;
 import observers.payment.BanknoteCollector;
 import observers.payment.CardReaderObserver;
 import observers.payment.CoinCollector;
-import observers.payment.ReceiptPrinterObserver;
 
 public class StubbedPaymentManager extends PaymentManager {
 
