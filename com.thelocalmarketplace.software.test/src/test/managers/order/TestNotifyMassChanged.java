@@ -10,9 +10,7 @@ import com.jjjwelectronics.scanner.BarcodedItem;
 import org.junit.Before;
 import org.junit.Test;
 
-import managers.enums.SessionStatus;
-import stubbing.StubbedBarcodedItem;
-import stubbing.StubbedBarcodedProduct;
+import enums.SessionStatus;
 import stubbing.StubbedOrderManager;
 import stubbing.StubbedSystemManager;
 import utils.DatabaseHelper;

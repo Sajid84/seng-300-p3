@@ -16,14 +16,13 @@ import org.junit.Test;
 import com.jjjwelectronics.Item;
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.scanner.BarcodedItem;
-import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.PLUCodedItem;
 import com.thelocalmarketplace.hardware.PLUCodedProduct;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
 
 import database.Database;
-import managers.enums.ScanType;
+import enums.ScanType;
 import stubbing.StubbedBarcodedProduct;
 import stubbing.StubbedGrid;
 import stubbing.StubbedItem;

@@ -16,7 +16,7 @@ import com.thelocalmarketplace.hardware.SelfCheckoutStationGold;
 import com.thelocalmarketplace.hardware.SelfCheckoutStationSilver;
 
 import ca.ucalgary.seng300.simulation.InvalidArgumentSimulationException;
-import managers.enums.SelfCheckoutTypes;
+import enums.SelfCheckoutTypes;
 import utils.DriverHelper;
 
 public class TestDriverHelper {

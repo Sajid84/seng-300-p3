@@ -10,9 +10,7 @@ import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
-
-import managers.enums.SessionStatus;
+import enums.SessionStatus;
 import stubbing.*;
 import utils.DatabaseHelper;
 

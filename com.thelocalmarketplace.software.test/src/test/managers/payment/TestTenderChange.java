@@ -83,7 +83,7 @@ public class TestTenderChange {
 
 		// Add item to order to get total price
 		// Price of item is $10
-		BarcodedItem item = DatabaseHelper.createRandomBarcodedItem();
+		BarcodedItem item = DatabaseHelper.createRandomBarcodedItem(10);
 		om.addItem(item);
 
 	}
@@ -109,7 +109,7 @@ public class TestTenderChange {
 	}
 
 	@Test
-	public void testPaymentEqualsTotal() throws CashOverloadException, OperationNotSupportedException,
+	public void testPaymentEqualsTotal() throws CashOverloadException,
 			DisabledException, RuntimeException, NoCashAvailableException {
 
 		// Load machine with 2 dollar coins
@@ -131,7 +131,7 @@ public class TestTenderChange {
 	// tests if tenderChnage returns true when
 	// change is returned
 	@Test
-	public void testReturnChange() throws OperationNotSupportedException, CashOverloadException, DisabledException,
+	public void testReturnChange() throws CashOverloadException, DisabledException,
 			RuntimeException, NoCashAvailableException {
 
 		// Load machine with 2 dollar coins
@@ -240,6 +240,7 @@ public class TestTenderChange {
 		this.machine.getBanknoteInput().receive(twentyNote);
 
 		this.banknoteDispenser.disable();
+
 		// Change should not be emitted
 		assertFalse(this.pm.tenderChange());
 		assertTrue("attendant was called", this.sm.notifyAttendantCalled);

@@ -159,10 +159,27 @@ public class DatabaseHelper {
      * @return the {@link BarcodedItem}
      */
     public static BarcodedItem createRandomBarcodedItem() {
+        return createRandomBarcodedItem(DatabaseHelper.createRandomPrice());
+    }
+
+    /**
+     * <p>
+     * Creates a {@link BarcodedItem} with a randomized mass and barcode. This
+     * method also creates a {@link BarcodedProduct} with a randomized barcode,
+     * description, price and mass.
+     * </p>
+     * <p>
+     * This method guarantees that the {@link Barcode}s of both item and product are
+     * the same and that they are put into respective databases in {@link Database}.
+     * </p>
+     *
+     * @param price the price of the product that this function creates
+     * @return the {@link BarcodedItem}
+     */
+    public static BarcodedItem createRandomBarcodedItem(long price) {
         // creating the barcode
         double mass = DatabaseHelper.createRandomMass();
         String desc = "B" + DatabaseHelper.createRandomSignifier() + " " + DatabaseHelper.createRandomDescription();
-        long price = DatabaseHelper.createRandomPrice();
 
         // temp vars
         Barcode barcode;
