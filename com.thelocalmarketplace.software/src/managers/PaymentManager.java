@@ -7,19 +7,11 @@
 
 package managers;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import com.jjjwelectronics.EmptyDevice;
 import com.jjjwelectronics.Item;
 import com.jjjwelectronics.OverloadedDevice;
 import com.jjjwelectronics.card.Card;
 import com.jjjwelectronics.card.Card.CardData;
-import com.jjjwelectronics.card.ChipFailureException;
 import com.jjjwelectronics.scanner.BarcodedItem;
 import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
@@ -28,18 +20,28 @@ import com.tdc.banknote.Banknote;
 import com.tdc.banknote.IBanknoteDispenser;
 import com.tdc.coin.Coin;
 import com.tdc.coin.ICoinDispenser;
-import com.thelocalmarketplace.hardware.*;
+import com.thelocalmarketplace.hardware.BarcodedProduct;
+import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
+import com.thelocalmarketplace.hardware.PLUCodedItem;
+import com.thelocalmarketplace.hardware.PLUCodedProduct;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
-
-import managers.enums.PaymentType;
-import managers.enums.SessionStatus;
+import enums.PaymentType;
+import enums.SessionStatus;
 import managers.interfaces.IPaymentManager;
 import managers.interfaces.IPaymentManagerNotify;
 import observers.payment.BanknoteCollector;
 import observers.payment.CardReaderObserver;
 import observers.payment.CoinCollector;
+import utils.CardHelper;
 import utils.DatabaseHelper;
 import utils.Pair;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 
@@ -154,7 +156,7 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 			throw new IllegalArgumentException("received null card data from the observer");
 		}
 
-		if (utils.CardHelper.isMembership(cardData)){
+		if (CardHelper.isMembership(cardData)){
 			membershipData = cardData;
 			return;
 		}
@@ -333,13 +335,11 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 		case 0:
 			// Dispensed enough change
 			this.machine.getBanknoteOutput().dispense();
-			this.sm.notifyPaid();
 			yield true;
 		case -1:
 			// this should never actually happen
 			this.sm.notifyAttendant("To much change was dispensed");
 			this.machine.getBanknoteOutput().dispense();
-			this.sm.notifyPaid();
 			yield false;
 		default:
 			// I can't imagine this ever happening, I don't know why Java forces you to

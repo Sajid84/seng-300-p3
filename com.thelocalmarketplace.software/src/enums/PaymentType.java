@@ -1,6 +1,6 @@
 // Liam Major 30223023
 
-package managers.enums;
+package enums;
 
 public enum PaymentType {
 	CASH, CARD, CRYPTO;

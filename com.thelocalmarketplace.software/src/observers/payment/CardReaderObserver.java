@@ -34,26 +34,22 @@ public class CardReaderObserver extends AbstractDeviceObserver implements CardRe
 
 	@Override
 	public void aCardHasBeenSwiped() {
-		// TODO Auto-generated method stub
-
+		// do nothing here
 	}
 
 	@Override
 	public void aCardHasBeenInserted() {
-		// TODO Auto-generated method stub
-
+		// do nothing here
 	}
 
 	@Override
 	public void theCardHasBeenRemoved() {
-		// TODO Auto-generated method stub
-
+		// do nothing here
 	}
 
 	@Override
 	public void aCardHasBeenTapped() {
-		// TODO Auto-generated method stub
-
+		// do nothing here
 	}
 
 }

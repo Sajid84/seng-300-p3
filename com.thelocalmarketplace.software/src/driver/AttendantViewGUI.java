@@ -14,22 +14,16 @@ import com.jjjwelectronics.card.Card;
 import com.jjjwelectronics.screen.ITouchScreen;
 
 import managers.SystemManager;
-import managers.enums.SessionStatus;
+import enums.SessionStatus;
 import managers.interfaces.IScreen;
 
 import java.awt.Dimension;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
-import java.awt.Component;
 import java.awt.Color;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.JTextPane;
-import javax.swing.JTextArea;
-import javax.swing.DropMode;
-import java.awt.Font;
-import javax.swing.UIManager;
 
 public class AttendantViewGUI extends JPanel implements IScreen{
 

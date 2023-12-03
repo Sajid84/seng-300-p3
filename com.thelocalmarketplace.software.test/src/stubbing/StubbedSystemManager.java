@@ -8,12 +8,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.jjjwelectronics.card.Card.CardData;
-import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
 
 import managers.SystemManager;
-import managers.enums.SessionStatus;
+import enums.SessionStatus;
 import utils.Pair;
 
 public class StubbedSystemManager extends SystemManager {

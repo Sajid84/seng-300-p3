@@ -18,7 +18,7 @@ import com.tdc.coin.ICoinDispenser;
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
 import managers.SystemManager;
-import managers.enums.SelfCheckoutTypes;
+import enums.SelfCheckoutTypes;
 import powerutility.PowerGrid;
 import utils.CardHelper;
 import utils.DriverHelper;

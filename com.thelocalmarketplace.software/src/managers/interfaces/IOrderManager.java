@@ -8,7 +8,7 @@ import com.jjjwelectronics.Item;
 import com.jjjwelectronics.scale.IElectronicScale;
 import com.jjjwelectronics.scanner.BarcodedItem;
 import com.thelocalmarketplace.hardware.PLUCodedItem;
-import managers.enums.ScanType;
+import enums.ScanType;
 import utils.Pair;
 
 import java.math.BigDecimal;

@@ -14,7 +14,7 @@ import com.tdc.NoCashAvailableException;
 import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
 
-import managers.enums.PaymentType;
+import enums.PaymentType;
 
 /**
  * A unified interface of what the payment manager should and should not do.

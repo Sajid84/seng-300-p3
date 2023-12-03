@@ -2,7 +2,7 @@ package managers.interfaces;
 
 import com.jjjwelectronics.Item;
 import com.jjjwelectronics.card.Card;
-import managers.enums.SessionStatus;
+import enums.SessionStatus;
 
 import java.math.BigDecimal;
 
