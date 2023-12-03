@@ -43,6 +43,7 @@ public class TestMaintainCoins {
         // configuring the machine
         sm.configure(machine);
     }
+
     @Test
     public void testMaintainCoinStorage() throws DisabledException, CashOverloadException {
         assertTrue(machine.getCoinStorage().hasSpace());
