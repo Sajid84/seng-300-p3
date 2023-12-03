@@ -30,7 +30,7 @@ import com.jjjwelectronics.scanner.BarcodedItem;
 import org.junit.Before;
 import org.junit.Test;
 
-import managers.enums.SessionStatus;
+import enums.SessionStatus;
 import stubbing.StubbedBarcodedItem;
 import stubbing.StubbedBarcodedProduct;
 import stubbing.StubbedOrderManager;

@@ -41,7 +41,7 @@ import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 import com.thelocalmarketplace.hardware.PLUCodedItem;
 import com.thelocalmarketplace.hardware.PriceLookUpCode;
 
-import managers.enums.ScanType;
+import enums.ScanType;
 import stubbing.StubbedGrid;
 import stubbing.StubbedOrderManager;
 import stubbing.StubbedOrderManagerNotify;

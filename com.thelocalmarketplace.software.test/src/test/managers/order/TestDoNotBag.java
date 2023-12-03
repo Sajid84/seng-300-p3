@@ -38,8 +38,8 @@ import com.jjjwelectronics.Item;
 import com.jjjwelectronics.scanner.BarcodedItem;
 import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 
-import managers.enums.ScanType;
-import managers.enums.SessionStatus;
+import enums.ScanType;
+import enums.SessionStatus;
 import stubbing.StubbedGrid;
 import stubbing.StubbedItem;
 import stubbing.StubbedOrderManager;

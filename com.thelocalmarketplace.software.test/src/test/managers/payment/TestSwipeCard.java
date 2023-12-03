@@ -41,7 +41,7 @@ import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
 
-import managers.enums.SessionStatus;
+import enums.SessionStatus;
 import stubbing.*;
 import utils.CardHelper;
 import utils.DatabaseHelper;

@@ -29,7 +29,7 @@ import java.math.BigDecimal;
 import org.junit.Before;
 import org.junit.Test;
 
-import managers.enums.SessionStatus;
+import enums.SessionStatus;
 import stubbing.StubbedPaymentManager;
 import stubbing.StubbedSystemManager;
 

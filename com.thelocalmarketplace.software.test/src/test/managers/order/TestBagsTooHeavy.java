@@ -35,7 +35,7 @@ import org.junit.Test;
 
 import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 
-import managers.enums.ScanType;
+import enums.ScanType;
 import powerutility.PowerGrid;
 import stubbing.StubbedBarcodedItem;
 import stubbing.StubbedOrderManager;
