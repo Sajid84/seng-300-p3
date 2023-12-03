@@ -5,6 +5,7 @@
 // Liam Major - 30223023
 // André Beaulieu - 30174544
 
+// Package declaration and imports
 package driver;
 
 import ca.ucalgary.seng300.simulation.SimulationException;
@@ -32,49 +33,49 @@ import java.util.Currency;
 import java.util.Locale;
 import java.util.Scanner;
 
-// start session use case
-
+// Driver class for the self-checkout system
 public class Driver {
 
-    // hardware references
+    // References to hardware components
     protected ISelfCheckoutStation machine;
 
-    // object references
+    // Scanner for user input
     protected static Scanner scanner = new Scanner(System.in);
 
-    // object ownership
+    // Object references
     protected SystemManager system;
     protected CardIssuer cardIssuer;
 
-    // vars
+    // Variables
     protected BigDecimal leniency = BigDecimal.ONE;
     protected Card card;
     protected JFrame gui;
 
-    // denominations
+    // Denominations for coins and banknotes
     protected final BigDecimal[] coinDenominations = new BigDecimal[]{new BigDecimal("0.01"), new BigDecimal("0.05"),
             new BigDecimal("0.10"), new BigDecimal("0.25"), new BigDecimal(1), new BigDecimal(2)};
     protected final BigDecimal[] banknoteDenominations = new BigDecimal[]{new BigDecimal(5), new BigDecimal(10),
             new BigDecimal(20), new BigDecimal(50)};
 
+    // Constructor
     public Driver(SelfCheckoutTypes type) {
-        // configuring the machine (need to do this before we initialize it)
+        // Configuring the self-checkout machine
         DriverHelper.configureMachine(coinDenominations, banknoteDenominations, 100, 1000);
 
-        // create the machine itself
+        // Creating the self-checkout machine
         this.machine = DriverHelper.createMachine(type);
 
-        // creating the vars for the system manager
+        // Creating card-related objects
         cardIssuer = CardHelper.createCardIssuer();
         card = CardHelper.createCard(cardIssuer);
 
-        // creating the system manager
+        // Creating the system manager
         this.system = new SystemManager(cardIssuer, leniency);
 
-        // configuring the system
+        // Configuring the system
         this.system.configure(this.machine);
 
-        // creating the gui
+        // Creating the GUI
         gui = new JFrame("Self Checkout Station");
         gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gui.setVisible(false);
@@ -82,98 +83,101 @@ public class Driver {
         gui.addWindowListener(windowClosingHook());
     }
 
+    // Method to perform initial setup
     protected void setup() {
-        // so that no power surges happen
+        // Ensuring uninterrupted power supply
         PowerGrid.engageUninterruptiblePowerSource();
 
-        // creating the GUI
+        // Creating the GUI
         createGUI();
 
-        // plug in and turn on the machine
+        // Plugging in and turning on the self-checkout machine
         this.machine.plugIn(PowerGrid.instance());
         this.machine.turnOn();
 
-        // loading the machine
+        // Loading the machine with coins, banknotes, ink, and paper
         loadMachine();
     }
 
+    // Method to set GUI visibility
     protected void setVisible(boolean visibility) {
         gui.setVisible(visibility);
     }
 
+    // Method to create the graphical user interface
     protected void createGUI() {
-        // configuring the main screen
+        // Configuring the main screen
         gui.setUndecorated(false);
         gui.setSize(600, 400);
         gui.setResizable(false);
 
-        // getting the touch screen
+        // Getting the touch screen
         JFrame screen = machine.getScreen().getFrame();
 
-        // putting the touch screen in the gui pane
+        // Putting the touch screen in the GUI pane
         gui.add(screen.getRootPane());
 
-        // pack & set the frame to visible
+        // Packing and setting the frame to visible
         gui.pack();
     }
 
+    // Method to load the self-checkout machine with coins, banknotes, ink, and paper
     protected void loadMachine() {
-        // loading the coin dispensers
+        // Loading the coin dispensers
         for (BigDecimal coinDenomination : coinDenominations) {
             ICoinDispenser cd = machine.getCoinDispensers().get(coinDenomination);
             for (int j = 0; j < cd.getCapacity(); ++j) {
                 try {
                     cd.load(new Coin(coinDenomination));
                 } catch (SimulationException | CashOverloadException e) {
-                    // shouldn't happen
+                    // Exception handling (shouldn't happen)
                 }
             }
         }
 
-        // loading the banknote dispensers
+        // Loading the banknote dispensers
         for (BigDecimal banknoteDenomination : banknoteDenominations) {
             IBanknoteDispenser abd = machine.getBanknoteDispensers().get(banknoteDenomination);
             for (int j = 0; j < abd.getCapacity(); ++j) {
                 try {
                     abd.load(new Banknote(Currency.getInstance(Locale.CANADA), banknoteDenomination));
                 } catch (SimulationException | CashOverloadException e) {
-                    // shouldn't happen
+                    // Exception handling (shouldn't happen)
                 }
             }
         }
 
-        // adding paper and ink to the printer
+        // Adding paper and ink to the printer
         try {
             machine.getPrinter().addInk(1 << 20);
             machine.getPrinter().addPaper(1 << 10);
         } catch (OverloadedDevice e) {
-            // shouldn't happen
+            // Exception handling (shouldn't happen)
         }
     }
 
+    // Method to define actions on window closing
     protected WindowAdapter windowClosingHook() {
         return new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
 
-                // doing closing actions
+                // Performing closing actions
                 system.postTransactions();
             }
         };
     }
 
-    /*
-     * Main method of program
-     */
+    // Main method of the program
     public static void main(String[] args) {
-        // create driver class
+        // Create driver class
         Driver d = new Driver(DriverHelper.chooseMachineType());
 
-        // setup driver class
+        // Setup driver class
         d.setup();
 
-        // setting the visibility of the frame
+        // Set the visibility of the frame
         d.setVisible(true);
     }
 }
