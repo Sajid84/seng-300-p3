@@ -342,6 +342,12 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 			}
 		}
 	}
+	public boolean isInkLow() {
+		return inkLow;
+	}
+	public boolean isPaperLow() {
+		return paperLow;
+	}
 
 	@Override
 	public void maintainBanknoteStorage() {

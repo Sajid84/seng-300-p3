@@ -31,4 +31,5 @@ public class StubbedAttendantManager extends AttendantManager {
     public void setHasInk(boolean has) {
         super.hasInk = has;
     }
+
 }
