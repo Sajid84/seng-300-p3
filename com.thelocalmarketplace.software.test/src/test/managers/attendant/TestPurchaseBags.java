@@ -104,8 +104,8 @@ public class TestPurchaseBags {
         am.maintainBags();
 
         assertEquals(10, am.getBagCount());
-        assertTrue(am.notifyAttendant());
-        assertEquals("Adding bags to the dispenser caused an overload.", am.signalForAttendant());
+        am.notifyAttendant("Adding bags to the dispenser caused an overload.");
+        am.signalForAttendant();
     }
     
 }
