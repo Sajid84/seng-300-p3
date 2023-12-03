@@ -27,6 +27,7 @@ import java.util.Currency;
 import java.util.Locale;
 
 import com.jjjwelectronics.scale.ElectronicScaleGold;
+import com.tdc.coin.Coin;
 import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import com.thelocalmarketplace.hardware.SelfCheckoutStationGold;
@@ -53,6 +54,7 @@ public class StubbedStation extends SelfCheckoutStationGold {
 		AbstractSelfCheckoutStation.configureBanknoteDenominations(banknoteDenominations);
 		AbstractSelfCheckoutStation.configureBanknoteStorageUnitCapacity(banknoteStorageCapacity);
 		AbstractSelfCheckoutStation.configureCurrency(Currency.getInstance(Locale.CANADA));
+		Coin.DEFAULT_CURRENCY = Currency.getInstance(Locale.CANADA);
 	}
 
 	public static void setBaggingAreaWeightLimit(double weight) {

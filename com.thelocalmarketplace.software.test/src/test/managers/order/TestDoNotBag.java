@@ -36,7 +36,6 @@ import org.junit.Test;
 
 import com.jjjwelectronics.Item;
 import com.jjjwelectronics.scanner.BarcodedItem;
-import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 
 import enums.ScanType;
 import enums.SessionStatus;

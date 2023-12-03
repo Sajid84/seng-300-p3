@@ -27,8 +27,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 
-import javax.naming.OperationNotSupportedException;
-
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import org.junit.Before;
 import org.junit.Test;

@@ -7,16 +7,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/com.thelocalmarketplace.hardware_0.3.3"/>
-	<classpathentry kind="lib" path="D:/Coding/main/SENG300P3/com.thelocalmarketplace.software/lib/jars/jgoodies-forms-1.8.0.jar">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="D:/Coding/main/SENG300P3/com.thelocalmarketplace.software/lib/jars/jgoodies-forms-1.8.0-sources.jar">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="D:/Coding/main/SENG300P3/com.thelocalmarketplace.software/lib/classes"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

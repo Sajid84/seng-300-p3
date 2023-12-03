@@ -22,27 +22,30 @@
 
 package test.utils;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
+import enums.CardType;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.jjjwelectronics.card.Card;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
 
+import stubbing.StubbedCardReader;
 import utils.CardHelper;
+
+import java.io.IOException;
+
+import static org.junit.Assert.*;
 
 public class TestCardHelper {
 	//Instance variable is create to use CardIssuer in test cases
 	private CardIssuer issuer;
+	private StubbedCardReader reader;
 
 	//setup method is used to initialize CardIssuer before test cases
 	@Before
 	public void setup() {
 		this.issuer = CardHelper.createCardIssuer();
+		reader = new StubbedCardReader();
 	}
 
 	//test case for if the CardIssuer created is not null
@@ -57,6 +60,21 @@ public class TestCardHelper {
 	@Test(expected = IllegalArgumentException.class)
 	public void testCreateCardNullIssuer() {
 		CardHelper.createCard(null);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testCreateCardWithAmountNullIssuer() {
+		CardHelper.createCard(null, 1);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testCreateTapEnabledCardNullIssuer() {
+		CardHelper.createTapEnabledCard(null, true);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testCreateInsertableCardNullIssuer() {
+		CardHelper.createInsertableCard(null, true);
 	}
 
 	//test case to give an IllegalArgumentException if creating a card with invalid amount
@@ -133,7 +151,7 @@ public class TestCardHelper {
 		Card card = CardHelper.createCard(issuer);
 
 		assertNotNull(card.cvv);
-		assertTrue(card.cvv.length() == 3);
+        assertEquals(3, card.cvv.length());
 
 		try {
 			Integer.parseInt(card.cvv);
@@ -148,7 +166,7 @@ public class TestCardHelper {
 		Card card = CardHelper.createCard(issuer);
 
 		assertNotNull(card.kind);
-		assertTrue(card.kind.length() > 0);
+        assertFalse(card.kind.isEmpty());
 	}
 
 	//test case to make sure card has a valid holder
@@ -157,6 +175,76 @@ public class TestCardHelper {
 		Card card = CardHelper.createCard(issuer);
 
 		assertNotNull(card.cardholder);
-		assertTrue(card.cardholder.length() > 0);
+        assertFalse(card.cardholder.isEmpty());
+	}
+
+	@Test
+	public void testCardHasDefaultPin() throws IOException {
+		Card card = CardHelper.createCard(issuer);
+
+		// this should always pass
+		assertNotNull(reader.insert(card, CardHelper.PIN));
+	}
+
+	@Test
+	public void testCardIsTapEnabled() {
+		Card card = CardHelper.createCard(issuer);
+
+		assertTrue(card.isTapEnabled);
+	}
+
+	@Test
+	public void testCardHasChip() {
+		Card card = CardHelper.createCard(issuer);
+
+		assertTrue(card.hasChip);
+	}
+
+	@Test
+	public void testCardWithLimitIsTapEnabled() {
+		Card card = CardHelper.createCard(issuer, 20);
+
+		assertTrue(card.isTapEnabled);
+	}
+
+	@Test
+	public void testCardWithLimitHasChip() {
+		Card card = CardHelper.createCard(issuer, 20);
+
+		assertTrue(card.hasChip);
+	}
+
+	@Test
+	public void testCreateTapEnabledCard() {
+		assertTrue(CardHelper.createTapEnabledCard(issuer, true).isTapEnabled);
+		assertFalse(CardHelper.createTapEnabledCard(issuer, false).isTapEnabled);
+	}
+
+	@Test
+	public void testCreateInsertableCard() {
+		assertTrue(CardHelper.createInsertableCard(issuer, true).hasChip);
+		assertFalse(CardHelper.createInsertableCard(issuer, false).hasChip);
+	}
+
+	@Test
+	public void testCreateMembershipCard() throws IOException {
+		// setting up
+		Card card = CardHelper.createMembershipCard();
+
+		// asserting
+		assertTrue(card.hasChip);
+		assertTrue(card.isTapEnabled);
+		assertEquals("Should be a membership card.", card.kind, CardType.MEMBERSHIP.toString());
+		assertNotNull(reader.insert(card, CardHelper.PIN));
+	}
+
+	@Test
+	public void testIsMembership() throws IOException {
+		// asserting
+		Card card = CardHelper.createMembershipCard();
+
+		// asserting
+		assertTrue(CardHelper.isMembership(card));
+		assertTrue(CardHelper.isMembership(reader.tap(card)));
 	}
 }

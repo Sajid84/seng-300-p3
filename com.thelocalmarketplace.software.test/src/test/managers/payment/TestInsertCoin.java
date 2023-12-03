@@ -82,12 +82,10 @@ public class TestInsertCoin {
 		this.pm.insertCoin(fiveCent);
 	}
 
-	@Test
+	@Test(expected = DisabledException.class)
 	public void testDisabledInsert() throws DisabledException, CashOverloadException {
 		this.machine.getCoinSlot().disable();
 		this.pm.insertCoin(fiveCent);
-		assertTrue("attendant was called", this.sm.notifyAttendantCalled);
-		assertTrue("Session was blocked", this.sm.blockSessionCalled);
 	}
 
 	/**
@@ -95,8 +93,7 @@ public class TestInsertCoin {
 	 * 
 	 * @throws CashOverloadException
 	 */
-
-	@Test
+	@Test(expected = CashOverloadException.class)
 	public void testOverloadedInsert() throws CashOverloadException, DisabledException {
 		CoinStorageUnit csu = this.machine.getCoinStorage();
 
@@ -116,11 +113,6 @@ public class TestInsertCoin {
 
 		// inserting a coin, this should trigger a cash overload exception
 		this.pm.insertCoin(fiveCent);
-
-		// asserting
-		assertTrue("attendant was called", this.sm.notifyAttendantCalled);
-		assertTrue("Session was blocked", this.sm.blockSessionCalled);
-
 	}
 
 }

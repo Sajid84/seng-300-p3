@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // Liam Major			- 30223023
 // Md Abu Sinan			- 30154627
 // Ali Akbari			- 30171539
@@ -21,6 +22,11 @@
 // Umer Rehman			- 30169819
 
 package test.managers.attendent;
+=======
+package test.managers.attendent;
+
+//Sheikh Falah Sheikh Hasan - 30175335
+>>>>>>> gui-dev
 
 import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
@@ -65,6 +71,7 @@ public class TestMaintainCoins {
         // configuring the machine
         sm.configure(machine);
     }
+
     @Test
     public void testMaintainCoinStorage() throws DisabledException, CashOverloadException {
         assertTrue(machine.getCoinStorage().hasSpace());

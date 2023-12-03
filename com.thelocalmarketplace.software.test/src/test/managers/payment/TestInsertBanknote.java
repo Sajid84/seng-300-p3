@@ -79,12 +79,10 @@ public class TestInsertBanknote {
 		this.pm.insertBanknote(fiveNote);
 	}
 
-	@Test
+	@Test(expected = DisabledException.class)
 	public void testDisabledInsert() throws DisabledException, CashOverloadException {
 		this.machine.getBanknoteInput().disable();
 		this.pm.insertBanknote(fiveNote);
-		assertTrue("attendant was called", this.sm.notifyAttendantCalled);
-		assertTrue("Session was blocked", this.sm.blockSessionCalled);
 	}
 
 	/**
