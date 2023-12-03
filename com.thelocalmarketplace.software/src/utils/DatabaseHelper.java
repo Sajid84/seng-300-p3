@@ -6,7 +6,6 @@ import ca.ucalgary.seng300.simulation.InvalidArgumentSimulationException;
 import com.jjjwelectronics.Item;
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Numeral;
-import com.jjjwelectronics.bag.ReusableBag;
 import com.jjjwelectronics.scanner.Barcode;
 import com.jjjwelectronics.scanner.BarcodedItem;
 import com.thelocalmarketplace.hardware.*;
@@ -184,6 +183,18 @@ public class DatabaseHelper {
 
         // return item to caller
         return item;
+    }
+
+    /**
+     * Since {@link Item} is abstract, the only real way to arbitrarily add mass to the
+     * scale is by generating some dummy item.
+     *
+     * @return a {@link BarcodedItem} with a mass of 200 and a randomly generated barcode.
+     */
+    public static BarcodedItem createCustomerBags() {
+        Barcode barcode = DatabaseHelper.createRandomBarcode(10);
+
+        return new BarcodedItem(barcode, new Mass(createRandomMass()));
     }
 
     /**
