@@ -443,6 +443,11 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 		this.pm.printReceipt(type, card);
 	}
 
+	@Override
+	public boolean isCardInserted() {
+		return pm.isCardInserted();
+	}
+
 	public void addCustomerBags(Item bags) {
 		if (getState() != SessionStatus.NORMAL) {
 			throw new IllegalStateException("cannot add customer bags when not in a normal state");

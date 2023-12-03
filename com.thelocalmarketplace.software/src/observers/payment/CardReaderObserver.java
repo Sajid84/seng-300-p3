@@ -39,12 +39,12 @@ public class CardReaderObserver extends AbstractDeviceObserver implements CardRe
 
 	@Override
 	public void aCardHasBeenInserted() {
-		// do nothing here
+		ref.notifyCardInserted(true);
 	}
 
 	@Override
 	public void theCardHasBeenRemoved() {
-		// do nothing here
+		ref.notifyCardInserted(false);
 	}
 
 	@Override

@@ -60,6 +60,7 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 	// vars
 	protected BigDecimal payment = BigDecimal.ZERO;
 	protected CardData membershipData;
+	protected boolean cardInserted = false;
 
 	/**
 	 * This controls everything relating to customer payment.
@@ -107,6 +108,11 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 			throw new IllegalArgumentException("the value added cannot be null");
 
 		this.payment = this.payment.add(value);
+	}
+
+	@Override
+	public void notifyCardInserted(boolean inserted) {
+		cardInserted = inserted;
 	}
 
 	@Override
@@ -441,6 +447,11 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 
 		// cutting the paper
 		this.machine.getPrinter().cutPaper();
+	}
+
+	@Override
+	public boolean isCardInserted() {
+		return cardInserted;
 	}
 
 	protected void printLine(String s) throws EmptyDevice {

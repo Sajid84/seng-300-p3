@@ -3,9 +3,9 @@
 
 package managers.interfaces;
 
-import java.math.BigDecimal;
-
 import com.jjjwelectronics.card.Card.CardData;
+
+import java.math.BigDecimal;
 
 /**
  * This interface is used by any object that {@link IPaymentManager} owns, this
@@ -15,18 +15,25 @@ import com.jjjwelectronics.card.Card.CardData;
  */
 public interface IPaymentManagerNotify {
 
-	/**
-	 * This method notifies {@link IPaymentManager that a card has been read.
-	 *
-	 * @param cardData the data of the read card
-	 */
-	void notifyCardDataRead(CardData cardData);
+    /**
+     * This method notifies {@link IPaymentManager that a card has been read.
+     *
+     * @param cardData the data of the read card
+     */
+    void notifyCardDataRead(CardData cardData);
 
-	/**
-	 * This method notifies the {@link IPaymentManager} that a child object has
-	 * received some payment, either from a banknote or from a coin.
-	 * 
-	 * @param value the value of the inputted banknote or coin
-	 */
-	void notifyBalanceAdded(BigDecimal value);
+    /**
+     * This method notifies the {@link IPaymentManager} that a child object has
+     * received some payment, either from a banknote or from a coin.
+     *
+     * @param value the value of the inputted banknote or coin
+     */
+    void notifyBalanceAdded(BigDecimal value);
+
+    /**
+     * This notifies the manager that a card was inserted into the machine, or if a card was removed.
+     *
+     * @param inserted true if a card was inserted, false a card was removed
+     */
+    void notifyCardInserted(boolean inserted);
 }
