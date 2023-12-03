@@ -28,6 +28,11 @@ public interface IPaymentManager extends IManager {
 	BigDecimal getCustomerPayment();
 
 	/**
+	 * Returns membership CardData
+	 */
+	CardData getMembershipData();
+
+	/**
 	 * Allows the customer to swipe their credit card
 	 * 
 	 * @param card a credit card

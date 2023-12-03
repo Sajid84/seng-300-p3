@@ -57,6 +57,7 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 
 	// vars
 	protected BigDecimal payment = BigDecimal.ZERO;
+	protected CardData membershipData;
 
 	/**
 	 * This controls everything relating to customer payment.
@@ -112,13 +113,16 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 	}
 
 	@Override
+	public CardData getMembershipData() {
+		return this.membershipData;
+	}
+
+	@Override
 	public void tapCard(Card card) throws IOException{
 		if (card == null) {
 			throw new IllegalArgumentException("cannot tap a null card");
 		}
-		if (isMembership(card)) {
-			throw new IllegalArgumentException("cannot tap a membership card as payment");
-		}
+
 		this.machine.getCardReader().tap(card);
 
 	}
@@ -129,9 +133,7 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 		if (card == null ) {
 			throw new IllegalArgumentException("Cannot insert a null card");
 		}
-		if (isMembership(card)) {
-			throw new IllegalArgumentException("cannot insert a membership card as payment");
-		}
+
 		this.machine.getCardReader().insert(card, pin);
 	}
 
@@ -140,9 +142,6 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 	public void swipeCard(Card card) throws IOException {
 		if (card == null) {
 			throw new IllegalArgumentException("cannot swipe a null card");
-		}
-		if (isMembership(card)) {
-			throw new IllegalArgumentException("cannot swipe a membership card as payment");
 		}
 
 		this.machine.getCardReader().swipe(card);
@@ -155,6 +154,10 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 			throw new IllegalArgumentException("received null card data from the observer");
 		}
 
+		if (utils.CardHelper.isMembership(cardData)){
+			membershipData = cardData;
+			return;
+		}
 		// vars
 		double amountDouble = sm.getTotalPrice().doubleValue();
 		long holdNumber = issuer.authorizeHold(cardData.getNumber(), amountDouble);
@@ -166,13 +169,6 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 		}
 	}
 
-	@Override
-	public boolean isMembership(Card card) throws IOException {
-		if (card.kind.toLowerCase() == "membership") {
-			return true;
-		}
-		return false;
-	}
 
 	@Override
 	public void insertCoin(Coin coin) throws DisabledException, CashOverloadException {

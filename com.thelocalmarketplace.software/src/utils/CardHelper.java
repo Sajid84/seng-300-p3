@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Random;
 
-import com.jjjwelectronics.card.Card;
+import com.jjjwelectronics.card.Card.*;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
 
 import ca.ucalgary.seng300.simulation.InvalidArgumentSimulationException;
@@ -135,8 +135,8 @@ public class CardHelper {
 	}
 
 
-	public boolean isMembership(Card card) throws IOException {
-		if (card.kind.equalsIgnoreCase("membership")) {
+	public static boolean isMembership(CardData cardData) {
+		if (cardData.getType().equalsIgnoreCase("membership")) {
 			return true;
 		}
 		return false;

@@ -243,14 +243,7 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 		}
 
 	}
-
-    @Override
-    public boolean isMembership(Card card) throws IOException {
-        if (card.kind.toLowerCase() == "membership") {
-            return true;
-        }
-        return false;
-    }
+	
 
 	public boolean tenderChange() {
 		if (!isPaid())
