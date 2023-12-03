@@ -50,11 +50,13 @@ public class TestCoinCollector {
 
     @Test(expected = IllegalArgumentException.class)
     public void testNullPaymentManager() {
+        // Attempting to create CoinCollector with a null PaymentManager should throw an IllegalArgumentException
         new CoinCollector(null, machine.getCoinValidator());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testNullDevice() {
+        // Attempting to create CoinCollector with a null device should throw an IllegalArgumentException
         new CoinCollector(pm, null);
     }
 
@@ -66,8 +68,8 @@ public class TestCoinCollector {
         // We don't care who the validator is, so it may be null.
         cc.validCoinDetected(null, new BigDecimal(2.0f));
 
-        // We expect the PaymentManager to know about an coin of value 3
-        assertTrue("The Payment Manager did not recieve the correct coin value",
+        // We expect the PaymentManager to know about a coin of value 3
+        assertTrue("The Payment Manager did not receive the correct coin value",
                 pm.notifyBalanceAddedValue.floatValue() == 2.0f);
     }
 }

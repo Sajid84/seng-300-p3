@@ -1,6 +1,6 @@
 // Liam Major 30223023
-//Katelan Ng 30144672
-//Coverage: 94.6%
+// Katelan Ng 30144672
+// Coverage: 94.6%
 
 package test.observers;
 
@@ -45,16 +45,19 @@ public class TestScaleObserver {
         // configuring the machine
         sm.configure(machine);
 
+        // creating the ScaleObserver instance
         so = om.getBaggingAreaObserver();
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testNullOrderManager() {
+        // Attempting to create ScaleObserver with a null OrderManager should throw an IllegalArgumentException
         new ScaleObserver(null, machine.getBaggingArea());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testNullDevice() {
+        // Attempting to create ScaleObserver with a null device should throw an IllegalArgumentException
         new ScaleObserver(om, null);
     }
 
@@ -66,10 +69,10 @@ public class TestScaleObserver {
     public void testNotifyOrderManagerMassChange() {
         Mass mass = new Mass(1);
 
-        // We don't care who the validator is, so it may be null.
+        // Simulating the mass change event on the scale (bagging area)
         so.theMassOnTheScaleHasChanged(null, mass);
 
-        // ensure that the actual weight in the OrderManager has updated
+        // Ensure that the actual weight in the OrderManager has updated
         assertEquals(mass.inGrams(), om.getActualWeight());
     }
 }

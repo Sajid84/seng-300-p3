@@ -1,6 +1,6 @@
-//Katelan Ng 30144672
+// Katelan Ng 30144672
 // Liam Major 30223023
-//Coverage: 77.2%
+// Coverage: 77.2%
 
 package test.observers;
 
@@ -25,53 +25,57 @@ import utils.DatabaseHelper;
 
 public class TestBarcodeScannerObserver {
 
-	// vars
-	private StubbedOrderManager om;
-	private StubbedSystemManager sm;
-	private BarcodeScannerObserver bso;
-	private BarcodedItem item;
-	private ISelfCheckoutStation machine;
+    // vars
+    private StubbedOrderManager om;
+    private StubbedSystemManager sm;
+    private BarcodeScannerObserver bso;
+    private BarcodedItem item;
+    private ISelfCheckoutStation machine;
 
-	@Before
-	public void setup() {
-		// creating a random item and putting in the database
-		this.item = DatabaseHelper.createRandomBarcodedItem();
+    @Before
+    public void setup() {
+        // creating a random item and putting it in the database
+        this.item = DatabaseHelper.createRandomBarcodedItem();
 
-		// creating the stubs
-		sm = new StubbedSystemManager();
-		om = sm.omStub;
+        // creating the stubs
+        sm = new StubbedSystemManager();
+        om = sm.omStub;
 
-		// configuring the hardware
-		StubbedStation.configure();
+        // configuring the hardware
+        StubbedStation.configure();
 
-		// creating the hardware
-		machine = new StubbedStation().machine;
-		machine.plugIn(StubbedGrid.instance());
+        // creating the hardware
+        machine = new StubbedStation().machine;
+        machine.plugIn(StubbedGrid.instance());
 
-		// configuring the machine
-		sm.configure(machine);
+        // configuring the machine
+        sm.configure(machine);
 
-		bso = om.getMainBarcodeObserver();
-	}
+        bso = om.getMainBarcodeObserver();
+    }
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testNullOrderManager() {
-		new BarcodeScannerObserver(null, machine.getHandheldScanner());
-	}
+    @Test(expected = IllegalArgumentException.class)
+    public void testNullOrderManager() {
+        // Attempting to create BarcodeScannerObserver with a null OrderManager should throw an IllegalArgumentException
+        new BarcodeScannerObserver(null, machine.getHandheldScanner());
+    }
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testNullDevice() {
-		new BarcodeScannerObserver(om, null);
-	}
+    @Test(expected = IllegalArgumentException.class)
+    public void testNullDevice() {
+        // Attempting to create BarcodeScannerObserver with a null device should throw an IllegalArgumentException
+        new BarcodeScannerObserver(om, null);
+    }
 
-	/***
-	 * Tests if the OrderManager actually received the item the hardware scanned.
-	 * 
-	 * This disregards most of the implementation of the method in OrderManager, the
-	 * method `notifyBarcodeScanned` is tested in TestOrderManager.java
-	 */
-	@Test
-	public void testNotifyOrderManagerBarcodeScanned() {
-		// TODO redo this test and assert the function
-	}
+    /**
+     * Tests if the OrderManager actually received the item the hardware scanned.
+     * 
+     * This disregards most of the implementation of the method in OrderManager, the
+     * method `notifyBarcodeScanned` is tested in TestOrderManager.java
+     */
+    @Test
+    public void testNotifyOrderManagerBarcodeScanned() {
+        // TODO: Redo this test and assert the function
+        // This test case is designed to ensure that the OrderManager receives the item information when a barcode is scanned.
+        // The implementation details are deferred to the TestOrderManager.java file.
+    }
 }

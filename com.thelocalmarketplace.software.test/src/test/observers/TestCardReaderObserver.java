@@ -46,22 +46,26 @@ public class TestCardReaderObserver {
 
     @Test(expected = IllegalArgumentException.class)
     public void testNullPaymentManager() {
+        // Attempting to create CardReaderObserver with a null PaymentManager should throw an IllegalArgumentException
         new CardReaderObserver(null, machine.getCardReader());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testNullDevice() {
+        // Attempting to create CardReaderObserver with a null device should throw an IllegalArgumentException
         new CardReaderObserver(pm, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testNotifyCardSwipeNullData() {
+        // Attempting to notify the observer about a card swipe with null data should throw an IllegalArgumentException
         cro.theDataFromACardHasBeenRead(null);
     }
 
     @Test
     public void testNotifyCardSwipeValidData() {
-        // this test should not throw
+        // This test should not throw an exception
+        // Simulates notifying the observer about a card swipe with valid data
         cro.theDataFromACardHasBeenRead(new StubbedCardData());
     }
 }

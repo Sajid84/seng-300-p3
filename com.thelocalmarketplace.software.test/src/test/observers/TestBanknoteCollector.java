@@ -1,5 +1,5 @@
 // Liam Major 30223023
-//Jason Very 30222040
+// Jason Very 30222040
 
 package test.observers;
 
@@ -50,22 +50,26 @@ public class TestBanknoteCollector {
 
     @Test(expected = IllegalArgumentException.class)
     public void testNullPaymentManager() {
+        // Attempting to create BanknoteCollector with a null PaymentManager should throw an IllegalArgumentException
         new BanknoteCollector(null, machine.getBanknoteValidator());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testNullDevice() {
+        // Attempting to create BanknoteCollector with a null device should throw an IllegalArgumentException
         new BanknoteCollector(pm, null);
     }
 
-    // Testing when the system detects a new valid bank note has been added
+    // Testing when the system detects a new valid banknote has been added
     @Test
     public void TestgoodBanknote() {
         Currency currency = Currency.getInstance("CAD");
+
+        // Calling the goodBanknote method on BanknoteCollector with null arguments (for testing purposes)
         bc.goodBanknote(null, currency, new BigDecimal(5.00f));
 
-        // We expect the PaymentManager to know about a bank note of value 5
-        assertTrue("The Payment Manager did recieve the correct amount",
+        // Verifying that the PaymentManager has received the correct amount
+        assertTrue("The Payment Manager did receive the correct amount",
                 pm.notifyBalanceAddedValue.floatValue() == 5.00f);
     }
 }
