@@ -108,4 +108,28 @@ public class TestPurchaseBags {
         am.signalForAttendant();
     }
     
+    @Test
+    public void testCheckBagDispenserStateWhenRemainingBelowThreshold() {
+        machine.getReusableBagDispenser().getCapacity();
+        machine.getReusableBagDispenser().getQuantityRemaining();
+        am.checkBagDispenserState();
+        assertTrue(am.isBagsLow());
+    }
+
+    @Test
+    public void testCheckBagDispenserStateWhenRemainingAboveThreshold() {
+        machine.getReusableBagDispenser().getCapacity();
+        machine.getReusableBagDispenser().getQuantityRemaining();
+        am.checkBagDispenserState();
+        assertFalse(am.isBagsLow());
+    }
+
+    @Test
+    public void testCheckBagDispenserStateWhenUnsupportedOperationException() {
+        machine.getReusableBagDispenser().getCapacity();
+        machine.getReusableBagDispenser().load();
+
+        am.checkBagDispenserState();
+        assertFalse(am.isBagsLow());
+    }
 }
