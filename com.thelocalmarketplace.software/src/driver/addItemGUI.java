@@ -3,14 +3,23 @@
 package driver;
 
 import java.awt.EventQueue;
+import java.awt.GridLayout;
+import java.awt.List;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.math.BigDecimal;
+import java.text.NumberFormat;
 
-import javax.swing.JTextField;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
+import javax.swing.JTextField;
+
 import com.jjjwelectronics.Item;
 import com.jjjwelectronics.card.Card;
 import com.jjjwelectronics.screen.ITouchScreen;
@@ -19,19 +28,9 @@ import managers.SystemManager;
 import managers.enums.ScanType;
 import managers.enums.SessionStatus;
 import managers.interfaces.IScreen;
+import javax.swing.SwingConstants;
 
-import com.jgoodies.forms.layout.FormSpecs;
-import java.awt.List;
-import javax.swing.JLabel;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.math.BigDecimal;
-import java.text.NumberFormat;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-
-public class addItemGUI extends JFrame implements IScreen{
+public class addItemGUI extends JPanel implements IScreen{
 	
 	private static NumberFormat PLUFormat = NumberFormat.getInstance();
 
@@ -56,8 +55,8 @@ public class addItemGUI extends JFrame implements IScreen{
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					addItemGUI frame = new addItemGUI(sm);
-					frame.setVisible(true);
+					addItemGUI panel = new addItemGUI(sm);
+					panel.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -75,72 +74,48 @@ public class addItemGUI extends JFrame implements IScreen{
 	 */
 	public addItemGUI(SystemManager sm) {
 		this.sm = sm;
-		setBounds(100, 100, 747, 576);
-		getContentPane().setLayout(new FormLayout(new ColumnSpec[] {
-				FormSpecs.RELATED_GAP_COLSPEC,
-				FormSpecs.DEFAULT_COLSPEC,
-				FormSpecs.RELATED_GAP_COLSPEC,
-				FormSpecs.DEFAULT_COLSPEC,
-				FormSpecs.RELATED_GAP_COLSPEC,
-				ColumnSpec.decode("default:grow"),
-				FormSpecs.RELATED_GAP_COLSPEC,
-				ColumnSpec.decode("max(184dlu;default):grow"),
-				FormSpecs.RELATED_GAP_COLSPEC,
-				FormSpecs.DEFAULT_COLSPEC,
-				FormSpecs.RELATED_GAP_COLSPEC,
-				FormSpecs.DEFAULT_COLSPEC,
-				FormSpecs.RELATED_GAP_COLSPEC,
-				ColumnSpec.decode("default:grow"),},
-			new RowSpec[] {
-				FormSpecs.RELATED_GAP_ROWSPEC,
-				RowSpec.decode("max(15dlu;default)"),
-				FormSpecs.RELATED_GAP_ROWSPEC,
-				RowSpec.decode("max(30dlu;default)"),
-				FormSpecs.RELATED_GAP_ROWSPEC,
-				RowSpec.decode("max(14dlu;default)"),
-				FormSpecs.RELATED_GAP_ROWSPEC,
-				RowSpec.decode("23dlu"),
-				FormSpecs.RELATED_GAP_ROWSPEC,
-				RowSpec.decode("max(15dlu;default)"),
-				FormSpecs.RELATED_GAP_ROWSPEC,
-				FormSpecs.DEFAULT_ROWSPEC,
-				FormSpecs.RELATED_GAP_ROWSPEC,
-				FormSpecs.DEFAULT_ROWSPEC,
-				FormSpecs.RELATED_GAP_ROWSPEC,
-				FormSpecs.DEFAULT_ROWSPEC,
-				FormSpecs.RELATED_GAP_ROWSPEC,
-				FormSpecs.DEFAULT_ROWSPEC,
-				FormSpecs.RELATED_GAP_ROWSPEC,
-				RowSpec.decode("default:grow"),}));
+		
+		GridLayout gridLayout = new GridLayout();
+		gridLayout.setVgap(2);
+		gridLayout.setHgap(2);
+		gridLayout.setColumns(1);
+		gridLayout.setRows(0);
+		setLayout(gridLayout);
 		
 		// add item by description
 		
-		searchByTextField.setColumns(10);
+		searchByTextField.setColumns(8);
+		searchByTextLabel.setVerticalAlignment(SwingConstants.BOTTOM);
+		searchByTextLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		
 		
-		getContentPane().add(searchByTextLabel, "8, 2, 1, 2, center, bottom");
-		getContentPane().add(searchByTextField, "8, 4, fill, default");
-		getContentPane().add(textSearchButton, "10, 4");
-		getContentPane().add(searchByTextStatusLabel, "12, 4, 3, 1");
+		add(searchByTextLabel, "8, 2, 1, 2, center, bottom");
+		add(searchByTextField, "8, 4, fill, default");
+		add(textSearchButton, "10, 4");
+		add(searchByTextStatusLabel, "12, 4, 3, 1");
 		
 		
 		// add item by PLU
 		
 		PLUCodeFormattedTextField.setToolTipText("Enter PLU Code");
 		PLUCodeFormattedTextField.setValue(PLUFormat);
+		searchByPLUCodeTextLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		searchByPLUCodeTextLabel.setVerticalAlignment(SwingConstants.BOTTOM);
 		
 		
-		getContentPane().add(searchByPLUCodeTextLabel, "8, 6, center, bottom");
-		getContentPane().add(PLUCodeFormattedTextField, "8, 8, fill, default");
-		getContentPane().add(PLUSearchButton, "10, 8");
-		getContentPane().add(searchByPLUStatusLabel, "12, 8, 3, 1");
+		add(searchByPLUCodeTextLabel, "8, 6, center, bottom");
+		add(PLUCodeFormattedTextField, "8, 8, fill, default");
+		add(PLUSearchButton, "10, 8");
+		add(searchByPLUStatusLabel, "12, 8, 3, 1");
+		searchByListTextLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+		searchByListTextLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		
 		
 		// add item by list
 	
 		
-		getContentPane().add(searchByListTextLabel, "8, 10, center, bottom");
-		getContentPane().add(list, "3, 12, 10, 6");
+		add(searchByListTextLabel, "8, 10, center, bottom");
+		add(list, "3, 12, 10, 6");
 		
 		
 		
@@ -157,8 +132,6 @@ public class addItemGUI extends JFrame implements IScreen{
 				}else {
 					sm.addItemToOrder(item, ScanType.MAIN);
 				}
-				
-			
 			}
 		});
 		

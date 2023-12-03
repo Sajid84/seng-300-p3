@@ -1,22 +1,10 @@
 // Gurjit Samra - 30172814
-// Liam Major
 
 package driver;
 
-import com.jgoodies.forms.factories.DefaultComponentFactory;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.FormSpecs;
-import com.jgoodies.forms.layout.RowSpec;
-import com.jjjwelectronics.Item;
-import com.jjjwelectronics.card.Card;
-import com.jjjwelectronics.screen.ITouchScreen;
-import managers.SystemManager;
-import managers.enums.SessionStatus;
-import managers.interfaces.IScreen;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.EventQueue;
+import java.awt.GridLayout;
+import java.awt.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -24,190 +12,214 @@ import java.awt.event.FocusEvent;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 
-public class AddItemGui extends JFrame implements IScreen {
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFormattedTextField;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
-    private static NumberFormat PLUFormat = NumberFormat.getInstance();
+import com.jjjwelectronics.Item;
+import com.jjjwelectronics.card.Card;
+import com.jjjwelectronics.screen.ITouchScreen;
 
-    private SystemManager sm;
+import managers.SystemManager;
+import managers.enums.ScanType;
+import managers.enums.SessionStatus;
+import managers.interfaces.IScreen;
+import javax.swing.SwingConstants;
 
-    JLabel searchByTextLabel = DefaultComponentFactory.getInstance().createLabel("Search by text");
-    JTextField searchByTextField = new JTextField();
-    JButton textSearchButton = new JButton("search");
-    JLabel searchByTextStatusLabel = new JLabel("");
-    JLabel searchByPLUCodeTextLabel = DefaultComponentFactory.getInstance().createLabel("Enter PLU code");
-    JFormattedTextField PLUCodeFormattedTextField = new JFormattedTextField(PLUFormat);
-    JButton PLUSearchButton = new JButton("search");
-    JLabel searchByPLUStatusLabel = new JLabel("");
-    JLabel searchByListTextLabel = DefaultComponentFactory.getInstance().createLabel("Search in List");
-    List list = new List();
-    JPanel keyboardPanel = new JPanel();
+public class addItemGUI extends JPanel implements IScreen{
+	
+	private static NumberFormat PLUFormat = NumberFormat.getInstance();
 
-    protected JPanel getKeyboardPanel() {
-        // TODO Auto-generated method stub
-        return keyboardPanel;
-    }
+	private SystemManager sm;
+	
+	JLabel searchByTextLabel = new JLabel("Search by text");
+	JTextField searchByTextField = new JTextField();
+	JButton textSearchButton = new JButton("search");
+	JLabel searchByTextStatusLabel = new JLabel("");
+	JLabel searchByPLUCodeTextLabel = new JLabel("Enter PLU code");
+	JFormattedTextField PLUCodeFormattedTextField = new JFormattedTextField(PLUFormat);
+	JButton PLUSearchButton = new JButton("search");
+	JLabel searchByPLUStatusLabel = new JLabel("");
+	JLabel searchByListTextLabel = new JLabel("Search in List");
+	List list = new List();
+	JPanel keyboardPanel = new JPanel();
+	
+	/**
+	 * Launch the application.
+	 */
+	public static void main(SystemManager sm) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					addItemGUI panel = new addItemGUI(sm);
+					panel.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+	
+	protected JPanel getKeyboardPanel() {
+		// TODO Auto-generated method stub
+		return keyboardPanel;
+	}
 
-    /**
-     * Create the frame.
-     */
-    public AddItemGui(SystemManager sm) {
-        this.sm = sm;
-        setBounds(100, 100, 747, 576);
-        getContentPane().setLayout(new FormLayout(new ColumnSpec[]{
-                FormSpecs.RELATED_GAP_COLSPEC,
-                FormSpecs.DEFAULT_COLSPEC,
-                FormSpecs.RELATED_GAP_COLSPEC,
-                FormSpecs.DEFAULT_COLSPEC,
-                FormSpecs.RELATED_GAP_COLSPEC,
-                ColumnSpec.decode("default:grow"),
-                FormSpecs.RELATED_GAP_COLSPEC,
-                ColumnSpec.decode("max(184dlu;default):grow"),
-                FormSpecs.RELATED_GAP_COLSPEC,
-                FormSpecs.DEFAULT_COLSPEC,
-                FormSpecs.RELATED_GAP_COLSPEC,
-                FormSpecs.DEFAULT_COLSPEC,
-                FormSpecs.RELATED_GAP_COLSPEC,
-                ColumnSpec.decode("default:grow"),},
-                new RowSpec[]{
-                        FormSpecs.RELATED_GAP_ROWSPEC,
-                        RowSpec.decode("max(15dlu;default)"),
-                        FormSpecs.RELATED_GAP_ROWSPEC,
-                        RowSpec.decode("max(30dlu;default)"),
-                        FormSpecs.RELATED_GAP_ROWSPEC,
-                        RowSpec.decode("max(14dlu;default)"),
-                        FormSpecs.RELATED_GAP_ROWSPEC,
-                        RowSpec.decode("23dlu"),
-                        FormSpecs.RELATED_GAP_ROWSPEC,
-                        RowSpec.decode("max(15dlu;default)"),
-                        FormSpecs.RELATED_GAP_ROWSPEC,
-                        FormSpecs.DEFAULT_ROWSPEC,
-                        FormSpecs.RELATED_GAP_ROWSPEC,
-                        FormSpecs.DEFAULT_ROWSPEC,
-                        FormSpecs.RELATED_GAP_ROWSPEC,
-                        FormSpecs.DEFAULT_ROWSPEC,
-                        FormSpecs.RELATED_GAP_ROWSPEC,
-                        FormSpecs.DEFAULT_ROWSPEC,
-                        FormSpecs.RELATED_GAP_ROWSPEC,
-                        RowSpec.decode("default:grow"),}));
+	/**
+	 * Create the frame.
+	 */
+	public addItemGUI(SystemManager sm) {
+		this.sm = sm;
+		
+		GridLayout gridLayout = new GridLayout();
+		gridLayout.setVgap(2);
+		gridLayout.setHgap(2);
+		gridLayout.setColumns(1);
+		gridLayout.setRows(0);
+		setLayout(gridLayout);
+		
+		// add item by description
+		
+		searchByTextField.setColumns(8);
+		searchByTextLabel.setVerticalAlignment(SwingConstants.BOTTOM);
+		searchByTextLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		
+		
+		add(searchByTextLabel, "8, 2, 1, 2, center, bottom");
+		add(searchByTextField, "8, 4, fill, default");
+		add(textSearchButton, "10, 4");
+		add(searchByTextStatusLabel, "12, 4, 3, 1");
+		
+		
+		// add item by PLU
+		
+		PLUCodeFormattedTextField.setToolTipText("Enter PLU Code");
+		PLUCodeFormattedTextField.setValue(PLUFormat);
+		searchByPLUCodeTextLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		searchByPLUCodeTextLabel.setVerticalAlignment(SwingConstants.BOTTOM);
+		
+		
+		add(searchByPLUCodeTextLabel, "8, 6, center, bottom");
+		add(PLUCodeFormattedTextField, "8, 8, fill, default");
+		add(PLUSearchButton, "10, 8");
+		add(searchByPLUStatusLabel, "12, 8, 3, 1");
+		searchByListTextLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+		searchByListTextLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		
+		
+		// add item by list
+	
+		
+		add(searchByListTextLabel, "8, 10, center, bottom");
+		add(list, "3, 12, 10, 6");
+		
+		
+		
+		// Component listeners
+		
+		textSearchButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String text = searchByTextField.getText();
+				
+				//if "text" is an item, add it to order
+				Item item = sm.searchItemsByText(text);
+				if (item == null) {
+					searchByTextStatusLabel.setText("Could not find " + "'"+text+"'" + " in database" );
+				}else {
+					sm.addItemToOrder(item, ScanType.MAIN);
+				}
+			}
+		});
+		
+		searchByTextField.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				PopupKeyboard keyboard = new PopupKeyboard(searchByTextField);
+				
+			}
+		});
+		
+		PLUCodeFormattedTextField.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				PopupKeyboard keyboard = new PopupKeyboard(searchByTextField);
+			}
+		});
+		
+		PLUSearchButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Object PLUcode = PLUCodeFormattedTextField.getValue();
+				//if PLU code exists, continue with order
+				
+				
+				// if PLU code does not exist
+				searchByTextStatusLabel.setText("Could not find PLU code: " + "'"+PLUcode+"'" + " in the database" );
+			}
+		});
 
-        // add item by description
-        searchByTextField.setColumns(10);
+	}
 
-        getContentPane().add(searchByTextLabel, "8, 2, 1, 2, center, bottom");
-        getContentPane().add(searchByTextField, "8, 4, fill, default");
-        getContentPane().add(textSearchButton, "10, 4");
-        getContentPane().add(searchByTextStatusLabel, "12, 4, 3, 1");
+	@Override
+	public void notifyItemAdded(Item item) {
+		// TODO Auto-generated method stub
+		
+	}
 
+	@Override
+	public void notifyItemRemoved(Item item) {
+		// TODO Auto-generated method stub
+		
+	}
 
-        // add item by PLU
-        PLUCodeFormattedTextField.setToolTipText("Enter PLU Code");
-        PLUCodeFormattedTextField.setValue(PLUFormat);
+	@Override
+	public void notifyStateChange(SessionStatus state) {
+		// TODO Auto-generated method stub
+		
+	}
 
-        getContentPane().add(searchByPLUCodeTextLabel, "8, 6, center, bottom");
-        getContentPane().add(PLUCodeFormattedTextField, "8, 8, fill, default");
-        getContentPane().add(PLUSearchButton, "10, 8");
-        getContentPane().add(searchByPLUStatusLabel, "12, 8, 3, 1");
+	@Override
+	public void notifyRefresh() {
+		// TODO Auto-generated method stub
+		
+	}
 
+	@Override
+	public void notifyPaymentAdded(BigDecimal value) {
+		// TODO Auto-generated method stub
+		
+	}
 
-        // add item by list
-        getContentPane().add(searchByListTextLabel, "8, 10, center, bottom");
-        getContentPane().add(list, "3, 12, 10, 6");
+	@Override
+	public void notifyPaymentWindowClosed() {
+		// TODO Auto-generated method stub
+		
+	}
 
+	@Override
+	public void notifyInvalidCardRead(Card card) {
+		// TODO Auto-generated method stub
+		
+	}
 
-        // Component listeners
-        textSearchButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String text = searchByTextField.getText();
-                //if "text" is an item, add it to order
+	@Override
+	public JPanel getPanel() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
+	@Override
+	public JFrame getFrame() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-                // if "text" is not an item
-                searchByTextStatusLabel.setText("Could not find " + "'" + text + "'" + " in database");
-            }
-        });
-
-        searchByTextField.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                PopupKeyboard keyboard = new PopupKeyboard(searchByTextField);
-
-            }
-        });
-
-        PLUCodeFormattedTextField.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                PopupKeyboard keyboard = new PopupKeyboard(searchByTextField);
-            }
-        });
-
-        PLUSearchButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                Object PLUcode = PLUCodeFormattedTextField.getValue();
-                //if PLU code exists, continue with order
-
-
-                // if PLU code does not exist
-                searchByTextStatusLabel.setText("Could not find PLU code: " + "'" + PLUcode + "'" + " in the database");
-            }
-        });
-
-    }
-
-    @Override
-    public void notifyItemAdded(Item item) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void notifyItemRemoved(Item item) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void notifyStateChange(SessionStatus state) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void notifyRefresh() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void notifyPaymentAdded(BigDecimal value) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void notifyPaymentWindowClosed() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void notifyInvalidCardRead(Card card) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public JPanel getPanel() {
-        throw new UnsupportedOperationException("This object does not have a panel.");
-    }
-
-    @Override
-    public JFrame getFrame() {
-        return this;
-    }
-
-    @Override
-    public void configure(ITouchScreen touchScreen) {
-        // do nothing
-    }
+	@Override
+	public void configure(ITouchScreen touchScreen) {
+		// TODO Auto-generated method stub
+		
+	}
 }
