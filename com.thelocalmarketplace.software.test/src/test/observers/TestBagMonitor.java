@@ -11,6 +11,7 @@ import stubbing.StubbedGrid;
 import stubbing.StubbedStation;
 import stubbing.StubbedSystemManager;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
@@ -50,13 +51,13 @@ public class TestBagMonitor {
     public void testBagDispensedNotification() {
         bm.aBagHasBeenDispensedByTheDispenser();
 
-        assertTrue(am.notifyBagDispensed());
+        assertEquals(4, am.getBagCount());
     }
 
     @Test
     public void testOutOfBagsNotification() {
         bm.theDispenserIsOutOfBags();
-        assertTrue(am.notifyBagsEmpty());
+        assertTrue(am.hasBags());
     }
 
     @Test
@@ -64,7 +65,7 @@ public class TestBagMonitor {
         int bagsLoadedCount = 5;
         bm.bagsHaveBeenLoadedIntoTheDispenser(bagsLoadedCount);
 
-        assertTrue(am.notifyBagsLoaded(bagsLoadedCount));
+        assertEquals(10, am.getBagCount());
     }
 
     @Test(expected = IllegalArgumentException.class)
