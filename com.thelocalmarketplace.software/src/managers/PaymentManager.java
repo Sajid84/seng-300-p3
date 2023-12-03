@@ -58,7 +58,6 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 
 	// vars
 	protected BigDecimal payment = BigDecimal.ZERO;
-	protected boolean isMembershipCard = false;
 
 	/**
 	 * This controls everything relating to customer payment.
