@@ -518,4 +518,9 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
         last_item = null;
     }
 
+	public void notifyKeyHasBeenPressed(String label) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
