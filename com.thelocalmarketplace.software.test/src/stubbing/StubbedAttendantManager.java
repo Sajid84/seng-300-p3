@@ -23,6 +23,7 @@
 package stubbing;
 
 import managers.AttendantManager;
+import observers.attendant.BagMonitor;
 import observers.attendant.ReceiptPrinterObserver;
 
 public class StubbedAttendantManager extends AttendantManager {
@@ -30,6 +31,7 @@ public class StubbedAttendantManager extends AttendantManager {
     
     public boolean notifyAttendantCalled;
 	private String attendantNotification;
+	private BagMonitor bagMonitor;
 
 
     public StubbedAttendantManager(StubbedSystemManager sm) {
@@ -88,5 +90,9 @@ public class StubbedAttendantManager extends AttendantManager {
 
     public void setBagCount(int bagCount) {
         super.bagCount = bagCount;
+    }
+    
+    public BagMonitor getBagMonitor() {
+        return bagMonitor;
     }
 }
