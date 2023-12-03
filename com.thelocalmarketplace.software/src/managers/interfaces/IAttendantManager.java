@@ -33,7 +33,7 @@ public interface IAttendantManager extends IManager {
 
     /**
      * Maintain banknotes use case. This function guarantees that the storage unit will be empty after calling.
-     * This function will only execute if the storage unit is full or over 90% capacity.
+     * This function will only execute if the storage unit is full or over 70% capacity.
      */
     void maintainBanknoteStorage();
 
@@ -45,7 +45,7 @@ public interface IAttendantManager extends IManager {
 
     /**
      * Maintain coins use case. This function guarantees that the storage unit will be empty after calling.
-     * This function will only execute if the storage unit is full or over 90% capacity.
+     * This function will only execute if the storage unit is full or over 70% capacity.
      */
     void maintainCoinStorage();
 

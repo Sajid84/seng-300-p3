@@ -235,8 +235,9 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 		if (unit.getCoinCount() == unit.getCapacity()) {
 			coinStorageUnitFull = true;
 			notifyAttendant("The coin storage unit is full.");
-		} else if (unit.getCoinCount() >= (unit.getCapacity() * 0.90)) {
-			notifyAttendant("The coin storage unit is over 90% full.");
+		} else if (unit.getCoinCount() >= (unit.getCapacity() * 0.70)) {
+			coinStorageUnitFull = true;
+			notifyAttendant("The coin storage unit is over 70% full.");
 		} else {
 			coinStorageUnitFull = false;
 		}
@@ -252,8 +253,9 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 		if (unit.getBanknoteCount() == unit.getCapacity()) {
 			banknoteStorageUnitFull = true;
 			notifyAttendant("The banknote storage unit is full.");
-		} else if (unit.getBanknoteCount() >= (unit.getCapacity() * 0.90)) {
-			notifyAttendant("The banknote storage unit is over 90% full.");
+		} else if (unit.getBanknoteCount() >= (unit.getCapacity() * 0.70)) {
+			banknoteStorageUnitFull = true;
+			notifyAttendant("The banknote storage unit is over 70% full.");
 		} else {
 			banknoteStorageUnitFull = false;
 		}
