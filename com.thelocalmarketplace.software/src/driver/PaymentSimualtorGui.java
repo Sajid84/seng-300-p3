@@ -6,7 +6,7 @@ import com.jjjwelectronics.screen.ITouchScreen;
 import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
 import managers.SystemManager;
-import managers.enums.SessionStatus;
+import enums.SessionStatus;
 import managers.interfaces.IScreen;
 import utils.CardHelper;
 

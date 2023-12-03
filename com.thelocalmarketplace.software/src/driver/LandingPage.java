@@ -4,7 +4,7 @@ import com.jjjwelectronics.Item;
 import com.jjjwelectronics.card.Card;
 import com.jjjwelectronics.screen.ITouchScreen;
 import managers.SystemManager;
-import managers.enums.SessionStatus;
+import enums.SessionStatus;
 import managers.interfaces.IScreen;
 
 import javax.swing.*;

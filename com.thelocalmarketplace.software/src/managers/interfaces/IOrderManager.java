@@ -8,7 +8,7 @@ import com.jjjwelectronics.Item;
 import com.jjjwelectronics.scale.IElectronicScale;
 import com.jjjwelectronics.scanner.BarcodedItem;
 import com.thelocalmarketplace.hardware.PLUCodedItem;
-import managers.enums.ScanType;
+import enums.ScanType;
 import utils.Pair;
 
 import java.math.BigDecimal;
@@ -35,6 +35,8 @@ public interface IOrderManager extends IManager {
     /**
      * Allows the customer to request the item not be bagged, unblocking the
      * session. This also updates the weight adjustment.
+     *
+     * @param bagRequest if true, the internal item flag will be set to false. Likewise for false
      */
     void doNotBagRequest(boolean bagRequest);
 

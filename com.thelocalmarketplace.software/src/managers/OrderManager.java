@@ -19,8 +19,8 @@ import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import com.thelocalmarketplace.hardware.PLUCodedItem;
 import com.thelocalmarketplace.hardware.PLUCodedProduct;
 import database.Database;
-import managers.enums.ScanType;
-import managers.enums.SessionStatus;
+import enums.ScanType;
+import enums.SessionStatus;
 import managers.interfaces.IOrderManager;
 import managers.interfaces.IOrderManagerNotify;
 import observers.order.BarcodeScannerObserver;
@@ -168,7 +168,8 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
      * @param a the weight adjustment
      */
     protected void setWeightAdjustment(BigDecimal a) {
-        this.adjustment = a;
+        // I love floating point numbers
+        this.adjustment = BigDecimal.valueOf(a.toBigInteger().intValue());
     }
 
     protected void increaseWeightAdjustment(BigDecimal a) {
@@ -375,14 +376,14 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
         sm.notifyAttendant(reason);
     }
 
-    /**
-     * This method handles a customer's request to skip bagging for a specific item.
-     * It adjusts the expected weight and updates the weight adjustment, blocks the
-     * session, and notifies the attendant.
-     */
     @Override
     public void doNotBagRequest(boolean bagRequest) {
-        if (bagRequest) {
+        /**
+         * The input is inverted because of the name of this function, do not bag request
+         * implies that the next item will not be bagged. So if the do not bag request is false,
+         * this function must set the bagging item flag to true.
+         */
+        if (!bagRequest) {
             notifyAttendant("Bagging the next item");
             bagItem = true;
         } else {
@@ -405,12 +406,15 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
         this.actualWeight = mass;
 
         /**
-         * calculating the magnitude of the difference, the expected weight should be
-         * greater than the actual weight.
+         * calculating the magnitude of the difference between the expected weight
+         * and the actual weight.
+         *
+         * Scaling the actual weight upto the expected weight. I don't really thing it matters
+         * because the goal is to add a number to the difference to make it zero.
          */
-        BigDecimal expected = getExpectedMass().add(getWeightAdjustment());
+        BigDecimal expected = getExpectedMass();
         BigDecimal actual = actualWeight;
-        BigDecimal difference = expected.subtract(actual).abs();
+        BigDecimal difference = expected.subtract(actual).add(getWeightAdjustment()).abs();
 
         // checking the weight difference
         checkWeightDifference(difference);

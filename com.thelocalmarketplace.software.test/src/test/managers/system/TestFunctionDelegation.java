@@ -7,7 +7,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
-import managers.enums.SessionStatus;
+import enums.SessionStatus;
 import stubbing.StubbedSystemManager;
 
 /**
@@ -51,7 +51,7 @@ public class TestFunctionDelegation {
 
 	@Test
 	public void testTenderChangeCallsPaymentManager() {
-		sm.setState(SessionStatus.NORMAL);
+		sm.setState(SessionStatus.PAID);
 
 		try {
 			sm.tenderChange();

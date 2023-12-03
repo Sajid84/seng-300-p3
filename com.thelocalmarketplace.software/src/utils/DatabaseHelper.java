@@ -6,7 +6,6 @@ import ca.ucalgary.seng300.simulation.InvalidArgumentSimulationException;
 import com.jjjwelectronics.Item;
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Numeral;
-import com.jjjwelectronics.bag.ReusableBag;
 import com.jjjwelectronics.scanner.Barcode;
 import com.jjjwelectronics.scanner.BarcodedItem;
 import com.thelocalmarketplace.hardware.*;
@@ -160,10 +159,27 @@ public class DatabaseHelper {
      * @return the {@link BarcodedItem}
      */
     public static BarcodedItem createRandomBarcodedItem() {
+        return createRandomBarcodedItem(DatabaseHelper.createRandomPrice());
+    }
+
+    /**
+     * <p>
+     * Creates a {@link BarcodedItem} with a randomized mass and barcode. This
+     * method also creates a {@link BarcodedProduct} with a randomized barcode,
+     * description, price and mass.
+     * </p>
+     * <p>
+     * This method guarantees that the {@link Barcode}s of both item and product are
+     * the same and that they are put into respective databases in {@link Database}.
+     * </p>
+     *
+     * @param price the price of the product that this function creates
+     * @return the {@link BarcodedItem}
+     */
+    public static BarcodedItem createRandomBarcodedItem(long price) {
         // creating the barcode
         double mass = DatabaseHelper.createRandomMass();
         String desc = "B" + DatabaseHelper.createRandomSignifier() + " " + DatabaseHelper.createRandomDescription();
-        long price = DatabaseHelper.createRandomPrice();
 
         // temp vars
         Barcode barcode;
@@ -205,7 +221,7 @@ public class DatabaseHelper {
      * </p>
      * <p>
      * This function also guarantess that the product's expected mass is bigger than
-     * the item's by at least 10 units.
+     * the item's by at 1,000 units.
      *
      * @return the generated barcoded item
      */

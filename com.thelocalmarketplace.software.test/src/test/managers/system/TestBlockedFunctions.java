@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import com.tdc.NoCashAvailableException;
 
-import managers.enums.SessionStatus;
+import enums.SessionStatus;
 import stubbing.StubbedSystemManager;
 
 /**
@@ -78,8 +78,8 @@ public class TestBlockedFunctions {
 	}
 
 	@Test(expected = IllegalStateException.class)
-	public void testCannotTenderChangeWhenPaid() throws RuntimeException, NoCashAvailableException {
-		sm.setState(SessionStatus.PAID);
+	public void testCannotTenderChangeWhenNormal() throws RuntimeException, NoCashAvailableException {
+		sm.setState(SessionStatus.NORMAL);
 
 		sm.tenderChange();
 	}

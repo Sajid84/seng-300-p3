@@ -17,10 +17,9 @@ import org.junit.Test;
 
 import com.jjjwelectronics.Item;
 import com.jjjwelectronics.scanner.BarcodedItem;
-import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 
-import managers.enums.ScanType;
-import managers.enums.SessionStatus;
+import enums.ScanType;
+import enums.SessionStatus;
 import stubbing.StubbedGrid;
 import stubbing.StubbedItem;
 import stubbing.StubbedOrderManager;
@@ -83,7 +82,7 @@ public class TestDoNotBag {
 		om.doNotBagRequest(true);
 
 		// check if the attendant is notified with the correct reason
-		assertEquals("do not bag request was received", sm.getAttendantNotification());
+        assertTrue(sm.notifyAttendantCalled);
 	}
 
 	@Test
@@ -94,7 +93,7 @@ public class TestDoNotBag {
 		om.doNotBagRequest(true);
 
 		// check if the attendant is notified with the correct reason
-		assertEquals("do not bag request was received", sm.getAttendantNotification());
+		assertTrue(sm.notifyAttendantCalled);
 		assertTrue(!om.getBagItem());
 
 		// adding the item to the order

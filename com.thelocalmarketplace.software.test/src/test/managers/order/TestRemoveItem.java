@@ -18,11 +18,10 @@ import com.jjjwelectronics.OverloadedDevice;
 import com.jjjwelectronics.scale.AbstractElectronicScale;
 import com.jjjwelectronics.scanner.Barcode;
 import com.jjjwelectronics.scanner.BarcodedItem;
-import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 import com.thelocalmarketplace.hardware.PLUCodedItem;
 import com.thelocalmarketplace.hardware.PriceLookUpCode;
 
-import managers.enums.ScanType;
+import enums.ScanType;
 import stubbing.StubbedGrid;
 import stubbing.StubbedOrderManager;
 import stubbing.StubbedOrderManagerNotify;

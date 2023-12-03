@@ -18,13 +18,12 @@ import org.junit.Test;
 
 import com.jjjwelectronics.card.Card;
 import com.jjjwelectronics.card.Card.CardSwipeData;
-import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
-import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
 
-import managers.enums.SessionStatus;
+import enums.SessionStatus;
 import stubbing.*;
 import utils.CardHelper;
+import utils.DatabaseHelper;
 
 public class TestSwipeCard {
 
@@ -49,12 +48,12 @@ public class TestSwipeCard {
 		sm = new StubbedSystemManager(BigDecimal.ZERO);
 		pm = sm.pmStub;
 		om = sm.omStub;
-		BarcodedItem prod = new StubbedBarcodedItem();
+		BarcodedItem item = DatabaseHelper.createRandomBarcodedItem();
 		issuer = CardHelper.createCardIssuer();
 		sm.setIssuer(issuer);
 
 		// configuring the machine
-		om.addItem(prod);
+		om.addItem(item);
 		sm.configure(machine);
 
 	}
@@ -65,14 +64,22 @@ public class TestSwipeCard {
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
-	public void testSystemSwipeNullCard() throws IOException {
+	public void testSystemSwipeNullCard() {
 		sm.swipeCard(null);
 	}
 
 	@Test
 	public void testSuccessfulNotifyCardSwipe() throws IOException {
-		Card card = CardHelper.createCard(issuer, sm.getTotalPrice().doubleValue());
-		pm.notifyCardSwipe(card.swipe());
+		// creating a card with enough balance
+		Card card = CardHelper.createCard(issuer, sm.getTotalPrice().doubleValue() + 1_0000);
+
+		// swiping the card
+		pm.notifyCardDataRead(card.swipe());
+
+		// checking if the session is paid or not
+		sm.checkPaid();
+
+		// asserting
 		assertEquals(SessionStatus.PAID, sm.getState());
 		assertEquals(sm.getTotalPrice(), sm.getCustomerPayment());
 	}
@@ -81,7 +88,7 @@ public class TestSwipeCard {
 	public void testUnsuccessfulNotifyCardSwipe() throws IOException {
 		Card card = CardHelper.createCard(issuer, 2);
 		CardSwipeData data = card.swipe();
-		pm.notifyCardSwipe(data);
+		pm.notifyCardDataRead(data);
 		assertEquals(SessionStatus.NORMAL, sm.getState());
 		assertNotEquals(sm.getTotalPrice(), sm.getCustomerPayment());
 	}
@@ -95,8 +102,8 @@ public class TestSwipeCard {
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void testNotifyNullCard() throws IOException {
-		pm.notifyCardSwipe(null);
+	public void testNotifyNullCard() {
+		pm.notifyCardDataRead(null);
 	}
 
 }

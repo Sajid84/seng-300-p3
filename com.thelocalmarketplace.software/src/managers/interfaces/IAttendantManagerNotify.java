@@ -64,5 +64,14 @@ public interface IAttendantManagerNotify {
      */
     void notifyBagDispensed();
 
+    /**
+     * Notifies that bags have been loaded into the machine.
+     * @param count the number of bags loaded
+     */
+    void notifyBagsLoaded(int count);
 
+    /**
+     * Notifies that there are no more bags left in the machine.
+     */
+    void notifyBagsEmpty();
 }
