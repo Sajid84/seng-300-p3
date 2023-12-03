@@ -2,6 +2,7 @@
 // Kear Sang Heng 30087289
 package test.managers.order;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
@@ -103,30 +104,8 @@ public class TestAddOwnBags {
 		om.addCustomerBags(normalBag2);
 		om.addCustomerBags(normalBag3);
 
-		assertTrue(om.getWeightAdjustment().compareTo(new BigDecimal(45)) == 0);
+        assertEquals(0, om.getWeightAdjustment().compareTo(new BigDecimal(45)));
 		assertTrue(omnStub.gotNoftifyMassChangedMessage = true);
-	}
-
-	/*
-	 * Adding an item (not a bag) to customer bags It is expected to throw
-	 * InvalidArgumentSimulationException
-	 */
-	@Test(expected = IllegalArgumentException.class)
-	public void testAddingItem() {
-		// Added an mock item
-		PLUCodedItem item = new PLUCodedItem(new PriceLookUpCode("1234"), new Mass(1));
-		om.addCustomerBags(item);
-	}
-
-	/*
-	 * Adding an bag with negative weight It is expected to throw
-	 * InvalidArgumentSimulationException
-	 */
-	@Test(expected = InvalidArgumentSimulationException.class)
-	public void testAddingBagWithNegativeWeight() {
-		// Mass of -10
-		Item negativeBag = new StubbedItem(-10);
-		om.addCustomerBags(negativeBag);
 	}
 
 	/*

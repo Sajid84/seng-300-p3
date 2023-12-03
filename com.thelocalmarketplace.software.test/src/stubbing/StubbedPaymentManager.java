@@ -57,10 +57,6 @@ public class StubbedPaymentManager extends PaymentManager {
 		return super.cro;
 	}
 	
-	public ReceiptPrinterObserver getReceiptPrinterObserver() {
-		return super.rpls;
-	}
-	
 	public BigDecimal getPayment() {
 		return super.payment;
 	}

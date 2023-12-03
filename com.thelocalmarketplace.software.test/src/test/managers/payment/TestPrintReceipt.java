@@ -33,6 +33,7 @@ public class TestPrintReceipt {
 	private StubbedPaymentManager pm;
 	private StubbedSystemManager sm;
 	private StubbedOrderManager om;
+	private StubbedAttendantManager am;
 	private ISelfCheckoutStation machine;
 	private CardIssuer issuer;
 	private Card card;
@@ -56,6 +57,7 @@ public class TestPrintReceipt {
 		sm = new StubbedSystemManager(issuer);
 		pm = sm.pmStub;
 		om = sm.omStub;
+		am = sm.amStub;
 		card = CardHelper.createCard(issuer);
 
 		// configuring the machine
@@ -175,8 +177,8 @@ public class TestPrintReceipt {
 	@Test
 	public void testPrintReceiptBlocksWhenNoPaper() {
 		// setting the state of payment manager
-		pm.setHasPaper(false);
-		pm.setHasInk(true);
+		am.setHasPaper(false);
+		am.setHasInk(true);
 
 		// adding a product to the order
 		BarcodedItem item = DatabaseHelper.createRandomBarcodedItem();
@@ -195,8 +197,8 @@ public class TestPrintReceipt {
 	@Test
 	public void testPrintReceiptBlocksWhenNoInk() {
 		// setting the state of payment manager
-		pm.setHasPaper(true);
-		pm.setHasInk(false);
+		am.setHasPaper(true);
+		am.setHasInk(false);
 
 		// adding a product to the order
 		BarcodedItem item = DatabaseHelper.createRandomBarcodedItem();
@@ -215,8 +217,8 @@ public class TestPrintReceipt {
 	@Test
 	public void testPrintReceiptBlocksWhenNeitherInkNorPaper() {
 		// setting the state of payment manager
-		pm.setHasPaper(false);
-		pm.setHasInk(false);
+		am.setHasPaper(false);
+		am.setHasInk(false);
 
 		// adding a product to the order
 		BarcodedItem item = DatabaseHelper.createRandomBarcodedItem();

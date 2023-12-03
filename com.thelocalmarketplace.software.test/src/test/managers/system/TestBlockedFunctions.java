@@ -78,8 +78,8 @@ public class TestBlockedFunctions {
 	}
 
 	@Test(expected = IllegalStateException.class)
-	public void testCannotTenderChangeWhenPaid() throws RuntimeException, NoCashAvailableException {
-		sm.setState(SessionStatus.PAID);
+	public void testCannotTenderChangeWhenNormal() throws RuntimeException, NoCashAvailableException {
+		sm.setState(SessionStatus.NORMAL);
 
 		sm.tenderChange();
 	}
