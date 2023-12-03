@@ -16,15 +16,13 @@ import com.jjjwelectronics.card.Card;
 import com.jjjwelectronics.screen.ITouchScreen;
 
 import managers.SystemManager;
+import managers.enums.ScanType;
 import managers.enums.SessionStatus;
 import managers.interfaces.IScreen;
 
 import com.jgoodies.forms.layout.FormSpecs;
 import java.awt.List;
 import javax.swing.JLabel;
-import com.jgoodies.forms.factories.DefaultComponentFactory;
-import javax.swing.event.CaretListener;
-import javax.swing.event.CaretEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.math.BigDecimal;
@@ -32,8 +30,6 @@ import java.text.NumberFormat;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 
 public class addItemGUI extends JFrame implements IScreen{
 	
@@ -41,15 +37,15 @@ public class addItemGUI extends JFrame implements IScreen{
 
 	private SystemManager sm;
 	
-	JLabel searchByTextLabel = DefaultComponentFactory.getInstance().createLabel("Search by text");
+	JLabel searchByTextLabel = new JLabel("Search by text");
 	JTextField searchByTextField = new JTextField();
 	JButton textSearchButton = new JButton("search");
 	JLabel searchByTextStatusLabel = new JLabel("");
-	JLabel searchByPLUCodeTextLabel = DefaultComponentFactory.getInstance().createLabel("Enter PLU code");
+	JLabel searchByPLUCodeTextLabel = new JLabel("Enter PLU code");
 	JFormattedTextField PLUCodeFormattedTextField = new JFormattedTextField(PLUFormat);
 	JButton PLUSearchButton = new JButton("search");
 	JLabel searchByPLUStatusLabel = new JLabel("");
-	JLabel searchByListTextLabel = DefaultComponentFactory.getInstance().createLabel("Search in List");
+	JLabel searchByListTextLabel = new JLabel("Search in List");
 	List list = new List();
 	JPanel keyboardPanel = new JPanel();
 	
@@ -153,11 +149,16 @@ public class addItemGUI extends JFrame implements IScreen{
 		textSearchButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String text = searchByTextField.getText();
+				
 				//if "text" is an item, add it to order
+				Item item = sm.searchItemsByText(text);
+				if (item == null) {
+					searchByTextStatusLabel.setText("Could not find " + "'"+text+"'" + " in database" );
+				}else {
+					sm.addItemToOrder(item, ScanType.MAIN);
+				}
 				
 			
-				// if "text" is not an item
-				searchByTextStatusLabel.setText("Could not find " + "'"+text+"'" + " in database" );
 			}
 		});
 		
