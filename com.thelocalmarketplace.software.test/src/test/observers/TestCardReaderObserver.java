@@ -20,6 +20,8 @@
 // Sheikh Falah Sheikh Hasan - 30175335
 // Umer Rehman			- 30169819
 
+package test.observers;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
