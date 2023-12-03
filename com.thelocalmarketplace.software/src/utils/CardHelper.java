@@ -2,6 +2,7 @@
 
 package utils;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Random;
 
@@ -131,5 +132,13 @@ public class CardHelper {
 
 		// returning the card to the caller
 		return card;
+	}
+
+
+	public boolean isMembership(Card card) throws IOException {
+		if (card.kind.equalsIgnoreCase("membership")) {
+			return true;
+		}
+		return false;
 	}
 }

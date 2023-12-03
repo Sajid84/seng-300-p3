@@ -123,25 +123,6 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 
 	}
 
-	@Override
-	public void notifyCardTap(CardData cardData) {
-		if (cardData == null) {
-			throw new IllegalArgumentException("received null card data from the observer");
-		}
-
-		//vars
-		double amountDouble = sm.getTotalPrice().doubleValue();
-		long holdNumber = issuer.authorizeHold(cardData.getNumber(), amountDouble);
-
-		// testing the hold number
-		if (holdNumber == -1) {
-			return;
-		} else {
-			payment = sm.getTotalPrice();
-			recordTransaction(cardData, holdNumber, amountDouble);
-			sm.notifyPaid();
-		}
-	}
 
 	@Override
 	public void insertCard(Card card, String pin) throws IOException {
@@ -154,22 +135,6 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 		this.machine.getCardReader().insert(card, pin);
 	}
 
-	@Override
-	public void notifyInsertCard(CardData cardData){
-		if (cardData == null){
-			throw new IllegalArgumentException("received null card data from the observer");
-		}
-		double amountDouble = sm.getTotalPrice().doubleValue();
-		long holdNumber = issuer.authorizeHold(cardData.getNumber(), amountDouble);
-
-		if (holdNumber == -1){
-			return;
-		} else {
-			payment = sm.getTotalPrice();
-			recordTransaction(cardData, holdNumber, amountDouble);
-			sm.notifyPaid();
-		}
-	}
 
 	@Override
 	public void swipeCard(Card card) throws IOException {
@@ -183,8 +148,9 @@ public class PaymentManager implements IPaymentManager, IPaymentManagerNotify {
 		this.machine.getCardReader().swipe(card);
 	}
 
+
 	@Override
-	public void notifyCardSwipe(CardData cardData) {
+	public void notifyCardDataRead(CardData cardData) {
 		if (cardData == null) {
 			throw new IllegalArgumentException("received null card data from the observer");
 		}

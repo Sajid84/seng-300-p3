@@ -16,37 +16,11 @@ import com.jjjwelectronics.card.Card.CardData;
 public interface IPaymentManagerNotify {
 
 	/**
-	 * This method notifies the {@link IPaymentManager} that a child object received
-	 * a card swipe.
-	 * 
-	 * @param cardData the swiped card data
-	 * @return
-	 */
-	void notifyCardSwipe(CardData cardData);
-
-	/**
-	 * This method notifies the {@link IPaymentManager} that a child object received
-	 * a card tap.
+	 * This method notifies {@link IPaymentManager that a card has been read.
 	 *
-	 * @param the tapped card data
-	 * @return
+	 * @param cardData the data of the read card
 	 */
-	void notifyCardTap(CardData cardData);
-	
-	/**
-	 * This method notifies that a card has been inserted
-	 *
-	 * @param cardData the data of the inserted card
-	 */
-	
-	void notifyInsertCard(CardData cardData);
-	/**
-	 * This method notifies that a card has been inserted
-	 *
-	 * @param cardData the data of the inserted card
-	 */
-	void notifyInsertCard(CardData cardData);
-
+	void notifyCardDataRead(CardData cardData);
 
 	/**
 	 * This method notifies the {@link IPaymentManager} that a child object has

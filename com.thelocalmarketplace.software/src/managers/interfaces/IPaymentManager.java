@@ -49,13 +49,6 @@ public interface IPaymentManager extends IManager {
 	 */
 	void insertCard(Card card, String pin) throws IOException;
 
-	/**
-	 * Checks to see if card is a membership card
-	 *
-	 * @param card a card
-	 * @throws IOException
-	 */
-	boolean isMembership(Card card) throws IOException;
 
 	/**
 	 * Allows the customer to insert a coin into the system.

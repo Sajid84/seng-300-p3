@@ -217,7 +217,7 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 		}
 	}
 	@Override
-	public void insertCard(Card card, String pin) throws IOException {
+	public void insertCard(Card card, String pin) {
 		if (!isUnblocked()) {throw new IllegalStateException("cannot insert card when PAID");}
 
 		try{
@@ -230,7 +230,7 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	}
 
 	@Override
-	public void tapCard(Card card) throws IOException {
+	public void tapCard(Card card) {
 		// not performing action if session is blocked
 		if (!isUnblocked()) {throw new IllegalStateException("cannot tap card when PAID");}
 
