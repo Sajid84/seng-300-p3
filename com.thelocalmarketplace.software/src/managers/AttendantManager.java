@@ -216,12 +216,12 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 		// checking if the dispenser is empty
 		if (dispenser.size() == 0) {
-			notifyAttendant("The " + dispenser + " banknote dispenser is empty.");
+			notifyAttendant("The " + denom + " banknote dispenser is empty.");
 		}
 
 		// checking if the dispenser is almost empty
 		if (banknoteDispenserLow.get(denom)) {
-			notifyAttendant("The " + dispenser + " banknote dispenser is less than 10% full.");
+			notifyAttendant("The " + denom + " banknote dispenser is less than 10% full.");
 		}
 	}
 
