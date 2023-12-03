@@ -115,7 +115,7 @@
                   </component>
                   <component id="a817" class="javax.swing.JButton" binding="signalForAttendantButton">
                     <constraints>
-                      <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                      <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                       <gridbag weightx="1.0" weighty="1.0"/>
                     </constraints>
                     <properties>
@@ -124,20 +124,11 @@
                   </component>
                   <component id="39bf8" class="javax.swing.JButton" binding="payForOrderButton">
                     <constraints>
-                      <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                      <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                       <gridbag weightx="1.0" weighty="1.0"/>
                     </constraints>
                     <properties>
                       <text value="Pay for Order"/>
-                    </properties>
-                  </component>
-                  <component id="74491" class="javax.swing.JButton" binding="searchForItemButton">
-                    <constraints>
-                      <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                      <gridbag weightx="1.0" weighty="1.0"/>
-                    </constraints>
-                    <properties>
-                      <text value="Search For Item"/>
                     </properties>
                   </component>
                   <component id="230b6" class="javax.swing.JButton" binding="scanByHandheldScannerButton">
@@ -151,7 +142,7 @@
                   </component>
                   <component id="7f70b" class="javax.swing.JButton" binding="addOwnBagsButton" default-binding="true">
                     <constraints>
-                      <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                      <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                       <gridbag weightx="1.0" weighty="1.0"/>
                     </constraints>
                     <properties>
@@ -160,7 +151,7 @@
                   </component>
                   <component id="7f35c" class="javax.swing.JButton" binding="purchaseBagsButton" default-binding="true">
                     <constraints>
-                      <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                      <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                       <gridbag weightx="1.0" weighty="1.0"/>
                     </constraints>
                     <properties>
@@ -169,7 +160,7 @@
                   </component>
                   <component id="57083" class="javax.swing.JCheckBox" binding="doNotBagItemCheckBox" default-binding="true">
                     <constraints>
-                      <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                      <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                       <gridbag weightx="1.0" weighty="1.0"/>
                     </constraints>
                     <properties>
@@ -178,7 +169,7 @@
                   </component>
                   <component id="f8bb6" class="javax.swing.JButton" binding="exitSessionButton" default-binding="true">
                     <constraints>
-                      <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                      <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                       <gridbag weightx="1.0" weighty="1.0"/>
                     </constraints>
                     <properties>
@@ -206,6 +197,14 @@
                 </properties>
               </component>
             </children>
+          </grid>
+          <grid id="7787e" binding="addItemView" layout-manager="GridBagLayout">
+            <constraints>
+              <tabbedpane title="Add Item"/>
+            </constraints>
+            <properties/>
+            <border type="none"/>
+            <children/>
           </grid>
           <grid id="5147" binding="debugView" layout-manager="GridBagLayout">
             <constraints>

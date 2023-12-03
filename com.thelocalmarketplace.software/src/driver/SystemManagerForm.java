@@ -1,4 +1,24 @@
-// Liam Major 30223023
+// Liam Major			- 30223023
+// Md Abu Sinan			- 30154627
+// Ali Akbari			- 30171539
+// Shaikh Sajid Mahmood	- 30182396
+// Abdullah Ishtiaq		- 30153185
+// Adefikayo Akande		- 30185937
+// Alecxia Zaragoza		- 30150008
+// Ana Laura Espinosa Garza - 30198679
+// Anmol Bansal			- 30159559
+// Emmanuel Trinidad	- 30172372
+// Gurjit Samra			- 30172814
+// Kelvin Jamila		- 30117164
+// Kevlam Chundawat		- 30180662
+// Logan Miszaniec		- 30156384
+// Maleeha Siddiqui		- 30179762
+// Michael Hoang		- 30123605
+// Nezla Annaisha		- 30123223
+// Nicholas MacKinnon	- 30172737
+// Ohiomah Imohi		- 30187606
+// Sheikh Falah Sheikh Hasan - 30175335
+// Umer Rehman			- 30169819
 
 package driver;
 
@@ -11,8 +31,8 @@ import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.PLUCodedItem;
 import com.thelocalmarketplace.hardware.PLUCodedProduct;
 import managers.SystemManager;
-import managers.enums.ScanType;
-import managers.enums.SessionStatus;
+import enums.ScanType;
+import enums.SessionStatus;
 import managers.interfaces.IScreen;
 import utils.DatabaseHelper;
 import utils.Pair;
@@ -35,7 +55,6 @@ public class SystemManagerForm implements IScreen {
     private JButton scanByMainScannerButton;
     private JButton signalForAttendantButton;
     private JButton payForOrderButton;
-    private JButton searchForItemButton;
     private JButton scanByHandheldScannerButton;
     private JLabel feedbackLabel;
     private JLabel tableLabel;
@@ -46,9 +65,10 @@ public class SystemManagerForm implements IScreen {
     private JCheckBox doNotBagItemCheckBox;
     private JButton exitSessionButton;
     protected JLabel priceLabel;
-    private final DebugForm debug;
+    protected JPanel addItemView;
     private PaymentSimualtorGui paymentGui;
-    private AddItemGui addItemGui;
+    private final DebugForm debug;
+    private final AddItemGUI addItem;
 
     // TABLE HEADERS
     private final String nameColumn = "Name";
@@ -64,11 +84,15 @@ public class SystemManagerForm implements IScreen {
     public SystemManagerForm(SystemManager sm) {
         // copying the system manager reference
         this.sm = sm;
-        this.debug = new DebugForm(sm);
+
+        // creating the other views
+        debug = new DebugForm(sm);
+        addItem = new AddItemGUI(sm);
 
         // attaching to the observer
         sm.attach(this);
         sm.attach(debug);
+        sm.attach(addItem);
 
         // setting the model
         itemsTable.setModel(generateModelSkeleton());
@@ -122,12 +146,6 @@ public class SystemManagerForm implements IScreen {
                 sm.signalForAttendant();
             }
         });
-        searchForItemButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Searching for item was initiated");
-            }
-        });
         doNotBagItemCheckBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -173,19 +191,6 @@ public class SystemManagerForm implements IScreen {
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Exiting the session.");
-            }
-        });
-        searchForItemButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("The customer wishes to pay for their order.");
-
-                // revealing the payment window
-                addItemGui.setVisible(true);
-
-                // blocking buttons
-                blockButtons();
-                updateButtonStates();
             }
         });
     }
@@ -248,14 +253,13 @@ public class SystemManagerForm implements IScreen {
         debugView.setLayout(new GridLayout());
         debugView.add(debug.getPanel());
 
+        // attaching the add item window to the correct panel
+        addItemView.setLayout(new GridLayout());
+        addItemView.add(addItem.getPanel());
+
         // creating the payment gui
         paymentGui = new PaymentSimualtorGui(sm);
         sm.attach(paymentGui);
-
-        // creating the add item gui
-        // TODO this will crash because the program cannot find the jgoodies jar.
-//        addItemGui = new AddItemGui(sm);
-//        sm.attach(addItemGui);
     }
 
     /**
@@ -445,7 +449,6 @@ public class SystemManagerForm implements IScreen {
     protected void setButtonsState(boolean state) {
         scanByMainScannerButton.setEnabled(state);
         scanByHandheldScannerButton.setEnabled(state);
-        searchForItemButton.setEnabled(state);
         addOwnBagsButton.setEnabled(state);
         purchaseBagsButton.setEnabled(state);
         doNotBagItemCheckBox.setEnabled(state);
@@ -555,7 +558,7 @@ public class SystemManagerForm implements IScreen {
         signalForAttendantButton.setText("Signal for Attendant");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 7;
+        gbc.gridy = 6;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -564,20 +567,11 @@ public class SystemManagerForm implements IScreen {
         payForOrderButton.setText("Pay for Order");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 6;
+        gbc.gridy = 5;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         panel2.add(payForOrderButton, gbc);
-        searchForItemButton = new JButton();
-        searchForItemButton.setText("Search For Item");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        panel2.add(searchForItemButton, gbc);
         scanByHandheldScannerButton = new JButton();
         scanByHandheldScannerButton.setText("Scan by Handheld Scanner");
         gbc = new GridBagConstraints();
@@ -591,7 +585,7 @@ public class SystemManagerForm implements IScreen {
         addOwnBagsButton.setText("Add Own Bags");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 4;
+        gbc.gridy = 3;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -600,7 +594,7 @@ public class SystemManagerForm implements IScreen {
         purchaseBagsButton.setText("Purchase Bags");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 5;
+        gbc.gridy = 4;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -609,7 +603,7 @@ public class SystemManagerForm implements IScreen {
         doNotBagItemCheckBox.setText("Do Not Bag Item");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 3;
+        gbc.gridy = 2;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         panel2.add(doNotBagItemCheckBox, gbc);
@@ -617,7 +611,7 @@ public class SystemManagerForm implements IScreen {
         exitSessionButton.setText("Exit Session");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 8;
+        gbc.gridy = 7;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -635,6 +629,9 @@ public class SystemManagerForm implements IScreen {
         gbc.gridx = 1;
         gbc.gridy = 2;
         regularView.add(priceLabel, gbc);
+        addItemView = new JPanel();
+        addItemView.setLayout(new GridBagLayout());
+        mainPane.addTab("Add Item", addItemView);
         debugView = new JPanel();
         debugView.setLayout(new GridBagLayout());
         mainPane.addTab("Debug", debugView);

@@ -1,98 +1,117 @@
-// Myra Latif 30171760
-// Liam Major 30223023
-// Jason Very 30222040
+// Liam Major			- 30223023
+// Md Abu Sinan			- 30154627
+// Ali Akbari			- 30171539
+// Shaikh Sajid Mahmood	- 30182396
+// Abdullah Ishtiaq		- 30153185
+// Adefikayo Akande		- 30185937
+// Alecxia Zaragoza		- 30150008
+// Ana Laura Espinosa Garza - 30198679
+// Anmol Bansal			- 30159559
+// Emmanuel Trinidad	- 30172372
+// Gurjit Samra			- 30172814
+// Kelvin Jamila		- 30117164
+// Kevlam Chundawat		- 30180662
+// Logan Miszaniec		- 30156384
+// Maleeha Siddiqui		- 30179762
+// Michael Hoang		- 30123605
+// Nezla Annaisha		- 30123223
+// Nicholas MacKinnon	- 30172737
+// Ohiomah Imohi		- 30187606
+// Sheikh Falah Sheikh Hasan - 30175335
+// Umer Rehman			- 30169819
 
 package test.managers.payment;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.math.BigDecimal;
-import java.util.Currency;
-import java.util.Locale;
-
-import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
-import org.junit.Before;
-import org.junit.Test;
-
+import ca.ucalgary.seng300.simulation.SimulationException;
 import com.tdc.CashOverloadException;
 import com.tdc.coin.Coin;
 import com.tdc.coin.ICoinDispenser;
-import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
-
-import ca.ucalgary.seng300.simulation.SimulationException;
-import powerutility.PowerGrid;
+import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
+import org.junit.Before;
+import org.junit.Test;
+import stubbing.StubbedGrid;
 import stubbing.StubbedPaymentManager;
 import stubbing.StubbedStation;
 import stubbing.StubbedSystemManager;
 
+import java.math.BigDecimal;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 public class TestCanTenderChange {
 
-	public ISelfCheckoutStation machine;
+    public ISelfCheckoutStation machine;
 
-	// vars
-	private StubbedPaymentManager pm;
-	private StubbedSystemManager sm;
+    // vars
+    private StubbedPaymentManager pm;
+    private StubbedSystemManager sm;
 
-	private Coin coin;
-	private ICoinDispenser coinDispenser;
+    private Coin coin;
+    private BigDecimal defaultDenomination;
 
-	@Before
-	public void setUp() {
-		// configuring the hardware
-		StubbedStation.configure();
+    @Before
+    public void setUp() {
+        // configuring the hardware
+        StubbedStation.configure();
 
-		// creating the hardware
-		this.machine = new StubbedStation().machine;
-		this.machine.plugIn(PowerGrid.instance());
-		this.machine.turnOn();
+        // creating the hardware
+        this.machine = new StubbedStation().machine;
+        this.machine.plugIn(StubbedGrid.instance());
+        this.machine.turnOn();
 
-		// creating the stubs
-		sm = new StubbedSystemManager(BigDecimal.ZERO);
-		pm = sm.pmStub;
+        // creating the stubs
+        sm = new StubbedSystemManager(BigDecimal.ZERO);
+        pm = sm.pmStub;
 
-		// configuring the machine
-		sm.configure(machine);
+        // configuring the machine
+        sm.configure(machine);
 
-		Coin.DEFAULT_CURRENCY = Currency.getInstance(Locale.CANADA);
-		coin = new Coin(new BigDecimal(2.00));
-	}
+        // getting any denomination from the machine, for testing purposes, it shouldn't matter what denomination we choose
+        defaultDenomination = machine.getCoinDenominations().get(0); // this should be $0.01
+    }
 
-	//Loads money into machine
-	private void loadMoneyIntoTheMachine() throws SimulationException, CashOverloadException {
-		BigDecimal denomination = this.machine.getCoinDenominations().get(5);
-		coinDispenser = this.machine.getCoinDispensers().get(denomination);
-		for (int i = 0; i < 10; i++) {
-			coinDispenser.load(coin);
-		}
+    //Loads money into machine
+    private void loadMoneyIntoTheMachine(int amount) throws SimulationException, CashOverloadException {
+        // getting the dispenser of the denomination
+        ICoinDispenser dispenser = machine.getCoinDispensers().get(defaultDenomination);
 
-	}
+        // checking the dispenser
+        if (dispenser == null) {
+            throw new RuntimeException("Tried to access a coin dispenser for a denomination that doesn't exist: " + defaultDenomination);
+        }
 
-	//Tests if canTenderChange when machine has enough cash
-	@Test
-	public void testCanTenderChangeWithEnoughCash() throws SimulationException, CashOverloadException {
-		loadMoneyIntoTheMachine();
+        // creating an array of coins to load into the machine
+        Coin[] coins = new Coin[amount];
+        for (int i = 0; i < amount; i++) {
+            coins[i] = new Coin(defaultDenomination);
+        }
 
-		// asserting
-		assertTrue(pm.canTenderChange(BigDecimal.valueOf(5)));
-	}
+        // loading the coins into the dispenser
+        dispenser.load(coins);
+    }
 
-	//Tests if you canTenderChange with empty machine
-	@Test
-	public void testCanTenderChangeWithNoCash() {
-		assertFalse(pm.canTenderChange(BigDecimal.valueOf(5)));
-	}
+    @Test
+    public void testCanTenderChangeNotEnoughMoney() throws SimulationException, CashOverloadException {
+        // loading money into the machine
+        loadMoneyIntoTheMachine(1);
 
-	//Tests if you canTenderChange with valid environment
-	@Test
-	public void testCanTenderChange()throws SimulationException, CashOverloadException {
-		loadMoneyIntoTheMachine();
-		
+        // asserting that we get false here, there is not enough money in the machine
+        assertFalse(pm.canTenderChange(BigDecimal.TEN));
+    }
 
-		// calling
-		BigDecimal change = new BigDecimal("10.00");
+    //Tests if you canTenderChange with empty machine
+    @Test
+    public void testCanTenderChangeWithNoCash() {
+        assertFalse(pm.canTenderChange(BigDecimal.TEN));
+    }
 
-		// asserting
-		assertTrue(pm.canTenderChange(change));
-	}
+    //Tests if you canTenderChange with valid environment
+    @Test
+    public void testCanTenderChange() throws SimulationException, CashOverloadException {
+        loadMoneyIntoTheMachine(5);
+
+        // asserting
+        assertTrue(pm.canTenderChange(defaultDenomination));
+    }
 }
