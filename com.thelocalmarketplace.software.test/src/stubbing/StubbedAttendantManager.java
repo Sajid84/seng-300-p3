@@ -81,5 +81,12 @@ public class StubbedAttendantManager extends AttendantManager {
 	public String getAttendantNotification() {
 		return attendantNotification;
 	}
- 
+	
+    public int getBagCount() {
+        return bagCount;
+    }
+
+    public void setBagCount(int bagCount) {
+        super.bagCount = bagCount;
+    }
 }
