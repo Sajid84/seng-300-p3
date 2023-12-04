@@ -16,7 +16,7 @@ import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
 
 import ca.ucalgary.seng300.simulation.SimulationException;
-import managers.enums.PaymentType;
+import enums.PaymentType;
 
 import org.junit.Before;
 import org.junit.Test;
