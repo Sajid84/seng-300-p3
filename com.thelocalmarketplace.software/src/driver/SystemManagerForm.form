@@ -1,33 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- XML document defining a form using the IntelliJ IDEA UI Designer format -->
+
+<!-- Root element: 'form' -->
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="driver.SystemManagerForm">
+  
+  <!-- Grid layout with GridBagLayout manager -->
   <grid id="27dc6" binding="root" layout-manager="GridBagLayout">
+    
+    <!-- Constraints for the grid layout -->
     <constraints>
+      <!-- Position and size of the grid -->
       <xy x="20" y="20" width="800" height="600"/>
     </constraints>
+    
+    <!-- Properties for the grid -->
     <properties>
+      <!-- Minimum, preferred, and opaque sizes of the grid -->
       <minimumSize width="800" height="600"/>
       <opaque value="false"/>
       <preferredSize width="800" height="600"/>
     </properties>
+    
+    <!-- No border for the grid -->
     <border type="none"/>
+    
+    <!-- Child elements within the grid -->
     <children>
+      
+      <!-- TabbedPane component for switching between main and debug views -->
       <tabbedpane id="a1bea" binding="mainPane">
+        
+        <!-- Constraints for the TabbedPane -->
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="3" indent="0" use-parent-layout="false">
+            <!-- Preferred size of the TabbedPane -->
             <preferred-size width="600" height="600"/>
           </grid>
           <gridbag weightx="1.0" weighty="1.0"/>
         </constraints>
+        
+        <!-- No properties or border for the TabbedPane -->
         <properties/>
         <border type="none"/>
+        
+        <!-- Child elements within the TabbedPane -->
         <children>
+          
+          <!-- Grid layout for the regular view -->
           <grid id="12f2e" binding="regularView" layout-manager="GridBagLayout">
+            
+            <!-- Constraints for the regular view -->
             <constraints>
               <tabbedpane title="Normal"/>
             </constraints>
+            
+            <!-- No properties or border for the regular view -->
             <properties/>
             <border type="none"/>
+            
+            <!-- Child elements within the regular view -->
             <children>
+              
+              <!-- JLabel for displaying 'Items' -->
               <component id="59596" class="javax.swing.JLabel" binding="tableLabel">
                 <constraints>
                   <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
@@ -37,6 +71,8 @@
                   <text value="Items"/>
                 </properties>
               </component>
+              
+              <!-- JLabel for displaying 'Actions' -->
               <component id="7e84b" class="javax.swing.JLabel" binding="buttonsLabel">
                 <constraints>
                   <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
@@ -47,17 +83,26 @@
                   <text value="Actions"/>
                 </properties>
               </component>
+              
+              <!-- Grid layout for organizing components -->
               <grid id="d5321" layout-manager="GridBagLayout">
                 <constraints>
-                  <grid row="3" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="true"/>
+                  <grid row="3" column="0" row-span="2" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="true"/>
                   <gridbag weightx="0.0" weighty="1.0"/>
                 </constraints>
+                
+                <!-- No properties or border for the inner grid -->
                 <properties/>
                 <border type="none"/>
+                
+                <!-- Child elements within the inner grid -->
                 <children>
+                  
+                  <!-- JScrollPane for the items table -->
                   <scrollpane id="421ea">
                     <constraints>
                       <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="0" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                        <!-- Maximum size for the scroll pane -->
                         <maximum-size width="350" height="-1"/>
                       </grid>
                       <gridbag weightx="1.0" weighty="1.0"/>
@@ -66,7 +111,11 @@
                       <horizontalScrollBarPolicy value="31"/>
                     </properties>
                     <border type="none"/>
+                    
+                    <!-- Child elements within the scroll pane -->
                     <children>
+                      
+                      <!-- JTable component for displaying items -->
                       <component id="27a63" class="javax.swing.JTable" binding="itemsTable">
                         <constraints/>
                         <properties>
@@ -83,6 +132,8 @@
                       </component>
                     </children>
                   </scrollpane>
+                  
+                  <!-- JButton for removing an item -->
                   <component id="61884" class="javax.swing.JButton" binding="removeItemButton" default-binding="true">
                     <constraints>
                       <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
@@ -96,14 +147,22 @@
                   </component>
                 </children>
               </grid>
+              
+              <!-- Grid layout for additional actions -->
               <grid id="71cda" layout-manager="GridBagLayout">
                 <constraints>
                   <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                   <gridbag weightx="1.0" weighty="1.0"/>
                 </constraints>
+                
+                <!-- No properties or border for the inner grid -->
                 <properties/>
                 <border type="none"/>
+                
+                <!-- Child elements within the inner grid -->
                 <children>
+                  
+                  <!-- JButton for scanning by the main scanner -->
                   <component id="74c4" class="javax.swing.JButton" binding="scanByMainScannerButton" default-binding="true">
                     <constraints>
                       <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
@@ -113,6 +172,8 @@
                       <text value="Scan by Main Scanner"/>
                     </properties>
                   </component>
+                  
+                  <!-- JButton for signaling for an attendant -->
                   <component id="a817" class="javax.swing.JButton" binding="signalForAttendantButton">
                     <constraints>
                       <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
@@ -122,6 +183,8 @@
                       <text value="Signal for Attendant"/>
                     </properties>
                   </component>
+                  
+                  <!-- JButton for paying for an order -->
                   <component id="39bf8" class="javax.swing.JButton" binding="payForOrderButton">
                     <constraints>
                       <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
@@ -131,6 +194,8 @@
                       <text value="Pay for Order"/>
                     </properties>
                   </component>
+                  
+                  <!-- JButton for searching for an item -->
                   <component id="74491" class="javax.swing.JButton" binding="searchForItemButton">
                     <constraints>
                       <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
@@ -140,6 +205,8 @@
                       <text value="Search For Item"/>
                     </properties>
                   </component>
+                  
+                  <!-- JButton for scanning by a handheld scanner -->
                   <component id="230b6" class="javax.swing.JButton" binding="scanByHandheldScannerButton">
                     <constraints>
                       <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
@@ -149,6 +216,8 @@
                       <text value="Scan by Handheld Scanner"/>
                     </properties>
                   </component>
+                  
+                  <!-- JButton for adding own bags -->
                   <component id="7f70b" class="javax.swing.JButton" binding="addOwnBagsButton" default-binding="true">
                     <constraints>
                       <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
@@ -158,6 +227,8 @@
                       <text value="Add Own Bags"/>
                     </properties>
                   </component>
+                  
+                  <!-- JButton for purchasing bags -->
                   <component id="7f35c" class="javax.swing.JButton" binding="purchaseBagsButton" default-binding="true">
                     <constraints>
                       <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
@@ -167,6 +238,8 @@
                       <text value="Purchase Bags"/>
                     </properties>
                   </component>
+                  
+                  <!-- JCheckBox for indicating not to bag an item -->
                   <component id="57083" class="javax.swing.JCheckBox" binding="doNotBagItemCheckBox" default-binding="true">
                     <constraints>
                       <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
@@ -176,6 +249,8 @@
                       <text value="Do Not Bag Item"/>
                     </properties>
                   </component>
+                  
+                  <!-- JButton for exiting the session -->
                   <component id="f8bb6" class="javax.swing.JButton" binding="exitSessionButton" default-binding="true">
                     <constraints>
                       <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
@@ -187,6 +262,8 @@
                   </component>
                 </children>
               </grid>
+              
+              <!-- JLabel for displaying feedback -->
               <component id="a6b36" class="javax.swing.JLabel" binding="feedbackLabel">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
@@ -196,6 +273,8 @@
                   <text value="Feedback Label"/>
                 </properties>
               </component>
+              
+              <!-- JLabel for displaying 'Price' -->
               <component id="48168" class="javax.swing.JLabel" binding="priceLabel">
                 <constraints>
                   <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
@@ -207,6 +286,8 @@
               </component>
             </children>
           </grid>
+          
+          <!-- Grid layout for the debug view (currently empty) -->
           <grid id="5147" binding="debugView" layout-manager="GridBagLayout">
             <constraints>
               <tabbedpane title="Debug"/>
@@ -220,3 +301,4 @@
     </children>
   </grid>
 </form>
+``
