@@ -79,13 +79,14 @@ public class StubbedAttendantManager extends AttendantManager {
 		this.attendantNotification = reason;
 		super.notifyAttendant(reason);
 	}
-	
-	public String getAttendantNotification() {
-		return attendantNotification;
-	}
+
+    @Override
+    public void checkBagDispenserState() {
+        super.checkBagDispenserState();
+    }
 	
     public int getBagCount() {
-        return bagCount;
+        return super.bagCount;
     }
 
     public void setBagCount(int bagCount) {

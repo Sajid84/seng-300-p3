@@ -65,8 +65,8 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	protected boolean hasInk = false;
 	protected boolean paperLow = false;
 	protected boolean inkLow = false;
-	protected boolean bagsEmpty = false;
-	protected boolean bagsLow = false;
+	protected boolean bagsEmpty = true;
+	protected boolean bagsLow = true;
 	protected int bagCount = 0;
 	protected boolean coinStorageUnitFull = false;
 	protected boolean banknoteStorageUnitFull = false;
@@ -470,7 +470,7 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	@Override
 	public void notifyBagDispensed() {
 		// decrementing the bag count
-		--bagCount;
+		bagCount -= 1;
 
 		// checking the state of the dispenser
 		checkBagDispenserState();
@@ -479,7 +479,7 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	@Override
 	public void notifyBagsLoaded(int count) {
 		if (count > 0) {
-			bagCount = count; // treating this as the maximum capacity if there's an exception
+			bagCount += count; // treating this as the maximum capacity if there's an exception
 
 			// resetting the count of the bags
 			bagsEmpty = false;
@@ -497,21 +497,10 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	protected void checkBagDispenserState() {
 		// getting the capacity of the machine, this will never cause an error
 		int capacity = machine.getReusableBagDispenser().getCapacity();
-		int remaining;
-
-		try {
-			// trying to access the amount of bags remaining
-			remaining = machine.getReusableBagDispenser().getQuantityRemaining();
-
-			// updating the internal variable from this
-			bagCount = remaining;
-		} catch (UnsupportedOperationException e) {
-			// setting the remaining to the bag count
-			remaining = bagCount;
-		}
+		int remaining = bagCount;
 
 		// checking if low
-		if (remaining <= (capacity * 0.1)) {
+		if (remaining <= (int)(capacity * 0.1)) {
 			bagsLow = true;
 			notifyAttendant("The bag dispenser has less than 10% capacity.");
 		} else {

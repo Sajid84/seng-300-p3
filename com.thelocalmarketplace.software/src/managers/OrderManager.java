@@ -227,6 +227,7 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 
             if (i instanceof ReusableBag) {
                 total = total.add(DatabaseHelper.PRICE_OF_BAG);
+                continue;
             }
 
             // Temporary exception, while item types other than Barcode are unsupported.
@@ -254,6 +255,9 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
         // figuring out how to scan the item
         if (item instanceof BarcodedItem) {
             this.addItemToOrder((BarcodedItem) item, method);
+        } else {
+            // clearing the flag since other items won't trigger this mechanism
+            last_item = null;
         }
 
         // adding the item
