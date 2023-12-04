@@ -37,19 +37,16 @@ public class TestSignalForAttendant {
         StubbedStation.configure();
         sm = new StubbedSystemManager();
         sm.configure(new StubbedStation().machine);
-        // Additional setup for AttendantManager as necessary
     }
     
     @Test(expected = IllegalStateException.class)
     public void testOnAttendantOverrideWhenPaidOrDisabled() {
-        // Simulate system being paid or disabled
-        sm.setState(SessionStatus.PAID); // or use SessionStatus.DISABLED
+        sm.setState(SessionStatus.PAID); 
         sm.onAttendantOverride();
     }
 
     @Test
     public void testOnAttendantOverrideNormal() {
-        // Setup system in a normal state
         sm.setState(SessionStatus.NORMAL);
         sm.onAttendantOverride();
         assertTrue(sm.omStub.onAttendantOverrideCalled); 
