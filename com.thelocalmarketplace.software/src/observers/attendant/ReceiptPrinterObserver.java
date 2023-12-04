@@ -55,12 +55,12 @@ public class ReceiptPrinterObserver extends AbstractDeviceObserver implements Re
 
     @Override
     public void thePrinterHasLowInk() {
-        this.ref.notifyInkLow();
+        this.ref.notifyLowInk();
     }
 
     @Override
     public void thePrinterHasLowPaper() {
-        this.ref.notifyPaperLow();
+        this.ref.notifyLowPaper();
     }
 
     @Override

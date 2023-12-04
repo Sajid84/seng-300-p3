@@ -91,14 +91,14 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 		// creating the coin monitors for each of the dispensers
 		for (BigDecimal denom : machine.getCoinDenominations()) {
-            coinMonitorMap.put(denom, new CoinMonitor(this, machine.getCoinDispensers().get(denom)));
-            coinDispenserLow.put(denom, false);
+			coinMonitorMap.put(denom, new CoinMonitor(this, machine.getCoinDispensers().get(denom)));
+			coinDispenserLow.put(denom, false);
 		}
 
 		// creating the banknote monitors for each of the dispensers
 		for (BigDecimal denom : machine.getBanknoteDenominations()) {
-            bankNoteMonitorMap.put(denom, new BanknoteMonitor(this, machine.getBanknoteDispensers().get(denom)));
-            banknoteDispenserLow.put(denom, false);
+			bankNoteMonitorMap.put(denom, new BanknoteMonitor(this, machine.getBanknoteDispensers().get(denom)));
+			banknoteDispenserLow.put(denom, false);
 		}
 
 		// creating the observers for the storage units
@@ -140,13 +140,15 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	}
 
 	@Override
-	public void notifyPaperLow() {
+	public void notifyLowPaper() {
 		paperLow = true;
+		notifyAttendant("The receipt paper is below 10%!");
 	}
 
 	@Override
-	public void notifyInkLow() {
+	public void notifyLowInk() {
 		inkLow = true;
+		notifyAttendant("The ink is below 10%!");
 	}
 
 	@Override
@@ -342,9 +344,11 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 			}
 		}
 	}
+
 	public boolean isInkLow() {
 		return inkLow;
 	}
+
 	public boolean isPaperLow() {
 		return paperLow;
 	}
@@ -537,7 +541,8 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 		// getting the upper bound
 		if (count > bagCount) {
 			bound = bagCount;
-			notifyAttendant("Cannot dispense the requested amount of bags for the customer, dispensing" + bagCount + " bags.");
+			notifyAttendant(
+					"Cannot dispense the requested amount of bags for the customer, dispensing" + bagCount + " bags.");
 		}
 
 		// dispensing bags

@@ -32,12 +32,12 @@ public interface IAttendantManagerNotify {
     /**
      * This notifies the manager that the paper in the observed printer is low.
      */
-    void notifyPaperLow();
+    void notifyLowPaper();
 
     /**
      * This notifies the manager that the ink in the observed printer is low.
      */
-    void notifyInkLow();
+    void notifyLowInk();
 
     /**
      * Notifies the manager that the coin dispenser had a change in its state.
@@ -70,14 +70,16 @@ public interface IAttendantManagerNotify {
     /**
      * Notifies the system about the paper status.
      *
-     * @param hasPaper A boolean indicating whether there is paper available (true) or not (false).
+     * @param hasPaper A boolean indicating whether there is paper available (true)
+     *                 or not (false).
      */
     void notifyPaper(boolean hasPaper);
 
     /**
      * Notifies the system about the ink status.
      *
-     * @param hasInk A boolean indicating whether there is ink available (true) or not (false).
+     * @param hasInk A boolean indicating whether there is ink available (true) or
+     *               not (false).
      */
     void notifyInk(boolean hasInk);
 
@@ -88,6 +90,7 @@ public interface IAttendantManagerNotify {
 
     /**
      * Notifies that bags have been loaded into the machine.
+     * 
      * @param count the number of bags loaded
      */
     void notifyBagsLoaded(int count);
