@@ -1,6 +1,6 @@
 //Emmanuel Trinidad 30172372
 
-package test.managers.attendent;
+package test.managers.attendant;
 
 import ca.ucalgary.seng300.simulation.SimulationException;
 import com.jjjwelectronics.EmptyDevice;

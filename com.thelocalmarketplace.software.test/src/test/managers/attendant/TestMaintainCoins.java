@@ -20,11 +20,9 @@
 // Sheikh Falah Sheikh Hasan - 30175335
 // Umer Rehman			- 30169819
 
-package test.managers.attendent;
+package test.managers.attendant;
 import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
-import com.tdc.banknote.Banknote;
-import com.tdc.banknote.IBanknoteDispenser;
 import com.tdc.coin.Coin;
 import com.tdc.coin.ICoinDispenser;
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;

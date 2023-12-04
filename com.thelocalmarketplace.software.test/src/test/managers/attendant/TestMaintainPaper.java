@@ -20,18 +20,21 @@
 // Sheikh Falah Sheikh Hasan - 30175335
 // Umer Rehman			- 30169819
 
-package test.managers.attendent;
+package test.managers.attendant;
+
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import managers.AttendantManager;
 import org.junit.Before;
 import org.junit.Test;
-import stubbing.*;
+import stubbing.StubbedAttendantManager;
+import stubbing.StubbedGrid;
+import stubbing.StubbedStation;
+import stubbing.StubbedSystemManager;
 
 import java.math.BigDecimal;
 
-public class TestMaintainInk {
+public class TestMaintainPaper {
 
     private ISelfCheckoutStation machine;
     private StubbedSystemManager sm;
@@ -52,14 +55,13 @@ public class TestMaintainInk {
         sam  = sm.amStub;
         // configuring the machine
         sm.configure(machine);
-
     }
 
     @Test
-    public void testInkLevelLow() {
-        sam.notifyInkLow();
-        assertTrue(sam.isInkLow());
-        sam.maintainInk();
-        assertTrue(sam.getHasInk());
+    public void testPaperLevelLow() {
+        sam.notifyPaperLow();
+        assertTrue(sam.isPaperLow());
+        sam.maintainPaper();
+        assertTrue(sam.getHasPaper());
     }
 }
