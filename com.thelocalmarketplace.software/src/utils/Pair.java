@@ -50,4 +50,18 @@ public class Pair<K, V> {
 		return val;
 	}
 
+	@Override
+	public boolean equals(Object other) {
+		if (other == this) return true;
+
+		if (!(other instanceof Pair<?,?>)) return false;
+
+		Pair<K, V> p = (Pair<K, V>) other;
+
+		if (p.getKey() != this.getKey()) return false;
+		if (p.getValue() != this.getValue()) return false;
+
+		return true;
+	}
+
 }

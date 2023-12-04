@@ -85,30 +85,30 @@ public class TestRemoveItem {
 	 */
 	@Test(expected = IllegalArgumentException.class)
 	public void testWhenItemTypeNotRecognized() {
-		om.removeItemFromOrder((Item) null);
+		om.removeItemFromOrder(null);
 	}
 
-	/**
-	 * TODO redo this method
-	 */
-	@Test(expected = OperationNotSupportedException.class)
-	public void testWhenItemIsPLUCoded() throws OperationNotSupportedException {
-		// Currently, PLU codes are not accepted so we expect this exception.
-		PLUCodedItem item = new PLUCodedItem(new PriceLookUpCode("1234"), new Mass(1));
+	@Test
+	public void testWhenItemIsPLUCoded() {
+		PLUCodedItem item = DatabaseHelper.createRandomPLUCodedItem();
+
+		om.setBagItem(true);
+		om.addItemToOrder(item, ScanType.MAIN);
+
+		// asserting
+		assertEquals(1, sm.getItems().size());
+
 		om.removeItemFromOrder(new Pair<>(item, true));
+
+		// asserting
+		assertEquals(0, sm.getItems().size());
+		assertEquals(BigDecimal.ZERO, sm.getActualWeight());
 	}
 
-	/**
-	 * Trying to add an item not currently in the order has this case happen. This
-	 * sets up a new item not in the current order and tries to remove it.
-	 * 
-	 * @throws OperationNotSupportedException This is expected to happen.
-	 */
 	@Test(expected = IllegalArgumentException.class)
 	public void testWhenItemNotInOrder() {
-		Barcode otherBarcode = new Barcode(new Numeral[] { Numeral.nine, Numeral.nine, Numeral.nine, });
-		BarcodedItem item = new BarcodedItem(otherBarcode, new Mass(2));
-		om.removeItemFromOrder((Item) item);
+		BarcodedItem item = DatabaseHelper.createRandomBarcodedItem();
+		om.removeItemFromOrder(new Pair<>(item, true));
 	}
 
 	/**
@@ -120,17 +120,17 @@ public class TestRemoveItem {
 		sm.removeItemFromOrder(null);
 	}
 
-	/**
-	 * PLU Coded items are unimplemented, so we expect an exception for the time
-	 * being.
-	 * 
-	 * @throws OperationNotSupportedException This is expected to happen.
-	 */
-	@Test(expected = OperationNotSupportedException.class)
-	public void testSystemManagerItemIsPLUCoded() throws OperationNotSupportedException {
-		// Currently, PLU codes are not accepted so we expect this exception.
-		PLUCodedItem item = new PLUCodedItem(new PriceLookUpCode("1234"), new Mass(1));
-		sm.removeItemFromOrder(new Pair<>(item, true));
+	@Test
+	public void testSystemManagerItemIsPLUCoded() {
+		PLUCodedItem item = DatabaseHelper.createRandomPLUCodedItem();
+
+		om.addItemToOrder(item, ScanType.MAIN);
+
+		om.removeItemFromOrder(new Pair<>(item, true));
+
+		// asserting
+		assertEquals(0, sm.getItems().size());
+		assertEquals(BigDecimal.ZERO, sm.getActualWeight());
 	}
 
 	/**
@@ -140,7 +140,7 @@ public class TestRemoveItem {
 	 * @throws OperationNotSupportedException This is expected to happen.
 	 */
 	@Test(expected = IllegalArgumentException.class)
-	public void testSystemManagerItemNotInOrder() throws OperationNotSupportedException {
+	public void testSystemManagerItemNotInOrder() {
 		Barcode otherBarcode = new Barcode(new Numeral[] { Numeral.nine, Numeral.nine, Numeral.nine, });
 		BarcodedItem item = new BarcodedItem(otherBarcode, new Mass(2));
 		sm.removeItemFromOrder(new Pair<>(item, true));
@@ -150,16 +150,9 @@ public class TestRemoveItem {
 	 * If the item is a Barcoded type and is in the current order, we expect that it
 	 * will be removed, all OrderManager's listeners will be informed, and that the
 	 * item will be removed from the scale.
-	 * 
-	 * @throws OperationNotSupportedException
-	 * @throws OverloadedDevice
 	 */
 	@Test
-	public void testSystemManagerItemInOrder() throws OperationNotSupportedException, OverloadedDevice {
-		AbstractElectronicScale scale = (AbstractElectronicScale) machine.getBaggingArea();
-		StubbedOrderManagerNotify omnStub = new StubbedOrderManagerNotify();
-		sm.omStub.registerListener(omnStub);
-
+	public void testSystemManagerItemInOrder() {
 		// creating a random item
 		BarcodedItem item = DatabaseHelper.createRandomBarcodedItem();
 
@@ -169,41 +162,27 @@ public class TestRemoveItem {
 		// removing
 		sm.removeItemFromOrder(new Pair<>(item, true));
 
-		// We expect our listeners to hear about this.
-		assertTrue(omnStub.gotOnItemRemovedFromOrderMessage);
-        assertSame(omnStub.itemRemovedFromOrder, item);
-
-		// We expect the item to be removed from the bagging area.
-		// Because this is the only item, removing it will make the current mass == 0
-        assertEquals(0, scale.getCurrentMassOnTheScale().inGrams().floatValue(), 0.0);
+		// asserting
+		assertEquals(0, sm.getItems().size());
+		assertEquals(BigDecimal.ZERO, sm.getActualWeight());
 	}
 
-	/**
-	 * If the item is a Barcoded type and is in the current order, we expect that it
-	 * will be removed, all OrderManager's listeners will be informed, and that the
-	 * item will be removed from the scale.
-	 */
 	@Test
-	public void testWhenItemInOrder() throws OverloadedDevice {
-		AbstractElectronicScale scale = (AbstractElectronicScale) machine.getBaggingArea();
-		StubbedOrderManagerNotify omnStub = new StubbedOrderManagerNotify();
-		om.registerListener(omnStub);
-
+	public void testWhenItemInOrder() {
 		// creating a random item
 		BarcodedItem item = DatabaseHelper.createRandomBarcodedItem();
 
 		// Make it so an item of this product already exists in the list.
 		sm.addItemToOrder(item, ScanType.MAIN);
 
+		// asserting
+		assertEquals(1, sm.getItems().size());
+
 		// removing
-		om.removeItemFromOrder((Item) item);
+		om.removeItemFromOrder(new Pair<>(item, true));
 
-		// We expect our listeners to hear about this.
-		assertTrue(omnStub.gotOnItemRemovedFromOrderMessage);
-        assertSame(omnStub.itemRemovedFromOrder, item);
-
-		// We expect the item to be removed from the bagging area.
-		// Because this is the only item, removing it will make the current mass == 0
-        assertEquals(0, scale.getCurrentMassOnTheScale().inGrams().floatValue(), 0.0);
+		// asserting
+		assertEquals(0, sm.getItems().size());
+		assertEquals(BigDecimal.ZERO, sm.getActualWeight());
 	}
 }

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // Liam Major			- 30223023
 // Md Abu Sinan			- 30154627
 // Ali Akbari			- 30171539
@@ -21,17 +20,11 @@
 // Sheikh Falah Sheikh Hasan - 30175335
 // Umer Rehman			- 30169819
 
-package test.managers.attendent;
-=======
-package test.managers.attendent;
-
-//Sheikh Falah Sheikh Hasan - 30175335
->>>>>>> gui-dev
-
+package test.managers.attendant;
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import managers.AttendantManager;
+
 import org.junit.Before;
 import org.junit.Test;
 import stubbing.*;
@@ -40,7 +33,6 @@ import java.math.BigDecimal;
 
 public class TestMaintainInk {
 
-    private StubbedStation station;
     private ISelfCheckoutStation machine;
     private StubbedSystemManager sm;
     private StubbedAttendantManager sam;
@@ -57,7 +49,7 @@ public class TestMaintainInk {
 
         // creating the stubs
         sm = new StubbedSystemManager(BigDecimal.ZERO);
-        sam  = new StubbedAttendantManager(sm);
+        sam  = sm.amStub;
         // configuring the machine
         sm.configure(machine);
 
@@ -65,9 +57,9 @@ public class TestMaintainInk {
 
     @Test
     public void testInkLevelLow() {
-        assertFalse(sam.isInkLow());
+        sam.notifyInkLow();
+        assertTrue(sam.isInkLow());
         sam.maintainInk();
-        assertFalse(sam.getHasInk());
+        assertTrue(sam.getHasInk());
     }
-
 }

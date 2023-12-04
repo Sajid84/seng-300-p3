@@ -185,14 +185,13 @@ public class StubbedOrderManager extends OrderManager {
 		super.doNotBagRequest(bagRequest);
 	}
 
-	public void removeItemFromOrder(Item item) {
-		removeItemFromOrder(new Pair<>(item, false));
-	}
-
 	@Override
 	public void removeItemFromOrder(Pair<Item, Boolean> pair) {
 		removeItemFromOrderCalled = true;
 		super.removeItemFromOrder(pair);
 	}
 
+	public void setBagItem(boolean b) {
+		super.bagItem = b;
+	}
 }

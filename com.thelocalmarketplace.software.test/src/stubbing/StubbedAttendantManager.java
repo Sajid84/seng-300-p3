@@ -23,13 +23,13 @@
 package stubbing;
 
 import managers.AttendantManager;
+import observers.attendant.BagMonitor;
 import observers.attendant.ReceiptPrinterObserver;
 
 public class StubbedAttendantManager extends AttendantManager {
     public StubbedSystemManager smStub;
     
     public boolean notifyAttendantCalled;
-	private String attendantNotification;
 
 
     public StubbedAttendantManager(StubbedSystemManager sm) {
@@ -63,23 +63,34 @@ public class StubbedAttendantManager extends AttendantManager {
     
     //getter for checking paperLow, inkLow variables
     public boolean isPaperLow() {
-    	return paperLow;
+    	return super.paperLow;
     }
     
     public boolean isInkLow() {
-    	return inkLow;
+    	return super.inkLow;
     }
     
     //needed to check predict notifications
 	@Override
 	public void notifyAttendant(String reason) {
 		notifyAttendantCalled = true;
-		this.attendantNotification = reason;
 		super.notifyAttendant(reason);
 	}
+
+    @Override
+    public void checkBagDispenserState() {
+        super.checkBagDispenserState();
+    }
 	
-	public String getAttendantNotification() {
-		return attendantNotification;
-	}
- 
+    public int getBagCount() {
+        return super.bagCount;
+    }
+
+    public void setBagCount(int bagCount) {
+        super.bagCount = bagCount;
+    }
+    
+    public BagMonitor getBagMonitor() {
+        return super.bm;
+    }
 }
