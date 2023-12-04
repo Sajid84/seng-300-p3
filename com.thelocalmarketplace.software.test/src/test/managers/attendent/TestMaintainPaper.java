@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // Liam Major			- 30223023
 // Md Abu Sinan			- 30154627
 // Ali Akbari			- 30171539
@@ -22,14 +21,10 @@
 // Umer Rehman			- 30169819
 
 package test.managers.attendent;
-=======
-package test.managers.attendent;
-
-//Sheikh Falah Sheikh Hasan - 30175335
->>>>>>> gui-dev
 
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import stubbing.StubbedAttendantManager;
@@ -41,7 +36,6 @@ import java.math.BigDecimal;
 
 public class TestMaintainPaper {
 
-    private StubbedStation station;
     private ISelfCheckoutStation machine;
     private StubbedSystemManager sm;
     private StubbedAttendantManager sam;
@@ -58,18 +52,16 @@ public class TestMaintainPaper {
 
         // creating the stubs
         sm = new StubbedSystemManager(BigDecimal.ZERO);
-        sam  = new StubbedAttendantManager(sm);
+        sam  = sm.amStub;
         // configuring the machine
         sm.configure(machine);
-
     }
 
     @Test
     public void testPaperLevelLow() {
-        assertFalse(sam.isPaperLow());
+        sam.notifyPaperLow();
+        assertTrue(sam.isPaperLow());
         sam.maintainPaper();
-        assertFalse(sam.getHasPaper());
-
-
+        assertTrue(sam.getHasPaper());
     }
 }

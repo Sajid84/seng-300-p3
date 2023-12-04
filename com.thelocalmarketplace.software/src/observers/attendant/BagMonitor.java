@@ -22,8 +22,6 @@
 
 package observers.attendant;
 
-import com.jjjwelectronics.IDevice;
-import com.jjjwelectronics.IDeviceListener;
 import com.jjjwelectronics.bag.IReusableBagDispenser;
 import com.jjjwelectronics.bag.ReusableBagDispenserListener;
 import managers.AttendantManager;
