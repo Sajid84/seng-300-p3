@@ -1,130 +1,176 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="driver.DebugForm">
+  <!-- Root grid layout with 3 rows and 3 columns -->
   <grid id="27dc6" binding="root" layout-manager="GridLayoutManager" row-count="3" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
+      <!-- Set position and size of the root grid -->
       <xy x="20" y="20" width="589" height="400"/>
     </constraints>
     <properties/>
     <border type="none"/>
     <children>
+      <!-- Button for causing weight discrepancy -->
       <component id="fecbe" class="javax.swing.JButton" binding="causeWeightDiscrepancyButton" default-binding="true">
         <constraints>
+          <!-- Set grid position for the button -->
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <!-- Set button text -->
           <text value="Cause Weight Discrepancy"/>
         </properties>
       </component>
+      <!-- Button for unblocking a session with attendant override -->
       <component id="48412" class="javax.swing.JButton" binding="unblockSessionButtonButton" default-binding="true">
         <constraints>
+          <!-- Set grid position for the button -->
           <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <!-- Set button text -->
           <text value="(Unblock Session) Attendant Override"/>
         </properties>
       </component>
+      <!-- Button for testing enabling a machine -->
       <component id="6f4a3" class="javax.swing.JButton" binding="testEnableMachineButton" default-binding="true">
         <constraints>
+          <!-- Set grid position for the button -->
           <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <!-- Set button text -->
           <text value="Test Enable Machine"/>
         </properties>
       </component>
+      <!-- Button for testing disabling a machine -->
       <component id="cb136" class="javax.swing.JButton" binding="testDisableMachineButton" default-binding="true">
         <constraints>
+          <!-- Set grid position for the button -->
           <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <!-- Set button text -->
           <text value="Test Disable Machine"/>
         </properties>
       </component>
+      <!-- Button for adding a too heavy item -->
       <component id="73f3" class="javax.swing.JButton" binding="addTooHeavyItemButton" default-binding="true">
         <constraints>
+          <!-- Set grid position for the button -->
           <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <!-- Set button text -->
           <text value="Add Too Heavy Item"/>
         </properties>
       </component>
+      <!-- Button for blocking a session -->
       <component id="2983" class="javax.swing.JButton" binding="blockSessionButtonButton" default-binding="true">
         <constraints>
+          <!-- Set grid position for the button -->
           <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <!-- Set button text -->
           <text value="Block Session Button"/>
         </properties>
       </component>
+      <!-- Nested grid layout for additional components -->
       <grid id="d29cd" layout-manager="GridLayoutManager" row-count="8" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
+          <!-- Set grid position for the nested grid -->
           <grid row="0" column="2" row-span="3" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties/>
         <border type="none"/>
         <children>
+          <!-- Label for expected weight -->
           <component id="3f7b7" class="javax.swing.JLabel" binding="expectedWeightLabel">
             <constraints>
+              <!-- Set grid position for the label -->
               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
+              <!-- Set label text -->
               <text value="Expected Weight"/>
             </properties>
           </component>
+          <!-- Label for customer payment -->
           <component id="fe7d" class="javax.swing.JLabel" binding="customerPaymentLabel">
             <constraints>
+              <!-- Set grid position for the label -->
               <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
+              <!-- Set label text -->
               <text value="Customer Payment"/>
             </properties>
           </component>
+          <!-- Label for weight adjustment -->
           <component id="ae164" class="javax.swing.JLabel" binding="weightAdjustmentLabel">
             <constraints>
+              <!-- Set grid position for the label -->
               <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
+              <!-- Set label text -->
               <text value="Weight Adjustment"/>
             </properties>
           </component>
+          <!-- Label for scale overloaded -->
           <component id="e940" class="javax.swing.JLabel" binding="scaleOverloadedLabel">
             <constraints>
+              <!-- Set grid position for the label -->
               <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
+              <!-- Set label text -->
               <text value="Scale overloaded?"/>
             </properties>
           </component>
+          <!-- Label for state -->
           <component id="6052" class="javax.swing.JLabel" binding="stateLabel">
             <constraints>
+              <!-- Set grid position for the label -->
               <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
+              <!-- Set label text -->
               <text value="State"/>
             </properties>
           </component>
+          <!-- Label for actual weight -->
           <component id="e34c3" class="javax.swing.JLabel" binding="actualWeightLabel">
             <constraints>
+              <!-- Set grid position for the label -->
               <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
+              <!-- Set label text -->
               <text value="Actual Weight"/>
             </properties>
           </component>
+          <!-- Button for refreshing -->
           <component id="def39" class="javax.swing.JButton" binding="refreshButton" default-binding="true">
             <constraints>
+              <!-- Set grid position for the button -->
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
+              <!-- Set button text -->
               <text value="Refresh"/>
             </properties>
           </component>
+          <!-- Label for price -->
           <component id="14dfc" class="javax.swing.JLabel" binding="priceLabel">
             <constraints>
+              <!-- Set grid position for the label -->
               <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
+              <!-- Set label text -->
               <text value="Price"/>
             </properties>
           </component>
