@@ -30,6 +30,12 @@ import com.jjjwelectronics.scanner.BarcodedItem;
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import org.junit.Before;
 import org.junit.Test;
+
+<<<<<<< HEAD
+import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
+
+=======
+>>>>>>> gui-dev
 import enums.SessionStatus;
 import stubbing.*;
 import utils.DatabaseHelper;

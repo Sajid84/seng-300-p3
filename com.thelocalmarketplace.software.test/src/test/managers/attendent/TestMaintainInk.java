@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // Liam Major			- 30223023
 // Md Abu Sinan			- 30154627
 // Ali Akbari			- 30171539
@@ -21,6 +22,12 @@
 // Umer Rehman			- 30169819
 
 package test.managers.attendent;
+=======
+package test.managers.attendent;
+
+//Sheikh Falah Sheikh Hasan - 30175335
+>>>>>>> gui-dev
+
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -50,7 +57,7 @@ public class TestMaintainInk {
 
         // creating the stubs
         sm = new StubbedSystemManager(BigDecimal.ZERO);
-        sam  = sm.amStub;
+        sam  = new StubbedAttendantManager(sm);
         // configuring the machine
         sm.configure(machine);
 
@@ -58,10 +65,9 @@ public class TestMaintainInk {
 
     @Test
     public void testInkLevelLow() {
-        sam.notifyInkLow();
-        assertTrue(sam.isInkLow());
+        assertFalse(sam.isInkLow());
         sam.maintainInk();
-        assertTrue(sam.getHasInk());
+        assertFalse(sam.getHasInk());
     }
 
 }

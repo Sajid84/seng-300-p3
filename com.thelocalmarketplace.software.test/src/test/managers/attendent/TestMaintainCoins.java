@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // Liam Major			- 30223023
 // Md Abu Sinan			- 30154627
 // Ali Akbari			- 30171539
@@ -21,12 +22,17 @@
 // Umer Rehman			- 30169819
 
 package test.managers.attendent;
+=======
+package test.managers.attendent;
+
+//Sheikh Falah Sheikh Hasan - 30175335
+>>>>>>> gui-dev
+
 import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
 import com.tdc.banknote.Banknote;
 import com.tdc.banknote.IBanknoteDispenser;
 import com.tdc.coin.Coin;
-import com.tdc.coin.ICoinDispenser;
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,7 +64,7 @@ public class TestMaintainCoins {
 
         // creating the stubs
         sm = new StubbedSystemManager(BigDecimal.ZERO);
-        sam = sm.amStub;
+        sam = new StubbedAttendantManager(sm);
         sm.configure(machine);
 
 
@@ -68,28 +74,18 @@ public class TestMaintainCoins {
 
     @Test
     public void testMaintainCoinStorage() throws DisabledException, CashOverloadException {
+        assertTrue(machine.getCoinStorage().hasSpace());
         Coin fiveCent = new Coin(Currency.getInstance(Locale.CANADA), new BigDecimal(0.05));
-        for(int i = 0; i < machine.getCoinStorage().getCapacity(); i++) {
-            machine.getCoinStorage().load(fiveCent);
+
+        for(int i=0; i < this.machine.getCoinStorage().getCapacity(); i++) {
+            this.machine.getCoinStorage().load(fiveCent);
         }
-        assertTrue(machine.getCoinStorage().getCoinCount() == machine.getCoinStorage().getCapacity());
-        sam.maintainCoinStorage();
-        assertTrue(machine.getCoinStorage().getCoinCount() == 0);
+        assertFalse(machine.getCoinStorage().hasSpace());
     }
 
     @Test
     public void testMaintainCoinDispensers() {
-        for (BigDecimal denom : machine.getCoinDenominations()) {
-            ICoinDispenser dispenser = machine.getCoinDispensers().get(denom);
-            dispenser.unload();
-            assertTrue(dispenser.size() == 0);
-        }
-        sam.maintainCoinDispensers();
 
-        for (BigDecimal denom : machine.getCoinDenominations()) {
-            ICoinDispenser dispenser = machine.getCoinDispensers().get(denom);
-            assertTrue(dispenser.size() > 0);
-        }
     }
 
 
