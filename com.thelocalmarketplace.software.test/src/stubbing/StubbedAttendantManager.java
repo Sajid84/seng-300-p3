@@ -30,8 +30,6 @@ public class StubbedAttendantManager extends AttendantManager {
     public StubbedSystemManager smStub;
     
     public boolean notifyAttendantCalled;
-	private String attendantNotification;
-	private BagMonitor bagMonitor;
 
 
     public StubbedAttendantManager(StubbedSystemManager sm) {
@@ -76,7 +74,6 @@ public class StubbedAttendantManager extends AttendantManager {
 	@Override
 	public void notifyAttendant(String reason) {
 		notifyAttendantCalled = true;
-		this.attendantNotification = reason;
 		super.notifyAttendant(reason);
 	}
 
@@ -94,6 +91,6 @@ public class StubbedAttendantManager extends AttendantManager {
     }
     
     public BagMonitor getBagMonitor() {
-        return bagMonitor;
+        return super.bm;
     }
 }

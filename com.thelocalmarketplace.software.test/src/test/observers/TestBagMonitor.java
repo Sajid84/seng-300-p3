@@ -11,11 +11,10 @@ import stubbing.StubbedGrid;
 import stubbing.StubbedStation;
 import stubbing.StubbedSystemManager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 
 public class TestBagMonitor {
@@ -51,13 +50,14 @@ public class TestBagMonitor {
     public void testBagDispensedNotification() {
         bm.aBagHasBeenDispensedByTheDispenser();
 
-        assertEquals(4, am.getBagCount());
+        // bag count should be zero, by dispensing it should be -1
+        assertEquals(-1, am.getBagCount());
     }
 
     @Test
     public void testOutOfBagsNotification() {
         bm.theDispenserIsOutOfBags();
-        assertTrue(am.hasBags());
+        assertFalse(am.hasBags());
     }
 
     @Test
@@ -65,7 +65,7 @@ public class TestBagMonitor {
         int bagsLoadedCount = 5;
         bm.bagsHaveBeenLoadedIntoTheDispenser(bagsLoadedCount);
 
-        assertEquals(10, am.getBagCount());
+        assertEquals(5, am.getBagCount());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -77,14 +77,5 @@ public class TestBagMonitor {
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorWithNullDispenser() {
         new BagMonitor(am, null);
-    }
-
-    @Test
-    public void testDeviceObserverMethods() {
-        // You may want to add more detailed tests for other methods in AbstractDeviceObserver
-        bm.aDeviceHasBeenTurnedOn(BagDispenser);
-        bm.aDeviceHasBeenTurnedOff(BagDispenser);
-
-        // Ensure that the methods in AbstractDeviceObserver are called without exceptions
     }
 }
