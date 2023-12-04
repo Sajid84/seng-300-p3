@@ -1,4 +1,4 @@
-package test.managers.attendent;
+package test.managers.attendant;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

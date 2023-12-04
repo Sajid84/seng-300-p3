@@ -1,9 +1,6 @@
-package test.managers.attendent;
+package test.managers.attendant;
 
-import com.tdc.DisabledException;
-import com.tdc.CashOverloadException;
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
-import managers.SystemManager;
 import managers.AttendantManager;
 import static org.junit.Assert.*;
 import org.junit.Before;
