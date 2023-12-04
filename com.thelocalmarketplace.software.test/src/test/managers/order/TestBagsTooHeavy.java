@@ -27,6 +27,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 
+import com.jjjwelectronics.scanner.BarcodedItem;
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,6 +40,7 @@ import stubbing.StubbedBarcodedItem;
 import stubbing.StubbedOrderManager;
 import stubbing.StubbedStation;
 import stubbing.StubbedSystemManager;
+import utils.DatabaseHelper;
 import utils.Pair;
 
 public class TestBagsTooHeavy {
@@ -58,7 +60,6 @@ public class TestBagsTooHeavy {
 	@Before
 	public void setup() {
 		// configuring the hardware
-		AbstractSelfCheckoutStation.resetConfigurationToDefaults();
 		StubbedStation.configure();
 
 		// Creating the hardware
@@ -82,39 +83,41 @@ public class TestBagsTooHeavy {
 
 	@Test
 	public void testBagsNotTooHeavy() {
-		// Test to ensure that adding a light item does not trigger the scale overload
-		StubbedBarcodedItem item = new StubbedBarcodedItem(massBelow);
+		BarcodedItem item = DatabaseHelper.createRandomBarcodedItem(massBelow);
+
 		om.addItemToOrder(item, ScanType.MAIN);
+
 		assertFalse("Scale should not be overloaded with a light item", om.isScaleOverloaded());
 	}
 
 	@Test
 	public void testBagsTooHeavy() {
-		// Test to check if adding a single heavy item correctly triggers the scale
 		// overload
-		StubbedBarcodedItem heavyItem = new StubbedBarcodedItem(massAbove);
-		om.addItemToOrder(heavyItem, ScanType.MAIN);
+		BarcodedItem item = DatabaseHelper.createRandomBarcodedItem(massAbove);
+
+		om.addItemToOrder(item, ScanType.MAIN);
+
 		assertTrue("Scale should be overloaded with a heavy item", om.isScaleOverloaded());
 	}
 
 	@Test
 	public void testRemovingItemReducesWeight() {
-		// Test to confirm that removing an item reduces the total weight and can
 		// resolve an overload
-		StubbedBarcodedItem heavyItem = new StubbedBarcodedItem(massAbove);
-		om.addItemToOrder(heavyItem, ScanType.MAIN);
+		BarcodedItem item = DatabaseHelper.createRandomBarcodedItem(massAbove);
+
+		om.addItemToOrder(item, ScanType.MAIN);
 		assertTrue("Scale should be overloaded after adding a heavy item", om.isScaleOverloaded());
 
-		om.removeItemFromOrder(new Pair<>(heavyItem, true));
+		om.removeItemFromOrder(new Pair<>(item, true));
+
 		assertFalse("Scale should not be overloaded after removing the heavy item", om.isScaleOverloaded());
 	}
 
 	@Test
 	public void testCumulativeWeightCausesOverload() {
-		// Test to check if the cumulative weight of multiple items leads to an overload
+		BarcodedItem item1 = DatabaseHelper.createRandomBarcodedItem(massHalf);
+		BarcodedItem item2 = DatabaseHelper.createRandomBarcodedItem(massAbove);
 
-		StubbedBarcodedItem item1 = new StubbedBarcodedItem(massHalf);
-		StubbedBarcodedItem item2 = new StubbedBarcodedItem(massAbove);
 		om.addItemToOrder(item1, ScanType.MAIN);
 		om.addItemToOrder(item2, ScanType.MAIN);
 

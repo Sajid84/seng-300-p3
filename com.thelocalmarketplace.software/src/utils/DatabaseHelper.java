@@ -179,7 +179,25 @@ public class DatabaseHelper {
      * @return the {@link BarcodedItem}
      */
     public static BarcodedItem createRandomBarcodedItem() {
-        return createRandomBarcodedItem(DatabaseHelper.createRandomPrice());
+        return createRandomBarcodedItem(BigDecimal.valueOf(DatabaseHelper.createRandomMass()), DatabaseHelper.createRandomPrice());
+    }
+
+    /**
+     * <p>
+     * Creates a {@link BarcodedItem} with a randomized mass and barcode. This
+     * method also creates a {@link BarcodedProduct} with a randomized barcode,
+     * description, price and mass.
+     * </p>
+     * <p>
+     * This method guarantees that the {@link Barcode}s of both item and product are
+     * the same and that they are put into respective databases in {@link Database}.
+     * </p>
+     *
+     * @param weight the specified weight of the object
+     * @return the {@link BarcodedItem}
+     */
+    public static BarcodedItem createRandomBarcodedItem(BigDecimal weight) {
+        return createRandomBarcodedItem(weight, DatabaseHelper.createRandomPrice());
     }
 
     /**
@@ -197,8 +215,26 @@ public class DatabaseHelper {
      * @return the {@link BarcodedItem}
      */
     public static BarcodedItem createRandomBarcodedItem(long price) {
+        return createRandomBarcodedItem(BigDecimal.valueOf(DatabaseHelper.createRandomMass()), price);
+    }
+
+    /**
+     * <p>
+     * Creates a {@link BarcodedItem} with a randomized mass and barcode. This
+     * method also creates a {@link BarcodedProduct} with a randomized barcode,
+     * description, price and mass.
+     * </p>
+     * <p>
+     * This method guarantees that the {@link Barcode}s of both item and product are
+     * the same and that they are put into respective databases in {@link Database}.
+     * </p>
+     *
+     * @param weight the specified weight of the object
+     * @param price the price of the product that this function creates
+     * @return the {@link BarcodedItem}
+     */
+    public static BarcodedItem createRandomBarcodedItem(BigDecimal weight, long price) {
         // creating the barcode
-        double mass = DatabaseHelper.createRandomMass();
         String desc = "B" + DatabaseHelper.createRandomSignifier() + " " + DatabaseHelper.createRandomDescription();
 
         // temp vars
@@ -212,10 +248,10 @@ public class DatabaseHelper {
             barcode = DatabaseHelper.createRandomBarcode(DEFAULT_BARCODE_LENGTH);
 
             // need to create the item
-            item = new BarcodedItem(barcode, new Mass(mass));
+            item = new BarcodedItem(barcode, new Mass(weight.doubleValue()));
 
             // need to create the corresponding product
-            prod = new BarcodedProduct(barcode, desc, price, mass);
+            prod = new BarcodedProduct(barcode, desc, price, weight.doubleValue());
         } while (!DatabaseHelper.insertIntoDatabase(item, prod));
 
         // return item to caller
