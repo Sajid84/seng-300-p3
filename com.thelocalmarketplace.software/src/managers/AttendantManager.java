@@ -128,10 +128,16 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	}
 
 	@Override
-	public void signalForAttendant() {
-		// TODO Auto-generated method stub
-
+	public void signalForAttendant(String errorMessage) {
+		logError(errorMessage);
+		AttendantStation.displayErrorMessage(errorMessage);
 	}
+	
+	@Override
+	private void logError(String message) {
+		System.out.println("Error: " + message);
+	}
+	// implemented by Abu  for error handling by attendant
 
 	@Override
 	public void notifyAttendant(String reason) {
