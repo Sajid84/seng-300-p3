@@ -30,7 +30,7 @@ import com.tdc.IComponentObserver;
  * individual observer.
  */
 
-public class AbstractComponentObserver implements IComponentObserver, IObserverUseable {
+public class AbstractComponentObserver implements IComponentObserver {
 
 	private IComponent<? extends IComponentObserver> device;
 

@@ -30,7 +30,7 @@ import com.jjjwelectronics.IDeviceListener;
  * individual observer.
  */
 
-public abstract class AbstractDeviceObserver implements IDeviceListener, IObserverUseable {
+public abstract class AbstractDeviceObserver implements IDeviceListener {
 
 	private IDevice<? extends IDeviceListener> device;
 
