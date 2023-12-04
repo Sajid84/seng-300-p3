@@ -22,9 +22,6 @@
 
 package test.managers.order;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
 import java.math.BigDecimal;
 
 import javax.naming.OperationNotSupportedException;
@@ -51,6 +48,9 @@ import stubbing.StubbedPLUItem;
 import stubbing.StubbedPLUProduct;
 import stubbing.StubbedStation;
 import stubbing.StubbedSystemManager;
+import utils.DatabaseHelper;
+
+import static org.junit.Assert.*;
 
 public class TestAddItem {
 	// machine
@@ -93,60 +93,67 @@ public class TestAddItem {
 	//Add a barcoded product. Get barcode and expected weight for the item. Add item to the order with ScanType.MAIN. Expect to Items size equal 1.
 	@Test
 	public void addingInstanceOfBarcodedItemViaMainScanner() throws OperationNotSupportedException {
-		BarcodedProduct prod = new StubbedBarcodedProduct();
-		ProductDatabases.BARCODED_PRODUCT_DATABASE.put(prod.getBarcode(), prod);
+		BarcodedItem item = DatabaseHelper.createRandomBarcodedItem();
 
-		BarcodedItem item = new BarcodedItem(prod.getBarcode(), new Mass(prod.getExpectedWeight()));
+		// adding the item to the order
 		om.addItemToOrder(item, ScanType.MAIN);
 
+		// asserting
 		assertEquals(om.getItems().size(), 1);
 	}
 
 	//Add a barcoded product. Get barcode and expected weight for the item. Add item to the order with ScanType.HANDHELD. Expect to Items size equal 1.
 	@Test
-	public void addingInstanceOfBarcodedItemViaHandheldScanner() throws OperationNotSupportedException {
-		BarcodedProduct prod = new StubbedBarcodedProduct();
-		ProductDatabases.BARCODED_PRODUCT_DATABASE.put(prod.getBarcode(), prod);
+	public void addingInstanceOfBarcodedItemViaHandheldScanner() {
+		BarcodedItem item = DatabaseHelper.createRandomBarcodedItem();
 
-		BarcodedItem item = new BarcodedItem(prod.getBarcode(), new Mass(prod.getExpectedWeight()));
+		// adding the item to the order
 		om.addItemToOrder(item, ScanType.HANDHELD);
 
+		// asserting
 		assertEquals(om.getItems().size(), 1);
 	}
 
-	//Add a pluCodedItem with main scanner and expect to throw an exception.
-	@Test(expected = OperationNotSupportedException.class)
-	public void addingInstanceOfPLUViaMainScanner() throws OperationNotSupportedException {
-		PLUCodedItem pluCodedItem = new StubbedPLUItem();
-		om.addItemToOrder(pluCodedItem, ScanType.MAIN);
+	@Test
+	public void addingInstanceOfPLUViaMainScanner() {
+		// creating the item
+		PLUCodedItem item = DatabaseHelper.createRandomPLUCodedItem();
+
+		// adding the item to the order
+		om.addItemToOrder(item, ScanType.MAIN);
+
+		// asserting
+		assertEquals(om.getItems().size(), 1);
 	}
 
-	//Add a pluCodedItem with handheld scanner and expect to throw an exception.
-	@Test(expected = OperationNotSupportedException.class)
-	public void addingInstanceOfPLUViaHandheldScanner() throws OperationNotSupportedException {
-		PLUCodedItem pluCodedItem = new StubbedPLUItem();
-		om.addItemToOrder(pluCodedItem, ScanType.HANDHELD);
+	@Test
+	public void addingInstanceOfPLUViaHandheldScanner() {
+		// creating the item
+		PLUCodedItem item = DatabaseHelper.createRandomPLUCodedItem();
+
+		// adding the item to the order
+		om.addItemToOrder(item, ScanType.MAIN);
+
+		// asserting
+		assertEquals(om.getItems().size(), 1);
 	}
 	
 	@Test
     public void searchItemsByText_ValidDescription_ReturnsBarcodedItem() {
-		
-        BarcodedProduct prod = new StubbedBarcodedProduct();
-        ProductDatabases.BARCODED_PRODUCT_DATABASE.put(prod.getBarcode(), prod);
+		// setting up
+		BarcodedItem item = DatabaseHelper.createRandomBarcodedItem();
+		BarcodedProduct prod = DatabaseHelper.get(item);
 
-        BarcodedItem expectedItem = new BarcodedItem(prod.getBarcode(), new Mass(prod.getExpectedWeight()));
+		// getting the item
+		Item result = om.searchItemsByText(prod.getDescription());
 
-        Item result = om.searchItemsByText(prod.getDescription());
-
-        assertEquals(expectedItem, result);
+		// asserting
+		assertTrue(item instanceof BarcodedItem);
+		assertEquals(item, result);
     }
 
     @Test
     public void searchItemsByText_InvalidDescription_ReturnsNull() {
-    	
-        BarcodedProduct prod = new StubbedBarcodedProduct();
-        ProductDatabases.BARCODED_PRODUCT_DATABASE.put(prod.getBarcode(), prod);
-
         Item result = om.searchItemsByText("Invalid Description");
 
         assertNull(result);
@@ -154,21 +161,20 @@ public class TestAddItem {
 
     @Test
     public void searchItemsByText_PLUProduct_ReturnsPLUCodedItem() {
-    	
-        PLUCodedProduct pluProduct = new StubbedPLUProduct();
-        Database.PLU_PRODUCT_DATABASE.put(pluProduct.getPLUCode(), pluProduct);
+		// setting up
+		PLUCodedItem item = DatabaseHelper.createRandomPLUCodedItem();
+		PLUCodedProduct prod = DatabaseHelper.get(item);
 
-        PLUCodedItem expectedItem = new StubbedPLUItem();
-        Database.PLU_ITEM_DATABASE.put(pluProduct.getPLUCode(), expectedItem);
+		// getting the item
+        Item result = om.searchItemsByText(prod.getDescription());
 
-        Item result = om.searchItemsByText(pluProduct.getDescription());
-
-        assertEquals(expectedItem, result);
+		// asserting
+		assertTrue(item instanceof PLUCodedItem);
+        assertEquals(item, result);
     }
 
     @Test
     public void searchItemsByText_NullDescription_ReturnsNull() {
-    	
         Item result = om.searchItemsByText(null);
 
         assertNull(result);
