@@ -31,11 +31,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import enums.SessionStatus;
-<<<<<<< HEAD
-import stubbing.StubbedBarcodedItem;
-import stubbing.StubbedBarcodedProduct;
-=======
->>>>>>> gui-dev
 import stubbing.StubbedOrderManager;
 import stubbing.StubbedSystemManager;
 import utils.DatabaseHelper;

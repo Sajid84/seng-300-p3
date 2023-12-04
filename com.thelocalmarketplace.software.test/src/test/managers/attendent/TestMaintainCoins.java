@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // Liam Major			- 30223023
 // Md Abu Sinan			- 30154627
 // Ali Akbari			- 30171539
@@ -22,17 +21,12 @@
 // Umer Rehman			- 30169819
 
 package test.managers.attendent;
-=======
-package test.managers.attendent;
-
-//Sheikh Falah Sheikh Hasan - 30175335
->>>>>>> gui-dev
-
 import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
 import com.tdc.banknote.Banknote;
 import com.tdc.banknote.IBanknoteDispenser;
 import com.tdc.coin.Coin;
+import com.tdc.coin.ICoinDispenser;
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,14 +36,11 @@ import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.Locale;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class TestMaintainCoins {
-    private StubbedStation station;
     private ISelfCheckoutStation machine;
     private StubbedSystemManager sm;
-    private StubbedPaymentManager pm;
     private StubbedAttendantManager sam;
 
     @Before
@@ -64,7 +55,7 @@ public class TestMaintainCoins {
 
         // creating the stubs
         sm = new StubbedSystemManager(BigDecimal.ZERO);
-        sam = new StubbedAttendantManager(sm);
+        sam = sm.amStub;
         sm.configure(machine);
 
 
@@ -74,18 +65,28 @@ public class TestMaintainCoins {
 
     @Test
     public void testMaintainCoinStorage() throws DisabledException, CashOverloadException {
-        assertTrue(machine.getCoinStorage().hasSpace());
         Coin fiveCent = new Coin(Currency.getInstance(Locale.CANADA), new BigDecimal(0.05));
-
-        for(int i=0; i < this.machine.getCoinStorage().getCapacity(); i++) {
-            this.machine.getCoinStorage().load(fiveCent);
+        for(int i = 0; i < machine.getCoinStorage().getCapacity(); i++) {
+            machine.getCoinStorage().load(fiveCent);
         }
-        assertFalse(machine.getCoinStorage().hasSpace());
+        assertEquals(machine.getCoinStorage().getCoinCount(), machine.getCoinStorage().getCapacity());
+        sam.maintainCoinStorage();
+        assertEquals(0, machine.getCoinStorage().getCoinCount());
     }
 
     @Test
     public void testMaintainCoinDispensers() {
+        for (BigDecimal denom : machine.getCoinDenominations()) {
+            ICoinDispenser dispenser = machine.getCoinDispensers().get(denom);
+            dispenser.unload();
+            assertEquals(0, dispenser.size());
+        }
+        sam.maintainCoinDispensers();
 
+        for (BigDecimal denom : machine.getCoinDenominations()) {
+            ICoinDispenser dispenser = machine.getCoinDispensers().get(denom);
+            assertTrue(dispenser.size() > 0);
+        }
     }
 
 
