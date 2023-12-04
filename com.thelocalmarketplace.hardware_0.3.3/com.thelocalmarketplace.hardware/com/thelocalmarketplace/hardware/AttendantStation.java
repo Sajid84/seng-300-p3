@@ -139,4 +139,14 @@ public class AttendantStation {
 		keyboard.turnOff();
 		screen.turnOff();
 	}
+	
+	// error handling 
+	
+	public void displayErrorMessage(String errorMessage) {
+		
+		// idk if this is the correct code for swing
+		//SwingUtilities.invokeLater(new Runnable()){
+	//        public void run(){} 	}
+	//			 messageLabel.setText("Error: " +errorMessage);	
+	}
 }
