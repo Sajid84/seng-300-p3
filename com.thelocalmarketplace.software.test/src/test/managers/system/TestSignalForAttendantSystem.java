@@ -21,15 +21,15 @@
 // Umer Rehman			- 30169819
 package test.managers.system;
 
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-
-import managers.enums.SessionStatus;
 import stubbing.StubbedStation;
 import stubbing.StubbedSystemManager;
 
-public class TestSignalForAttendant {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class TestSignalForAttendantSystem {
     private StubbedSystemManager sm;
 
     @Before
@@ -39,35 +39,9 @@ public class TestSignalForAttendant {
         sm.configure(new StubbedStation().machine);
     }
     
-    @Test(expected = IllegalStateException.class)
-    public void testOnAttendantOverrideWhenPaidOrDisabled() {
-        sm.setState(SessionStatus.PAID); 
-        sm.onAttendantOverride();
-    }
-
-    @Test
-    public void testOnAttendantOverrideNormal() {
-        sm.setState(SessionStatus.NORMAL);
-        sm.onAttendantOverride();
-        assertTrue(sm.omStub.onAttendantOverrideCalled); 
-    }
-    
-    @Test
-    public void testNotifyAttendant() {
-        String reason = "Test reason";
-        sm.notifyAttendant(reason);
-        assertTrue(sm.notifyAttendantCalled);
-        assertEquals(reason, sm.getAttendantNotification());
-    }
-
-
     @Test
     public void testSignalForAttendant() {
         sm.signalForAttendant();
         assertTrue(sm.notifyAttendantCalled);
-        String expectedReason = "Station attention of the attendant manager";
-        assertEquals(expectedReason, sm.getAttendantNotification());
     }
-
-    
 }

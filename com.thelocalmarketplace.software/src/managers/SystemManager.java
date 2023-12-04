@@ -574,10 +574,10 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 
 	@Override
 	public void enableMachine() {
-		// TODO make this method actually do something
-		if (isDisabled()) {
+		if (isDisabled() && !disabledRequest) {
 			setState(SessionStatus.NORMAL);
 			notifyAttendant("Machine was enabled");
+			return;
 		}
 
 		// throwing when not in the expected state

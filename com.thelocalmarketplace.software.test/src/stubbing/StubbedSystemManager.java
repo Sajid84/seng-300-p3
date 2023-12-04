@@ -135,4 +135,8 @@ public class StubbedSystemManager extends SystemManager {
 		recordTransactionCalled = true;
 		super.recordTransaction(card, holdnumber, amount);
 	}
+
+	public boolean getDisabledRequest() {
+		return super.disabledRequest;
+	}
 }

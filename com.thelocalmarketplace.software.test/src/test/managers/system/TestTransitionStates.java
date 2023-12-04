@@ -22,13 +22,15 @@
 
 package test.managers.system;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import enums.SessionStatus;
+import stubbing.StubbedAttendantManager;
+import stubbing.StubbedStation;
 import stubbing.StubbedSystemManager;
+
+import static org.junit.Assert.*;
 
 /**
  * This tests that the functions that control state can only move between
@@ -38,10 +40,12 @@ import stubbing.StubbedSystemManager;
 public class TestTransitionStates {
 
 	private StubbedSystemManager sm;
+	private StubbedAttendantManager am;
 
 	@Before
 	public void setup() {
 		sm = new StubbedSystemManager();
+		am = sm.amStub;
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
@@ -89,5 +93,96 @@ public class TestTransitionStates {
 		sm.setState(SessionStatus.BLOCKED);
 
 		sm.notifyPaid();
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testUnblockSessionWhenPaidOrDisabled() {
+		sm.setState(SessionStatus.PAID);
+		sm.unblockSession();
+	}
+
+	@Test
+	public void testIsBlockedAndIsUnblocked() {
+		sm.setState(SessionStatus.BLOCKED);
+		assertTrue(sm.isBlocked());
+		assertFalse(sm.isUnblocked());
+
+		sm.setState(SessionStatus.NORMAL);
+		assertFalse(sm.isBlocked());
+		assertTrue(sm.isUnblocked());
+	}
+
+	@Test
+	public void testDisableMachine() {
+		sm.requestDisableMachine();
+		sm.disableMachine();
+		assertEquals(SessionStatus.DISABLED, sm.getState());
+		assertTrue(sm.notifyAttendantCalled);
+		assertEquals("Machine was disabled", sm.getAttendantNotification());
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testEnableMachineWhenNotDisabled() {
+		sm.enableMachine();
+	}
+
+	@Test
+	public void testEnableMachine() {
+		// setup
+		sm.requestDisableMachine();
+		sm.disableMachine();
+
+		// testing
+		sm.requestEnableMachine();
+		sm.enableMachine();
+
+		// asserting
+		assertEquals(SessionStatus.NORMAL, sm.getState());
+		assertTrue(sm.notifyAttendantCalled);
+	}
+
+	@Test
+	public void testRequestDisableMachine() {
+		sm.requestDisableMachine();
+		sm.disableMachine();
+		assertEquals(SessionStatus.DISABLED, sm.getState());
+	}
+
+
+	@Test
+	public void testRequestEnableMachine() {
+		sm.requestDisableMachine();
+		sm.disableMachine();
+		assertEquals(SessionStatus.DISABLED, sm.getState());
+
+		sm.requestEnableMachine();
+		try {
+			sm.enableMachine();
+			assertEquals(SessionStatus.NORMAL, sm.getState());
+		} catch (IllegalStateException e) {
+			fail("Machine should have been enabled successfully");
+		}
+	}
+
+	@Test
+	public void testIsDisabled() {
+		sm.setState(SessionStatus.DISABLED);
+		assertTrue(sm.isDisabled());
+
+		sm.setState(SessionStatus.NORMAL);
+		assertFalse(sm.isDisabled());
+	}
+
+	@Test
+	public void testDisabledAfterCallForDisable() {
+		sm.requestDisableMachine();
+		sm.disableMachine();
+		assertTrue(am.isDisabled());
+	}
+
+	@Test
+	public void testNotDisabledWithoutCallForDisable() {
+		sm.requestDisableMachine();
+		assertFalse(am.isDisabled());
 	}
 }
