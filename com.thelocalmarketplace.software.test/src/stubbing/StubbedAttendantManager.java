@@ -63,11 +63,11 @@ public class StubbedAttendantManager extends AttendantManager {
     
     //getter for checking paperLow, inkLow variables
     public boolean isPaperLow() {
-    	return paperLow;
+    	return super.paperLow;
     }
     
     public boolean isInkLow() {
-    	return inkLow;
+    	return super.inkLow;
     }
     
     //needed to check predict notifications
