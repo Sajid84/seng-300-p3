@@ -40,12 +40,9 @@ import java.util.Currency;
 import java.util.Locale;
 
 public class TestMaintainBanknotes {
-    private StubbedStation station;
     private ISelfCheckoutStation machine;
     private StubbedSystemManager sm;
-    private StubbedPaymentManager pm;
     private StubbedAttendantManager sam;
-    private IBanknoteDispenser bd;
 
     @Before
     public void setup(){
@@ -58,9 +55,8 @@ public class TestMaintainBanknotes {
         machine.turnOn();
 
         // creating the stubs
-        sm = new StubbedSystemManager(BigDecimal.ZERO);
+        sm = new StubbedSystemManager();
         sam  = sm.amStub;
-        pm = sm.pmStub;
 
         // configuring the machine
         sm.configure(machine);
@@ -68,22 +64,24 @@ public class TestMaintainBanknotes {
     }
 
     @Test
-    public void testMaintainBanknoteStorage() throws DisabledException, CashOverloadException {
-        Banknote fiveNote = new Banknote(Currency.getInstance(Locale.CANADA), new BigDecimal(5.00));
+    public void testMaintainBanknoteStorage() throws CashOverloadException {
+        Banknote fiveNote = new Banknote(Currency.getInstance(Locale.CANADA), new BigDecimal("5.00"));
         for(int i = 0; i < machine.getBanknoteStorage().getCapacity(); i++) {
             machine.getBanknoteStorage().load(fiveNote);
         }
-        assertTrue(machine.getBanknoteStorage().getBanknoteCount() == machine.getBanknoteStorage().getCapacity());
+
+        assertEquals(machine.getBanknoteStorage().getBanknoteCount(), machine.getBanknoteStorage().getCapacity());
         sam.maintainBanknoteStorage();
-        assertTrue(machine.getBanknoteStorage().getBanknoteCount() == 0);
+        assertEquals(0, machine.getBanknoteStorage().getBanknoteCount());
     }
     @Test
     public void testMaintainBanknoteDispenser() {
         for (BigDecimal denom : machine.getBanknoteDenominations()) {
             IBanknoteDispenser dispenser = machine.getBanknoteDispensers().get(denom);
             dispenser.unload();
-            assertTrue(dispenser.size() == 0);
+            assertEquals(0, dispenser.size());
         }
+
         sam.maintainBanknoteDispensers();
 
         for (BigDecimal denom : machine.getBanknoteDenominations()) {

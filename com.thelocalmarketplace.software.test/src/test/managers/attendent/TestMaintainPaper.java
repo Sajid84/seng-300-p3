@@ -36,7 +36,6 @@ import java.math.BigDecimal;
 
 public class TestMaintainPaper {
 
-    private StubbedStation station;
     private ISelfCheckoutStation machine;
     private StubbedSystemManager sm;
     private StubbedAttendantManager sam;
@@ -56,7 +55,6 @@ public class TestMaintainPaper {
         sam  = sm.amStub;
         // configuring the machine
         sm.configure(machine);
-
     }
 
     @Test
@@ -65,7 +63,5 @@ public class TestMaintainPaper {
         assertTrue(sam.isPaperLow());
         sam.maintainPaper();
         assertTrue(sam.getHasPaper());
-
-
     }
 }

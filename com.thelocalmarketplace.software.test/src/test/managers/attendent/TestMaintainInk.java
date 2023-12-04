@@ -33,7 +33,6 @@ import java.math.BigDecimal;
 
 public class TestMaintainInk {
 
-    private StubbedStation station;
     private ISelfCheckoutStation machine;
     private StubbedSystemManager sm;
     private StubbedAttendantManager sam;
@@ -63,5 +62,4 @@ public class TestMaintainInk {
         sam.maintainInk();
         assertTrue(sam.getHasInk());
     }
-
 }

@@ -36,14 +36,11 @@ import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.Locale;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class TestMaintainCoins {
-    private StubbedStation station;
     private ISelfCheckoutStation machine;
     private StubbedSystemManager sm;
-    private StubbedPaymentManager pm;
     private StubbedAttendantManager sam;
 
     @Before
@@ -72,9 +69,9 @@ public class TestMaintainCoins {
         for(int i = 0; i < machine.getCoinStorage().getCapacity(); i++) {
             machine.getCoinStorage().load(fiveCent);
         }
-        assertTrue(machine.getCoinStorage().getCoinCount() == machine.getCoinStorage().getCapacity());
+        assertEquals(machine.getCoinStorage().getCoinCount(), machine.getCoinStorage().getCapacity());
         sam.maintainCoinStorage();
-        assertTrue(machine.getCoinStorage().getCoinCount() == 0);
+        assertEquals(0, machine.getCoinStorage().getCoinCount());
     }
 
     @Test
@@ -82,7 +79,7 @@ public class TestMaintainCoins {
         for (BigDecimal denom : machine.getCoinDenominations()) {
             ICoinDispenser dispenser = machine.getCoinDispensers().get(denom);
             dispenser.unload();
-            assertTrue(dispenser.size() == 0);
+            assertEquals(0, dispenser.size());
         }
         sam.maintainCoinDispensers();
 
