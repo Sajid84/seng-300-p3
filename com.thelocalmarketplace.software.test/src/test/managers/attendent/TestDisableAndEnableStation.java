@@ -20,10 +20,8 @@ public class TestDisableAndEnableStation {
 
     @Before
     public void setup() {
-        // similar setup as before...
         sm = new StubbedSystemManager();
         attendantManager = new AttendantManager(sm);
-        // additional setup as necessary...
     }
     
     @Test
