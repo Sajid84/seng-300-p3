@@ -18,7 +18,6 @@
 // Nicholas MacKinnon	- 30172737
 // Ohiomah Imohi		- 30187606
 // Sheikh Falah Sheikh Hasan - 30175335
-// Umer Rehman			- 30169819
 
 package managers.interfaces;
 
