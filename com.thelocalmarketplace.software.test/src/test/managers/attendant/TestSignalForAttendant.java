@@ -1,3 +1,4 @@
+Liam Major 30223023
 package test.managers.attendant;
 
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
