@@ -65,6 +65,10 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
     
     private String AmountInPre = "Amount Inserted: $";
     private String AmountDuePre = "Remaining Due: $";
+    private JPanel ReciptPanel;
+    private JCheckBox ReciptCheckbox;
+    
+    public boolean wantRecipt = false;
 
     @Override
     public JPanel getPanel() {
@@ -107,6 +111,8 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setBounds(100, 100, 400, 150);
         contentPane = new JPanel();
+        contentPane.setPreferredSize(new Dimension(200, 150));
+        contentPane.setMinimumSize(new Dimension(200, 100));
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
         setContentPane(contentPane);
@@ -230,6 +236,14 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
         
         RemainingDueLabel = new JLabel("Remaining Due: $");
         MoneyTrackerPanel.add(RemainingDueLabel);
+        
+        ReciptPanel = new JPanel();
+        contentPane.add(ReciptPanel, BorderLayout.NORTH);
+        
+        ReciptCheckbox = new JCheckBox("Would you like a recipt?");
+        ReciptCheckbox.setActionCommand("ReciptCheckbox");
+        ReciptPanel.add(ReciptCheckbox);
+        
         updateMoneyLabels();
 
 
