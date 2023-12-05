@@ -158,7 +158,8 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 	@Override
 	public void notifyAttendant(String reason) {
-		gui.AddEvent(reason);
+		if (gui != null)
+			gui.AddEvent(reason);
 	}
 
 	@Override

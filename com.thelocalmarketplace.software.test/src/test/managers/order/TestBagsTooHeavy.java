@@ -36,10 +36,7 @@ import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 
 import enums.ScanType;
 import powerutility.PowerGrid;
-import stubbing.StubbedBarcodedItem;
-import stubbing.StubbedOrderManager;
-import stubbing.StubbedStation;
-import stubbing.StubbedSystemManager;
+import stubbing.*;
 import utils.DatabaseHelper;
 import utils.Pair;
 
@@ -65,7 +62,7 @@ public class TestBagsTooHeavy {
 		// Creating the hardware
 		station = new StubbedStation();
 		machine = station.machine;
-		machine.plugIn(PowerGrid.instance());
+		machine.plugIn(StubbedGrid.instance());
 		machine.turnOn();
 
 		// Creating the stubs
