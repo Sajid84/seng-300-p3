@@ -141,12 +141,17 @@ public class LandingPage implements IScreen {
     }
 
     @Override
-    public void notifyPaymentWindowClosed() {
+    public void notifyWindowClosed(Object screen) {
 
     }
 
     @Override
     public void notifyInvalidCardRead(Card card) {
+
+    }
+
+    @Override
+    public void notifyReset() {
 
     }
 }

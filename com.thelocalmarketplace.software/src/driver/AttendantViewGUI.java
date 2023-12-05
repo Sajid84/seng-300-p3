@@ -22,291 +22,262 @@
 
 package driver;
 
-import javax.swing.JPanel;
-import javax.swing.BoxLayout;
-import java.awt.GridLayout;
+import com.jjjwelectronics.Item;
+import com.jjjwelectronics.card.Card;
+import com.jjjwelectronics.screen.ITouchScreen;
+import enums.SessionStatus;
+import managers.AttendantManager;
+import managers.SystemManager;
+import managers.interfaces.IScreen;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 
-import javax.swing.border.EmptyBorder;
+public class AttendantViewGUI extends JPanel implements IScreen {
 
-import com.jjjwelectronics.Item;
-import com.jjjwelectronics.card.Card;
-import com.jjjwelectronics.screen.ITouchScreen;
+    private static final long serialVersionUID = 1L;
+    private final AttendantManager am;
+    private SystemManager sm;
+    private JButton FillInkButton;
+    private JButton EnableMachineButton;
+    private JButton FillPaperButton;
+    private JButton DisableMachineButton;
+    private JButton FillCoinsButton;
+    private JButton UnloadCoinsButton;
+    private JButton FillBanknotesButton;
+    private JButton UnloadBanknotesButton;
+    private JButton UnblockSessionButton;
+    private JButton FillBagsButton;
+    private JPanel EventTextHolder;
 
-import managers.SystemManager;
-import enums.SessionStatus;
-import managers.interfaces.IScreen;
+    /**
+     * Create the panel.
+     */
+    public AttendantViewGUI(SystemManager sm, AttendantManager am) {
+        this.sm = sm;
+        this.am = am;
 
-import java.awt.Dimension;
-import javax.swing.JButton;
-import javax.swing.JFrame;
+        // attaching for events
+        sm.attach(this);
 
-import java.awt.Color;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
+        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
-public class AttendantViewGUI extends JPanel implements IScreen{
+        JPanel EventViewerPanel = new JPanel();
+        EventViewerPanel.setBackground(new Color(240, 240, 240));
+        EventViewerPanel.setPreferredSize(new Dimension(200, 600));
+        EventViewerPanel.setMinimumSize(new Dimension(70, 10));
+        EventViewerPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+        add(EventViewerPanel);
+        EventViewerPanel.setLayout(new BoxLayout(EventViewerPanel, BoxLayout.Y_AXIS));
 
-	private static final long serialVersionUID = 1L;
-	private SystemManager sm;
-	private JButton FillInkButton;
-	private JButton EnableMachineButton;
-	private JButton FillPaperButton;
-	private JButton DisableMachineButton;
-	private JButton FillCoinsButton;
-	private JButton UnloadCoinsButton;
-	private JButton FillBanknotesButton;
-	private JButton UnloadBanknotesButton;
-	private JButton UnblockSessionButton;
-	private JButton ExtraActionButton;
-	private JPanel EventTextHolder;
+        JScrollPane SysEventsScrollPane = new JScrollPane();
+        SysEventsScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        EventViewerPanel.add(SysEventsScrollPane);
 
-	/**
-	 * Create the panel.
-	 */
-	public AttendantViewGUI(SystemManager sm) {
-		//this.sm = sm;
-		
-		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-		
-		JPanel EventViewerPanel = new JPanel();
-		EventViewerPanel.setBackground(new Color(240, 240, 240));
-		EventViewerPanel.setPreferredSize(new Dimension(200, 600));
-		EventViewerPanel.setMinimumSize(new Dimension(70, 10));
-		EventViewerPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-		add(EventViewerPanel);
-		EventViewerPanel.setLayout(new BoxLayout(EventViewerPanel, BoxLayout.Y_AXIS));
-		
-		JScrollPane SysEventsScrollPane = new JScrollPane();
-		SysEventsScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		EventViewerPanel.add(SysEventsScrollPane);
-		
-		EventTextHolder = new JPanel();
-		EventTextHolder.setBackground(new Color(192, 192, 192));
-		EventTextHolder.setBorder(null);
-		SysEventsScrollPane.setViewportView(EventTextHolder);
-		EventTextHolder.setLayout(new BoxLayout(EventTextHolder, BoxLayout.Y_AXIS));
-		
-		
-		
-		JPanel ButtonPanel = new JPanel();
-		ButtonPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-		add(ButtonPanel);
-		ButtonPanel.setLayout(new GridLayout(5, 2, 5, 5));
-		
-		FillInkButton = new JButton("Fill Ink");
-		FillInkButton.addActionListener(new ActionListener() {
+        EventTextHolder = new JPanel();
+        EventTextHolder.setBackground(new Color(192, 192, 192));
+        EventTextHolder.setBorder(null);
+        SysEventsScrollPane.setViewportView(EventTextHolder);
+        EventTextHolder.setLayout(new BoxLayout(EventTextHolder, BoxLayout.Y_AXIS));
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				sm.maintainInk();
-				FillInkButton.setEnabled(false);
-				// why is there even in in the first place? aren't receipts typically heat based?	
-			}
-			
-		});
-		FillInkButton.setEnabled(false);
-		ButtonPanel.add(FillInkButton);
-		
-		EnableMachineButton = new JButton("Enable Machine");
-		EnableMachineButton.addActionListener(new ActionListener() {
+        JPanel ButtonPanel = new JPanel();
+        ButtonPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+        add(ButtonPanel);
+        ButtonPanel.setLayout(new GridLayout(5, 2, 5, 5));
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				sm.requestEnableMachine();
-				
-			}
-			
-		});
-		ButtonPanel.add(EnableMachineButton);
-		
-		FillPaperButton = new JButton("Fill Paper");
-		FillPaperButton.addActionListener(new ActionListener() {
+        FillInkButton = new JButton("Fill Ink");
+        FillInkButton.addActionListener(new ActionListener() {
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				sm.maintainPaper();
-				FillPaperButton.setEnabled(false);
-			}
-			
-		});
-		FillPaperButton.setEnabled(false);
-		ButtonPanel.add(FillPaperButton);
-		
-		DisableMachineButton = new JButton("Disable Machine");
-		DisableMachineButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                AttendantViewGUI.this.sm.maintainInk();
+                FillInkButton.setEnabled(false);
+                // why is there even in in the first place? aren't receipts typically heat based?
+            }
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				sm.requestDisableMachine();
-				
-			}
-			
-		});
-		ButtonPanel.add(DisableMachineButton);
-		
-		FillCoinsButton = new JButton("Fill Coins");
-		FillCoinsButton.addActionListener(new ActionListener() {
+        });
+        FillInkButton.setEnabled(false);
+        ButtonPanel.add(FillInkButton);
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				sm.maintainCoinDispensers();
-				FillCoinsButton.setEnabled(false);
-				
-			}
-			
-		});
-		FillCoinsButton.setEnabled(false);
-		ButtonPanel.add(FillCoinsButton);
-		
-		UnloadCoinsButton = new JButton("Unload Coins");
-		UnloadCoinsButton.addActionListener(new ActionListener() {
+        EnableMachineButton = new JButton("Enable Machine");
+        EnableMachineButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sm.requestEnableMachine();
+                sm.enableMachine();
+            }
+        });
+        ButtonPanel.add(EnableMachineButton);
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				sm.maintainCoinStorage();
-				
-			}
-			
-		});
-		ButtonPanel.add(UnloadCoinsButton);
-		
-		FillBanknotesButton = new JButton("Fill Banknotes");
-		FillBanknotesButton.addActionListener(new ActionListener() {
+        FillPaperButton = new JButton("Fill Paper");
+        FillPaperButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                AttendantViewGUI.this.sm.maintainPaper();
+                FillPaperButton.setEnabled(false);
+            }
+        });
+        FillPaperButton.setEnabled(false);
+        ButtonPanel.add(FillPaperButton);
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				sm.maintainBanknoteDispensers();
-				FillBanknotesButton.setEnabled(false);
-				
-			}
-			
-		});
-		FillBanknotesButton.setEnabled(false);
-		ButtonPanel.add(FillBanknotesButton);
-		
-		UnloadBanknotesButton = new JButton("Unload Banknotes");
-		UnloadBanknotesButton.addActionListener(new ActionListener() {
+        DisableMachineButton = new JButton("Disable Machine");
+        DisableMachineButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               sm.requestDisableMachine();
+            }
+        });
+        ButtonPanel.add(DisableMachineButton);
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				sm.maintainBanknoteStorage();
-				
-			}
-			
-		});
-		ButtonPanel.add(UnloadBanknotesButton);
-		
-		UnblockSessionButton = new JButton("Unblock Session");
-		UnblockSessionButton.addActionListener(new ActionListener() {
+        FillCoinsButton = new JButton("Fill Coins");
+        FillCoinsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                AttendantViewGUI.this.sm.maintainCoinDispensers();
+                FillCoinsButton.setEnabled(false);
+            }
+        });
+        FillCoinsButton.setEnabled(false);
+        ButtonPanel.add(FillCoinsButton);
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				sm.unblockSession();
-				
-			}
-			
-		});
-		ButtonPanel.add(UnblockSessionButton);
-		
-		ExtraActionButton = new JButton("EXTRA");
-		ExtraActionButton.addActionListener(new ActionListener() {
+        UnloadCoinsButton = new JButton("Unload Coins");
+        UnloadCoinsButton.addActionListener(new ActionListener() {
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO or not TODO, that is the question (yes if we need an extra thing to do)
-				
-			}
-			
-		});
-		ButtonPanel.add(ExtraActionButton);
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                AttendantViewGUI.this.sm.maintainCoinStorage();
 
-	}
-	
-	public void AddEvent(String eventName) {
-		EventPanel newEvent = new EventPanel(this, eventName);
-		
-		EventTextHolder.add(newEvent);
-		
-	}
-	
-	public void removeEvent(EventPanel event) {
-		EventTextHolder.remove(event);
-		
-	}
-	
-	
-	public void enableFillInk() {
-		FillInkButton.setEnabled(true);
-	}
-	public void enableFillPaper() {
-		FillPaperButton.setEnabled(true);
-	}
-	public void enableFillCoins() {
-		FillCoinsButton.setEnabled(true);
-	}
-	public void enableFillBanknotes() {
-		FillBanknotesButton.setEnabled(true);
-	}
+            }
 
-	@Override
-	public void notifyItemAdded(Item item) {
-		// TODO Auto-generated method stub
-		
-	}
+        });
+        ButtonPanel.add(UnloadCoinsButton);
 
-	@Override
-	public void notifyItemRemoved(Item item) {
-		// TODO Auto-generated method stub
-		
-	}
+        FillBanknotesButton = new JButton("Fill Banknotes");
+        FillBanknotesButton.addActionListener(new ActionListener() {
 
-	@Override
-	public void notifyStateChange(SessionStatus state) {
-		// TODO Auto-generated method stub
-		
-	}
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                AttendantViewGUI.this.sm.maintainBanknoteDispensers();
+                FillBanknotesButton.setEnabled(false);
 
-	@Override
-	public void notifyRefresh() {
-		// TODO Auto-generated method stub
-		
-	}
+            }
 
-	@Override
-	public void notifyPaymentAdded(BigDecimal value) {
-		// TODO Auto-generated method stub
-		
-	}
+        });
+        FillBanknotesButton.setEnabled(false);
+        ButtonPanel.add(FillBanknotesButton);
 
-	@Override
-	public void notifyPaymentWindowClosed() {
-		// TODO Auto-generated method stub
-		
-	}
+        UnloadBanknotesButton = new JButton("Unload Banknotes");
+        UnloadBanknotesButton.addActionListener(new ActionListener() {
 
-	@Override
-	public void notifyInvalidCardRead(Card card) {
-		// TODO Auto-generated method stub
-		
-	}
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                AttendantViewGUI.this.sm.maintainBanknoteStorage();
+            }
 
-	@Override
-	public JPanel getPanel() {
-		return this;
-	}
+        });
+        ButtonPanel.add(UnloadBanknotesButton);
 
-	@Override
-	public JFrame getFrame() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        UnblockSessionButton = new JButton("Unblock Session");
+        UnblockSessionButton.addActionListener(new ActionListener() {
 
-	@Override
-	public void configure(ITouchScreen touchScreen) {
-		// TODO Auto-generated method stub
-		
-	}
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sm.onAttendantOverride();
+            }
+
+        });
+        ButtonPanel.add(UnblockSessionButton);
+
+        FillBagsButton = new JButton("Fill Bags");
+        FillBagsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                am.maintainBags();
+                notifyRefresh();
+            }
+
+        });
+        ButtonPanel.add(FillBagsButton);
+    }
+
+    public void AddEvent(String eventName) {
+        EventPanel newEvent = new EventPanel(this, eventName);
+
+        EventTextHolder.add(newEvent);
+    }
+
+    public void removeEvent(EventPanel event) {
+        EventTextHolder.remove(event);
+    }
+
+    @Override
+    public void notifyItemAdded(Item item) {
+        updateButtons();
+    }
+
+    @Override
+    public void notifyItemRemoved(Item item) {
+        updateButtons();
+    }
+
+    protected void updateButtons() {
+        FillInkButton.setEnabled(am.isInkLow());
+        FillPaperButton.setEnabled(am.isPaperLow());
+        FillCoinsButton.setEnabled(am.isCoinsLow());
+        FillBanknotesButton.setEnabled(am.isBanknotesLow());
+        FillBagsButton.setEnabled(am.isBagsLow());
+        UnloadCoinsButton.setEnabled(am.isCoinsFull());
+        UnloadBanknotesButton.setEnabled(am.isBanknotesFull());
+    }
+
+    @Override
+    public void notifyStateChange(SessionStatus state) {
+        updateButtons();
+    }
+
+    @Override
+    public void notifyRefresh() {
+        updateButtons();
+    }
+
+    @Override
+    public void notifyPaymentAdded(BigDecimal value) {
+        updateButtons();
+    }
+
+    @Override
+    public void notifyWindowClosed(Object screen) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void notifyInvalidCardRead(Card card) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void notifyReset() {
+        updateButtons();
+    }
+
+    @Override
+    public JPanel getPanel() {
+        return this;
+    }
+
+    @Override
+    public JFrame getFrame() {
+        throw new UnsupportedOperationException("This object doesn't have a JFrame");
+    }
+
+    @Override
+    public void configure(ITouchScreen touchScreen) {
+
+    }
 }

@@ -45,6 +45,7 @@ import utils.Pair;
 import javax.swing.*;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.sql.SQLOutput;
 import java.util.*;
 
 /**
@@ -102,11 +103,11 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 		this.om = new OrderManager(this, leniency);
 		this.am = new AttendantManager(this);
 
-		// creating the GUI
-		msf = new MainScreenForm(this);
-
 		// setting the initial state
 		setState(SessionStatus.NORMAL);
+
+		// creating the GUI
+		msf = new MainScreenForm(this);
 	}
 
 	@Override
@@ -253,6 +254,9 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 
 			// inserting the card
 			this.pm.insertCard(card, pin);
+
+			// removing the card
+			removeCard();
 		} catch (IOException e) {
 			notifyInvalidCardRead(card);
 		} finally {
@@ -278,7 +282,6 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 		} finally {
 			checkPaid();
 		}
-
 	}
 	
 	@Override
@@ -379,6 +382,8 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 		// setting the state
 		this.state = state;
 
+		System.out.println("State: " + state);
+
 		// publishing the state
 		notifyStateChange(state);
 	}
@@ -461,6 +466,10 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 		}
 
 		this.pm.printReceipt(type, card);
+
+		machine.getPrinter().cutPaper();
+
+		System.out.println("Receipt:\n" + machine.getPrinter().removeReceipt());
 	}
 
 	@Override
@@ -549,22 +558,21 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 
 	@Override
 	public boolean isBlocked() {
-		return getState() == SessionStatus.BLOCKED;
+		return getState().equals(SessionStatus.BLOCKED);
 	}
 
 	@Override
 	public boolean isUnblocked() {
-		return getState() == SessionStatus.NORMAL;
+		return getState().equals(SessionStatus.NORMAL);
 	}
 
 	@Override
 	public boolean isPaid() {
-		return getState() == SessionStatus.PAID;
+		return getState().equals(SessionStatus.PAID);
 	}
 
 	@Override
 	public void disableMachine() {
-		// TODO make this method actually do something
 		if (disabledRequest) {
 			setState(SessionStatus.DISABLED);
 		}
@@ -660,19 +668,45 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	}
 
 	@Override
+	public boolean isCoinsLow() {
+		return am.isCoinsLow();
+	}
+
+	@Override
+	public boolean isBanknotesLow() {
+		return am.isBanknotesLow();
+	}
+
+	@Override
+	public boolean isCoinsFull() {
+		return am.isCoinsFull();
+	}
+
+	@Override
+	public boolean isBanknotesFull() {
+		return am.isBanknotesFull();
+	}
+
+	@Override
 	public boolean isDisabled() {
 		return getState() == SessionStatus.DISABLED;
 	}
 
 	@Override
 	public void reset() {
+		// setting state
+		setState(SessionStatus.NORMAL);
+
 		// resetting the managers
 		am.reset();
 		pm.reset();
 		om.reset();
 
 		// resetting self
-		setState(SessionStatus.NORMAL);
+		disableMachine();
+
+		// resetting listeners
+		notifyReset();
 	}
 
 	@Override
@@ -711,9 +745,9 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	}
 
 	@Override
-	public void notifyPaymentWindowClosed() {
+	public void notifyWindowClosed(Object screen) {
 		for (ISystemManagerNotify observer : observers) {
-			observer.notifyPaymentWindowClosed();
+			observer.notifyWindowClosed(screen);
 		}
 	}
 
@@ -721,6 +755,13 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	public void notifyInvalidCardRead(Card card) {
 		for (ISystemManagerNotify observer : observers) {
 			observer.notifyInvalidCardRead(card);
+		}
+	}
+
+	@Override
+	public void notifyReset() {
+		for (ISystemManagerNotify observer : observers) {
+			observer.notifyReset();
 		}
 	}
 }

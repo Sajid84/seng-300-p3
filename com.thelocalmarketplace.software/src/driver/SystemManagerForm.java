@@ -69,6 +69,7 @@ public class SystemManagerForm implements IScreen {
     private PaymentSimualtorGui paymentGui;
     private final DebugForm debug;
     private final AddItemGUI addItem;
+    private final MainScreenForm parent;
 
     // TABLE HEADERS
     private final String nameColumn = "Name";
@@ -81,9 +82,10 @@ public class SystemManagerForm implements IScreen {
     };
 
 
-    public SystemManagerForm(SystemManager sm) {
+    public SystemManagerForm(SystemManager sm, MainScreenForm parent) {
         // copying the system manager reference
         this.sm = sm;
+        this.parent = parent;
 
         // creating the other views
         debug = new DebugForm(sm);
@@ -191,6 +193,7 @@ public class SystemManagerForm implements IScreen {
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Exiting the session.");
+                parent.changeView(parent.landing_name);
             }
         });
     }
@@ -224,7 +227,10 @@ public class SystemManagerForm implements IScreen {
      * item check boxes.
      */
     protected void updateRemoveItemButtonState() {
-        // TODO edge case where adding the first item doesn't scan properly
+        if (sm.isBlocked()) {
+            removeItemButton.setEnabled(true);
+            return;
+        }
 
         // enabling the buttom if there is at least one item in the order
         removeItemButton.setEnabled(!sm.getItems().isEmpty());
@@ -358,11 +364,7 @@ public class SystemManagerForm implements IScreen {
                 determineCause();
             }
             case PAID -> {
-                /**
-                 * For reasons that I cannot comprehend, this doesn't actually work.
-                 */
-                System.out.println("The session has been paid for.");
-                blockButtons();
+                parent.changeView(parent.landing_name);
             }
             case DISABLED -> {
                 // TODO implement the disabled state
@@ -387,7 +389,7 @@ public class SystemManagerForm implements IScreen {
     }
 
     @Override
-    public void notifyPaymentWindowClosed() {
+    public void notifyWindowClosed(Object screen) {
         unblockButtons();
         updateButtonStates();
     }
@@ -395,6 +397,14 @@ public class SystemManagerForm implements IScreen {
     @Override
     public void notifyInvalidCardRead(Card card) {
         // do nothing here
+    }
+
+    @Override
+    public void notifyReset() {
+        unblockButtons();
+        updateButtonStates();
+        updateTable();
+        updatePriceLabel();
     }
 
     protected void determineCause() {

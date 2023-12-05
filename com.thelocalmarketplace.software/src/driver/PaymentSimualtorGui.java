@@ -27,6 +27,7 @@ import com.jjjwelectronics.card.Card;
 import com.jjjwelectronics.screen.ITouchScreen;
 import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
+import enums.PaymentType;
 import managers.SystemManager;
 import enums.SessionStatus;
 import managers.interfaces.IScreen;
@@ -68,7 +69,8 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
     private JPanel ReciptPanel;
     private JCheckBox ReciptCheckbox;
     
-    public boolean wantRecipt = false;
+    public boolean wantReceipt = false;
+    private PaymentType type = PaymentType.CARD;
 
     @Override
     public JPanel getPanel() {
@@ -134,6 +136,7 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Swiping a card.");
+                type = PaymentType.CARD;
                 sm.swipeCard(simulatedCard);
                 updateMoneyLabels();
             }
@@ -146,9 +149,10 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                //sm.tapCard(SimulatedCard); TODO: get actual implementation
+                System.out.println("Tapping a card.");
+                type = PaymentType.CARD;
+                sm.tapCard(simulatedCard);
                 updateMoneyLabels();
-
             }
         });
         CardPanel.add(TapCardButton);
@@ -159,9 +163,9 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                //sm.insertCard(SimulatedCard); TODO: get actual implementation
+                type = PaymentType.CARD;
+                sm.insertCard(simulatedCard, CardHelper.PIN);
             	updateMoneyLabels();
-
             }
         });
         CardPanel.add(InsertCardButton);
@@ -191,6 +195,7 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
             @Override
             public void actionPerformed(ActionEvent e) {
                 BigDecimal denom = stringToCoinDenom.get(CoinValueDropdown.getSelectedItem());
+                type = PaymentType.CASH;
                 sm.insertCoin(new Coin(Currency.getInstance("CAD"), denom));
                 System.out.println("Inserted a coin of value: " + denom.toString());
                 updateMoneyLabels();
@@ -219,10 +224,10 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
             @Override
             public void actionPerformed(ActionEvent e) {
                 BigDecimal denom = stringToBanknoteDenom.get(CashValueDropdown.getSelectedItem());
+                type = PaymentType.CASH;
                 sm.insertBanknote(new Banknote(Currency.getInstance("CAD"), denom));
                 System.out.println("Inserted a banknote of value: " + denom.toString());
                 updateMoneyLabels();
-
             }
         });
         CashPanel.add(InsertBanknoteButton);
@@ -243,6 +248,12 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
         ReciptCheckbox = new JCheckBox("Would you like a recipt?");
         ReciptCheckbox.setActionCommand("ReciptCheckbox");
         ReciptPanel.add(ReciptCheckbox);
+        ReciptCheckbox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                wantReceipt = !wantReceipt;
+            }
+        });
         
         updateMoneyLabels();
 
@@ -250,7 +261,7 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
-                sm.notifyPaymentWindowClosed();
+                sm.notifyWindowClosed(this);
             }
         });
     }
@@ -282,7 +293,10 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
 
     @Override
     public void notifyStateChange(SessionStatus state) {
-        if (sm.isPaid() || sm.isDisabled()) {
+        if (sm.isPaid()) {
+            if (wantReceipt) {
+                sm.printReceipt(type, simulatedCard);
+            }
             this.dispose();
         }
     }
@@ -298,7 +312,7 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
     }
 
     @Override
-    public void notifyPaymentWindowClosed() {
+    public void notifyWindowClosed(Object screen) {
         // does nothing
     }
 
@@ -307,4 +321,8 @@ public class PaymentSimualtorGui extends JFrame implements IScreen {
         // TODO update some feedback label
     }
 
+    @Override
+    public void notifyReset() {
+        this.dispose();
+    }
 }

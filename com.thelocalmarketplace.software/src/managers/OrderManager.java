@@ -47,6 +47,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class OrderManager implements IOrderManager, IOrderManagerNotify {
@@ -530,16 +531,20 @@ public class OrderManager implements IOrderManager, IOrderManagerNotify {
 
     @Override
     public void reset() {
+        // creating a copy of the list
+        List<Pair<Item, Boolean>> collection = new ArrayList<>();
+        collection.addAll(items);
+
+        // removing the items from the bagging area
+        for (Pair<Item, Boolean> p : collection) {
+            removeItemFromOrder(p);
+        }
+
+        // resetting everything else
         resetWeightAdjustment();
+        items = new ArrayList<>();
         actualWeight = BigDecimal.ZERO;
         bagItem = true;
-        items = new ArrayList<>();
         last_item = null;
     }
-
-	public void notifyKeyHasBeenPressed(String label) {
-		// TODO Auto-generated method stub
-		
-	}
-
 }

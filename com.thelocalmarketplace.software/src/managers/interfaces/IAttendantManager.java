@@ -108,4 +108,32 @@ public interface IAttendantManager extends IManager {
      * @return true if low, false otherwise
      */
     boolean isBagsLow();
+
+    /**
+     * This method checks if the coins in any of the dispensers are low.
+     *
+     * @return true if there is at least one dispenser that is low, false otherwise
+     */
+    boolean isCoinsLow();
+
+    /**
+     * This method checks if the banknotes in any of the dispensers are low.
+     *
+     * @return true if there is at least one dispenser that is low, false otherwise
+     */
+    boolean isBanknotesLow();
+
+    /**
+     * This method checks if the coins in the coin storage unit is full or close to full.
+     *
+     * @return true if full or close to full, false otherwise
+     */
+    boolean isCoinsFull();
+
+    /**
+     * This method checks if the banknotes in the banknote storage unit is full or close to full.
+     *
+     * @return true if full or close to full, false otherwise
+     */
+    boolean isBanknotesFull();
 }

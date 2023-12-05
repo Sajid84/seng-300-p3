@@ -47,7 +47,7 @@ public class EventPanel extends JPanel {
 	 * 
 	 * visually represents an event from the customer station.
 	 */
-	public EventPanel(AttendantViewGUI avgui,String event) {
+	public EventPanel(AttendantViewGUI avgui, String event) {
 		this.self = this;
 		this.avgui = avgui;
 		setMinimumSize(new Dimension(200, 50));
@@ -74,7 +74,5 @@ public class EventPanel extends JPanel {
 				avgui.removeEvent(self);
 			}});
 		add(ResolveIssueButton);
-
 	}
-
 }

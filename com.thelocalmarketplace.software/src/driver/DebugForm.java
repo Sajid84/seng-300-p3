@@ -172,13 +172,18 @@ public class DebugForm implements IScreen {
     }
 
     @Override
-    public void notifyPaymentWindowClosed() {
-        // do nothing with this
+    public void notifyWindowClosed(Object screen) {
+        updateLabels();
     }
 
     @Override
     public void notifyInvalidCardRead(Card card) {
-        // do nothing here
+        updateLabels();
+    }
+
+    @Override
+    public void notifyReset() {
+        updateLabels();
     }
 
     {

@@ -66,11 +66,16 @@ public interface ISystemManagerNotify {
     /**
      * This notifies all listeners that the payment window has closed.
      */
-    void notifyPaymentWindowClosed();
+    void notifyWindowClosed(Object screen);
 
     /**
      * This notifies all listeners that there was an issue reading data from the inserted card.
      */
     void notifyInvalidCardRead(Card card);
+
+    /**
+     * Notifies all listeners to reset themselves.
+     */
+    void notifyReset();
 
 }

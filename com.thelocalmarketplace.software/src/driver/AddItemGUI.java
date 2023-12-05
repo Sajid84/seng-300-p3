@@ -183,7 +183,7 @@ public class AddItemGUI extends JPanel implements IScreen {
     }
 
     @Override
-    public void notifyPaymentWindowClosed() {
+    public void notifyWindowClosed(Object screen) {
         // TODO Auto-generated method stub
 
     }
@@ -191,6 +191,11 @@ public class AddItemGUI extends JPanel implements IScreen {
     @Override
     public void notifyInvalidCardRead(Card card) {
         // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void notifyReset() {
 
     }
 

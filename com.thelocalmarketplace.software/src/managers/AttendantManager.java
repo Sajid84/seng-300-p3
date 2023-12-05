@@ -32,13 +32,18 @@ import com.tdc.banknote.IBanknoteDispenser;
 import com.tdc.coin.Coin;
 import com.tdc.coin.CoinStorageUnit;
 import com.tdc.coin.ICoinDispenser;
+import com.thelocalmarketplace.hardware.AttendantStation;
 import com.thelocalmarketplace.hardware.ISelfCheckoutStation;
+import com.thelocalmarketplace.hardware.SelfCheckoutStationBronze;
+import driver.AttendantViewGUI;
 import enums.ScanType;
 import enums.SessionStatus;
 import managers.interfaces.IAttendantManager;
 import managers.interfaces.IAttendantManagerNotify;
 import observers.attendant.*;
+import powerutility.PowerGrid;
 
+import javax.swing.*;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -59,6 +64,8 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	protected CoinStorageMonitor csu;
 	protected BanknoteStorageMonitor bsu;
 	protected BagMonitor bm;
+	protected AttendantStation station;
+	protected AttendantViewGUI gui;
 
 	// vars
 	protected boolean hasPaper = false;
@@ -72,7 +79,6 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	protected boolean banknoteStorageUnitFull = false;
 
 	public AttendantManager(SystemManager sm) {
-
 		// checking arguments
 		if (sm == null) {
 			throw new IllegalArgumentException("the system manager cannot be null");
@@ -86,6 +92,24 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	public void configure(ISelfCheckoutStation machine) {
 		// saving reference
 		this.machine = machine;
+
+		/// creating the gui
+
+		// creating the station
+		station = new AttendantStation();
+		station.plugIn(PowerGrid.instance());
+		station.turnOn();
+
+		// creating the gui
+		gui = new AttendantViewGUI(sm, this);
+
+		// configuring the frame (why is it undecorated)
+		JFrame frame = station.screen.getFrame();
+		frame.setVisible(false);
+		frame.setContentPane(gui);
+		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		frame.setSize(800, 600);
+		frame.setVisible(true);
 
 		/// initializing the maps
 
@@ -129,14 +153,12 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 
 	@Override
 	public void signalForAttendant() {
-		// TODO Auto-generated method stub
-
+		machine.setSupervisor(station);
 	}
 
 	@Override
 	public void notifyAttendant(String reason) {
-		// TODO replace this with a GUI
-		System.out.printf("[ATTENDANT NOTIFY]: %s\n", reason);
+		gui.AddEvent(reason);
 	}
 
 	@Override
@@ -552,6 +574,32 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 	@Override
 	public boolean isBagsLow() {
 		return bagsLow;
+	}
+
+	@Override
+	public boolean isCoinsLow() {
+		for (Boolean low : coinDispenserLow.values()) {
+			if (low) return low;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean isBanknotesLow() {
+		for (Boolean low : banknoteDispenserLow.values()) {
+			if (low) return low;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean isCoinsFull() {
+		return coinStorageUnitFull;
+	}
+
+	@Override
+	public boolean isBanknotesFull() {
+		return banknoteStorageUnitFull;
 	}
 
 	/**
