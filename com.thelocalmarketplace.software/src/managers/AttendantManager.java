@@ -101,7 +101,7 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 		station.turnOn();
 
 		// creating the gui
-		gui = new AttendantViewGUI(sm, this);
+		gui = new AttendantViewGUI(sm);
 
 		// configuring the frame (why is it undecorated)
 		JFrame frame = station.screen.getFrame();
@@ -365,9 +365,13 @@ public class AttendantManager implements IAttendantManager, IAttendantManagerNot
 			}
 		}
 	}
+
+	@Override
 	public boolean isInkLow() {
 		return inkLow;
 	}
+
+	@Override
 	public boolean isPaperLow() {
 		return paperLow;
 	}

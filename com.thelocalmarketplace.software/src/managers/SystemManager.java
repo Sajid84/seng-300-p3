@@ -304,7 +304,7 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	}
 
 	@Override
-	public List<Pair<Item, Boolean>> getItems() throws NullPointerSimulationException {
+	public List<Pair<Item, Boolean>> getItems() {
 		return this.om.getItems();
 	}
 
@@ -685,6 +685,16 @@ public class SystemManager implements IScreen, ISystemManager, IPaymentManager, 
 	@Override
 	public boolean isBanknotesFull() {
 		return am.isBanknotesFull();
+	}
+
+	@Override
+	public boolean isInkLow() {
+		return am.isInkLow();
+	}
+
+	@Override
+	public boolean isPaperLow() {
+		return am.isPaperLow();
 	}
 
 	@Override

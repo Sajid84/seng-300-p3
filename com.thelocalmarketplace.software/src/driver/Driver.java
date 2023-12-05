@@ -63,7 +63,6 @@ public class Driver {
 
     // vars
     protected BigDecimal leniency = BigDecimal.ONE;
-    protected Card card;
     protected JFrame gui;
 
     // denominations
@@ -81,7 +80,6 @@ public class Driver {
 
         // creating the vars for the system manager
         cardIssuer = CardHelper.createCardIssuer();
-        card = CardHelper.createCard(cardIssuer);
 
         // creating the system manager
         this.system = new SystemManager(cardIssuer, leniency);

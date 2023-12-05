@@ -136,4 +136,18 @@ public interface IAttendantManager extends IManager {
      * @return true if full or close to full, false otherwise
      */
     boolean isBanknotesFull();
+
+    /**
+     * This method checks if the ink in the printer is low.
+     *
+     * @return true if low, false otherwise
+     */
+    boolean isInkLow();
+
+    /**
+     * This method checks if the paper in the printer is low.
+     *
+     * @return true if low, false otherwise
+     */
+    boolean isPaperLow();
 }

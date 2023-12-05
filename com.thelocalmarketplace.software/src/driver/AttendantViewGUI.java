@@ -40,7 +40,6 @@ import java.math.BigDecimal;
 public class AttendantViewGUI extends JPanel implements IScreen {
 
     private static final long serialVersionUID = 1L;
-    private final AttendantManager am;
     private SystemManager sm;
     private JButton FillInkButton;
     private JButton EnableMachineButton;
@@ -57,9 +56,8 @@ public class AttendantViewGUI extends JPanel implements IScreen {
     /**
      * Create the panel.
      */
-    public AttendantViewGUI(SystemManager sm, AttendantManager am) {
+    public AttendantViewGUI(SystemManager sm) {
         this.sm = sm;
-        this.am = am;
 
         // attaching for events
         sm.attach(this);
@@ -150,7 +148,6 @@ public class AttendantViewGUI extends JPanel implements IScreen {
             @Override
             public void actionPerformed(ActionEvent e) {
                 AttendantViewGUI.this.sm.maintainCoinStorage();
-
             }
 
         });
@@ -163,9 +160,7 @@ public class AttendantViewGUI extends JPanel implements IScreen {
             public void actionPerformed(ActionEvent e) {
                 AttendantViewGUI.this.sm.maintainBanknoteDispensers();
                 FillBanknotesButton.setEnabled(false);
-
             }
-
         });
         FillBanknotesButton.setEnabled(false);
         ButtonPanel.add(FillBanknotesButton);
@@ -196,7 +191,7 @@ public class AttendantViewGUI extends JPanel implements IScreen {
         FillBagsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                am.maintainBags();
+                sm.maintainBags();
                 notifyRefresh();
             }
 
@@ -225,13 +220,13 @@ public class AttendantViewGUI extends JPanel implements IScreen {
     }
 
     protected void updateButtons() {
-        FillInkButton.setEnabled(am.isInkLow());
-        FillPaperButton.setEnabled(am.isPaperLow());
-        FillCoinsButton.setEnabled(am.isCoinsLow());
-        FillBanknotesButton.setEnabled(am.isBanknotesLow());
-        FillBagsButton.setEnabled(am.isBagsLow());
-        UnloadCoinsButton.setEnabled(am.isCoinsFull());
-        UnloadBanknotesButton.setEnabled(am.isBanknotesFull());
+        FillInkButton.setEnabled(sm.isInkLow());
+        FillPaperButton.setEnabled(sm.isPaperLow());
+        FillCoinsButton.setEnabled(sm.isCoinsLow());
+        FillBanknotesButton.setEnabled(sm.isBanknotesLow());
+        FillBagsButton.setEnabled(sm.isBagsLow());
+        UnloadCoinsButton.setEnabled(sm.isCoinsFull());
+        UnloadBanknotesButton.setEnabled(sm.isBanknotesFull());
     }
 
     @Override
